@@ -264,6 +264,15 @@ def classify_book(
             )
             results_by_page[page] = result
             print(f"ok  {book} p-{page:03d} → {result.page_kind.value} unit={result.unit}")
+            # Persist after each page so long full-book runs survive interruption.
+            pages_sorted = [results_by_page[p] for p in sorted(results_by_page)]
+            index = PagesIndex(
+                book=book,
+                model=model,
+                created_at=datetime.now(timezone.utc).isoformat(),
+                pages=pages_sorted,
+            )
+            dest.write_text(index.model_dump_json(indent=2), encoding="utf-8")
         except Exception as exc:  # noqa: BLE001 — log and continue per page
             append_failure(
                 {
