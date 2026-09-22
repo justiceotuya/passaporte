@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { StimulusImage } from "@/components/StimulusImage";
 import type { ReviewQueueItem } from "@/lib/content-review";
 import type { ReviewStatus } from "@/types/item";
 
@@ -111,6 +112,12 @@ export function AdminReviewBoard({ initialItems, bypass = false }: Props) {
       </p>
 
       <div className="card-surface space-y-4 p-5">
+        {current.stimulus_image ? (
+          <StimulusImage
+            src={current.stimulus_image}
+            alt={`Stimulus for ${current.id}`}
+          />
+        ) : null}
         <p className="book-text">{current.instruction}</p>
         {editPrompt ? (
           <label className="flex flex-col gap-2">

@@ -16,6 +16,7 @@ export type ReviewQueueItem = Pick<
   | "answer"
   | "options"
   | "hint_en"
+  | "stimulus_image"
   | "review"
 >;
 
@@ -49,6 +50,7 @@ export function listReviewQueue(status: ReviewStatus = "pending"): ReviewQueueIt
         answer: item.answer,
         options: item.options,
         hint_en: item.hint_en,
+        stimulus_image: item.stimulus_image,
         review: item.review,
       });
     }
