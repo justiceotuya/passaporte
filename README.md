@@ -34,8 +34,9 @@ cd pipeline && uv sync && cd ..
 # PDFs (if raw/pdf missing)
 mkdir -p raw && ln -sfn ../../raw/pdf raw/pdf
 
-# Convex (interactive login once per machine)
-cd apps/web && npx convex login && npx convex dev
+# Convex — must run from apps/web (or use root script). Not from monorepo root.
+pnpm web:convex
+# first time: cd apps/web && pnpm exec convex login && pnpm exec convex dev
 # See apps/web/convex/README.md for env vars
 ```
 

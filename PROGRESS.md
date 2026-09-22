@@ -3,7 +3,7 @@
 **Last updated:** 2026-09-22  
 **Owner:** Justice  
 **Status:** Convex schema + progress bridge wired; Better Auth still on SQLite until `convex login`  
-**Next:** `npx convex login` + adapter cutover · gold review · remaining item types
+**Next:** `pnpm web:convex` (login once) + adapter cutover · gold review · remaining item types
 
 ---
 
@@ -39,7 +39,7 @@ Open signup · player-first · Zustand progress · Better Auth+SQLite (Convex ad
 
 ## Remaining
 
-- [ ] Run `npx convex login` + `npx convex dev`; cut Better Auth routes to Convex adapter
+- [ ] Run `cd apps/web && pnpm exec convex login && pnpm exec convex dev` (or `pnpm web:convex`); cut Better Auth routes to Convex adapter
 - [ ] Gold review · unit-map cleanup · raise teacher_book rate · better extract bboxes
 - [ ] Player: `order`, `transform`, `listen_choice`
 - [ ] Review queue · stats · hearts · admin · PostHog
@@ -55,8 +55,9 @@ pnpm pipeline:test
 pnpm web
 
 # Convex (first time — interactive login required)
-cd apps/web && npx convex login && npx convex dev
-# then fill NEXT_PUBLIC_CONVEX_* from .env.local — see apps/web/convex/README.md
+cd apps/web && pnpm exec convex login && pnpm exec convex dev
+# or from root: pnpm web:convex — see apps/web/convex/README.md
+# then fill NEXT_PUBLIC_CONVEX_* from .env.local
 ```
 
 ---
@@ -91,7 +92,7 @@ You are continuing **Passaporte** (gamified A1 Portuguese app).
 - Player: choice, true_false, fill_blank, match + stimulus_image
 
 ## Current focus
-1. `npx convex login` + `npx convex dev` → switch auth routes to Convex adapter
+1. `cd apps/web && pnpm exec convex login && pnpm exec convex dev` (or `pnpm web:convex`) → switch auth routes to Convex adapter
 2. Gold review / unit-map cleanup
 3. Remaining types: order, transform, listen_choice
 

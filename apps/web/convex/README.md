@@ -4,17 +4,26 @@ Progress, sessions, attempts, and (after cutover) Better Auth live here.
 
 ## First-time setup
 
+`convex` is a dependency of `@passaporte/web` (`apps/web/package.json`). Always run the CLI from **`apps/web`** (or via the root `pnpm web:convex` script). Do **not** run `npx convex` from the monorepo root — root `package.json` has no `convex` dependency, and the CLI will exit with:
+
+> In order to run `npx convex dev`, add `convex` to your package.json dependencies.
+
 ```bash
+# from monorepo root
+pnpm install
+pnpm web:convex
+# or explicitly:
 cd apps/web
-npx convex login          # interactive — required once per machine
-npx convex dev            # creates deployment, writes .env.local, codegen
+pnpm exec convex login   # interactive — required once per machine
+pnpm exec convex dev     # creates deployment, writes .env.local, codegen
 ```
 
 Then set Convex env vars (CLI will prompt / you can set explicitly):
 
 ```bash
-npx convex env set SITE_URL http://localhost:3000
-npx convex env set BETTER_AUTH_SECRET "$(openssl rand -base64 32)"
+cd apps/web
+pnpm exec convex env set SITE_URL http://localhost:3000
+pnpm exec convex env set BETTER_AUTH_SECRET "$(openssl rand -base64 32)"
 ```
 
 Copy into repo-root `.env.local` (gitignored) whatever `convex dev` prints:
@@ -39,7 +48,9 @@ https://labs.convex.dev/better-auth/framework-guides/next
 ## Regenerating types
 
 ```bash
-npx convex codegen
+cd apps/web
+pnpm exec convex codegen
+# or: pnpm convex:codegen
 ```
 
 Commit `convex/_generated/` when it changes.
