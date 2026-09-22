@@ -2,8 +2,8 @@
 
 **Last updated:** 2026-09-22  
 **Owner:** Justice  
-**Status:** Classify calibration live (aluno 10–40) · full rasters · player + e2e green  
-**Next:** Classify professor calibration +/or full aluno; then `extract.py`. Convex swap still open on app track.
+**Status:** Classify aluno+professor 10–40 · extract smoke aluno 10–12 · rasters full · player e2e green  
+**Next:** `extract_key.py` for professor, or expand extract to aluno 10–40; then `join.py`
 
 ---
 
@@ -55,8 +55,10 @@ See earlier table: open signup · player-first · Zustand progress · Better Aut
 - [x] Live `rasterize.py` pages 10–40 (aluno + professor)
 - [x] Full rasterize all pages — aluno (258), professor (207), valer (245)
 - [x] `classify.py` + calibration run aluno pages 10–40 → `extracted/passaporte-aluno/pages.json`
-- [ ] Convex + Better Auth Convex adapter; remove SQLite auth + localStorage progress
-- [ ] Classify professor 10–40 / expand classify; then `extract.py`
+- [x] Classify professor pages 10–40 → `extracted/passaporte-professor/pages.json`
+- [x] `extract.py` + smoke aluno pages 10–12 → `extracted/passaporte-aluno/<run_id>/`
+- [ ] Expand extract to aluno 10–40; `extract_key.py` for professor
+- [ ] `join.py` · Convex swap (app track)
 
 ### Still later
 
@@ -103,6 +105,8 @@ uv run python rasterize.py --book passaporte-aluno --pages 10-40
 | 2026-09-22 | 2 raster full | `bash scripts/rasterize-all.sh` (all pages × 3 books) | PASS — 258+207+245 pages + thumbs; ~1.35 GB gitignored |
 | 2026-09-22 | 2 classify | `uv run pytest tests/test_classify.py` | PASS |
 | 2026-09-22 | 2 classify live | `classify.py --book passaporte-aluno --pages 10-40` | PASS — 31/31 → `extracted/passaporte-aluno/pages.json` |
+| 2026-09-22 | 2 classify live | `classify.py --book passaporte-professor --pages 10-40` | PASS — 31/31 → `extracted/passaporte-professor/pages.json` |
+| 2026-09-22 | 2 extract | `pytest tests/test_extract.py` + `extract.py --pages 10-12` | PASS — 14 tests; 3 pages / 20 items extracted |
 | 2026-09-22 | 2 raster full | `scripts/rasterize-all.sh` (aluno, professor, valer, all pages) | PASS — 258+207+245 pages + thumbs; ~1.3 GB gitignored |
 
 ---
@@ -130,14 +134,15 @@ You are continuing **Passaporte** (gamified A1 Portuguese app).
 - **Git:** commit + push after every stage (`origin` = https://github.com/justiceotuya/passaporte)
 
 ## Current focus
-1. Continue pipeline: classify professor 10–40, then `extract.py` for exercise pages
-2. Or app: Convex + Better Auth Convex adapter
-3. Anthropic key is active in local `.env` (never commit). Classify model default: `claude-haiku-4-5-20251001` (override with `ANTHROPIC_CLASSIFY_MODEL`)
+1. Expand `extract.py` to aluno pages 10–40, then build `extract_key.py` for professor answer pages
+2. Then `join.py` → draft unit JSON for gold review
+3. App track still open: Convex + Better Auth adapter
 
 ## Commands
-- `cd pipeline && uv run python classify.py --book passaporte-aluno --pages 10-40`
-- `pnpm web:test` · `pnpm web:e2e` · `pnpm pipeline:test` · `pnpm web`
-- After each stage: commit + `git push -u origin HEAD`
+- `cd pipeline && uv run python classify.py --book passaporte-professor --pages 10-40`
+- `cd pipeline && uv run python extract.py --book passaporte-aluno --pages 10-12`
+- Extract outputs: `extracted/<book>/<run_id>/p-NNN.json` (never overwritten; gitignored)
+- After each stage: commit + `git push`
 
 ## Definition of done for your session
 Update PROGRESS.md + test log; rewrite Current focus / Next actions in this handover block.

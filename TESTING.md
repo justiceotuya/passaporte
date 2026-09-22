@@ -50,11 +50,11 @@ Run commands will be filled in as packages are scaffolded. Until then, use the *
 
 **Exit suite (must stay green before any full-book run)**
 
-- [ ] **Join:** missing item, extra item, letter mismatch, page mismatch → expected report buckets
-- [ ] **Hints:** hint containing the answer string (case-insensitive, accent-normalised) is rejected
-- [x] **Classify (calibration):** aluno pages 10–40 → `extracted/passaporte-aluno/pages.json` (31 pages, 2026-09-22)
+- [x] **Classify (calibration):** aluno + professor pages 10–40 → `pages.json`
+- [x] **Extract (smoke):** aluno pages 10–12 → `extracted/passaporte-aluno/<run_id>/`
 - [x] **Rasterize (full):** all pages, all three books
-- [ ] **Calibrate extract accuracy** vs gold once extract exists
+- [ ] **Extract (calibration):** aluno 10–40
+- [ ] **extract_key / join / hints**
 - [ ] Failed pages append to `failures.jsonl` and do not invent answers
 
 **Run (example):** `make calibrate` + `pytest pipeline/tests/`
