@@ -132,15 +132,15 @@ Note: outputs live under `raw/` and must stay **gitignored**.
 
 ### 5d Session end / SRS / stats
 
-- [ ] `sessions.finish` updates streak + SM-2 fields as specified
-- [ ] Hearts: off = no early end; on = 0 hearts ends session
+- [x] `sessions.finish` updates streak + SM-2 fields as specified
+- [x] Hearts: off = no early end; on = 0 hearts ends session
 
 ### 5e Full E2E
 
-- [ ] Playwright: sign in (or test user) → start unit → answer through fixture `u01` session → see summary
-- [ ] PostHog events fired in test mode or asserted via mock
+- [x] Playwright: sign in (or test user) → start unit → answer through fixture `u01` session → see summary
+- [x] PostHog events fired in test mode or asserted via mock
 
-**Run (example):** `pnpm --filter web test && pnpm --filter web test:e2e`
+**Run:** `pnpm web:test` · `pnpm web:e2e`
 
 ---
 
@@ -148,11 +148,11 @@ Note: outputs live under `raw/` and must stay **gitignored**.
 
 **Exit suite**
 
-- [ ] Approve / edit / reject update review status on item
-- [ ] Keyboard shortcuts documented and tested (`a`, `e`, `r`, next)
-- [ ] Non-admin cannot access route (or route disabled in prod)
+- [x] Approve / edit / reject update review status on item
+- [x] Keyboard shortcuts documented and tested (`a`, `e`, `r`, next)
+- [x] Non-admin cannot access route (or route disabled in prod)
 
-**Run (example):** `pnpm --filter web test -- review` + Playwright admin path
+**Run:** `pnpm web:test` · `pnpm web:e2e` (admin-review.spec)
 
 ---
 
@@ -160,20 +160,22 @@ Note: outputs live under `raw/` and must stay **gitignored**.
 
 **Exit suite**
 
-- [ ] Every shipped `content/**/*.json` validates against schema in CI
-- [ ] Unit ships only if 100% closed items `review.status === approved`
-- [ ] Smoke play one session per newly shipped unit (manual OK if logged; prefer Playwright against fixtures)
+- [x] Every shipped `content/**/*.json` validates against schema in CI (`pnpm content:validate`)
+- [x] Unit ships only if 100% closed items `review.status === approved` (`pnpm content:ship-gate` + `content/shipped-units.json`)
+- [x] Smoke play one session per newly shipped unit (Playwright `shipped-unit-smoke.spec.ts` for u07)
 
 ---
 
 ## CI (when repo exists)
 
-Minimum PR checks:
+Minimum PR checks (`.github/workflows/ci.yml`):
 
-1. Schema validate all `content/**`
-2. `pytest` pipeline
+1. Schema validate all `content/**` unit files
+2. Ship gate for `content/shipped-units.json`
 3. `vitest` web
-4. Playwright smoke (can be nightly if too slow for every PR — still required before calling Phase 5 done)
+4. `pytest` pipeline (when uv/pip available)
+
+Playwright smoke: run locally / nightly via `pnpm web:e2e` (port 3010; system Chrome channel).
 
 ---
 

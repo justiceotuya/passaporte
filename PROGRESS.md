@@ -2,8 +2,8 @@
 
 **Last updated:** 2026-09-22  
 **Owner:** Justice  
-**Status:** Home unit map + unit detail live · all closed types playable · Convex auth ready  
-**Next:** Review queue page · stats · gold review / unit-map content cleanup
+**Status:** Phases 5d–7 complete · review/stats/settings · admin review · content ship CI  
+**Next:** Gold content cleanup · full-book pipeline approval · browser smoke Convex signup with `pnpm web:convex`
 
 ---
 
@@ -32,16 +32,18 @@ Open signup · player-first · Zustand progress · Better Auth (Convex when URL 
 | When | What |
 | --- | --- |
 | 2026-09-22 | Pipeline calibration · hints/crop · Convex · all closed item types |
-| 2026-09-22 | **Home unit map** (`/`) · **unit detail** (`/units/[n]`) · play `?unit=` · 60% unlock / 80% complete |
+| 2026-09-22 | **Home unit map** · **unit detail** · play `?unit=` · 60% unlock / 80% complete |
+| 2026-09-22 | **5d** SM-2 + hearts + analytics · **5e** /review /stats /settings + e2e |
+| 2026-09-22 | **6** `/admin/review` keyboard a/e/r/→ · gated API |
+| 2026-09-22 | **7** `content:validate` · ship gate · CI · shipped **u07** smoke |
 
 ---
 
 ## Remaining
 
-- [ ] Dedicated Review queue page (map chip already links `/play?review=1`)
-- [ ] Stats · hearts · admin · PostHog
 - [ ] Gold review · content unit-map cleanup · better bboxes
 - [ ] Browser smoke Convex signup (with `pnpm web:convex` running)
+- [ ] Failures.jsonl pipeline exit item (Phase 2 leftover)
 
 ---
 
@@ -50,8 +52,10 @@ Open signup · player-first · Zustand progress · Better Auth (Convex when URL 
 ```bash
 cd passaporte && pnpm install
 pnpm web:test
+pnpm content:validate && pnpm content:ship-gate
 pnpm web:convex
-pnpm web   # map at / · unit at /units/1 · play at /play?unit=1
+pnpm web   # map / review / stats / settings / play
+# Admin: PASSAPORTE_ADMIN_EMAILS=you@example.com  (or PASSAPORTE_ADMIN_BYPASS=1 in non-prod)
 ```
 
 ---
@@ -62,6 +66,10 @@ pnpm web   # map at / · unit at /units/1 · play at /play?unit=1
 | --- | --- | --- | --- |
 | 2026-09-22 | 5c types | vitest | PASS 46 |
 | 2026-09-22 | Home map | vitest + next build | PASS **50** · routes `/`, `/units/[unit]`, `/play` |
+| 2026-09-22 | 5d SRS/hearts | `pnpm web:test` | PASS **58** |
+| 2026-09-22 | 5e pages+e2e | `pnpm web:test` · `pnpm web:e2e` | PASS **59** unit · **4/4** e2e |
+| 2026-09-22 | 6 admin | vitest + admin e2e | PASS **68** · admin API gated |
+| 2026-09-22 | 7 ship | `pnpm content:validate` · `ship-gate` | PASS 7 units · u07 shipped |
 
 ---
 
@@ -72,9 +80,9 @@ You are continuing Passaporte.
 
 Read: PROGRESS.md, TESTING.md, apps/web/convex/README.md
 
-Done: unit map + detail; all closed item types; Convex Better Auth when URL set.
+Done through Phase 7: SM-2/hearts, review/stats/settings, admin review, content validate + ship gate (u07), CI workflow.
 
-Next: review queue page; stats; gold content cleanup.
+Next: gold content cleanup; full-book pipeline when approved; Convex signup smoke with web:convex running.
 
-Commands: pnpm web:test · pnpm web · pnpm web:convex
+Commands: pnpm web:test · pnpm content:validate · pnpm content:ship-gate · pnpm web · pnpm web:e2e · pnpm web:convex
 ```
