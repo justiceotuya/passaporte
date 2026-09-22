@@ -66,6 +66,37 @@ class ExtractedItem(BaseModel):
     needs_image: bool = False
     bbox: list[float] | None = None
 
+    @field_validator("type", mode="before")
+    @classmethod
+    def coerce_type(cls, value: object) -> object:
+        allowed = {
+            "choice",
+            "fill_blank",
+            "match",
+            "order",
+            "true_false",
+            "transform",
+            "listen_choice",
+            "open",
+        }
+        if isinstance(value, str) and value not in allowed:
+            return "open"
+        return value
+
+    @field_validator("pairs", mode="before")
+    @classmethod
+    def clean_pairs(cls, value: object) -> object:
+        if not isinstance(value, list):
+            return value
+        cleaned = []
+        for pair in value:
+            if not isinstance(pair, dict):
+                continue
+            left = str(pair.get("left") or "").strip() or "?"
+            right = str(pair.get("right") or "").strip() or "?"
+            cleaned.append({"left": left, "right": right})
+        return cleaned or None
+
     @field_validator("options", "sequence")
     @classmethod
     def non_empty_entries(cls, value: list[str] | None) -> list[str] | None:
@@ -360,6 +391,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--pages", help="e.g. 10-15 (exercise pages only)", default=None)
     parser.add_argument("--model", default=DEFAULT_MODEL)
     parser.add_argument("--sleep", type=float, default=0.2)
+    parser.add_argument(
+        "--run-id",
+        default=None,
+        help="Reuse an existing run folder (skips pages that already have JSON)",
+    )
     return parser
 
 
@@ -372,6 +408,7 @@ def main(argv: list[str] | None = None) -> int:
             pages=pages,
             model=args.model,
             sleep_s=args.sleep,
+            run_id=args.run_id,
         )
     except ExtractError as exc:
         print(f"error: {exc}", file=sys.stderr)

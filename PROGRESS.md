@@ -2,8 +2,8 @@
 
 **Last updated:** 2026-09-22  
 **Owner:** Justice  
-**Status:** Classify aluno+professor 10–40 · extract smoke aluno 10–12 · rasters full · player e2e green  
-**Next:** `extract_key.py` for professor, or expand extract to aluno 10–40; then `join.py`
+**Status:** Extract aluno 10–40 + extract_key professor 10–40 done · classify + rasters + player green  
+**Next:** `join.py` to merge exercises with keys into draft `content/` units
 
 ---
 
@@ -56,9 +56,10 @@ See earlier table: open signup · player-first · Zustand progress · Better Aut
 - [x] Full rasterize all pages — aluno (258), professor (207), valer (245)
 - [x] `classify.py` + calibration run aluno pages 10–40 → `extracted/passaporte-aluno/pages.json`
 - [x] Classify professor pages 10–40 → `extracted/passaporte-professor/pages.json`
-- [x] `extract.py` + smoke aluno pages 10–12 → `extracted/passaporte-aluno/<run_id>/`
-- [ ] Expand extract to aluno 10–40; `extract_key.py` for professor
-- [ ] `join.py` · Convex swap (app track)
+- [x] `extract.py` aluno pages 10–40 → `extracted/passaporte-aluno/20260922T163925Z-0b8f810b/` (29 pages, 301 items)
+- [x] `extract_key.py` professor pages 10–40 → `extracted/passaporte-professor/20260922T164242Z-833219b4/` (22 pages, 298 answers)
+- [ ] `join.py` → draft unit JSON for gold review
+- [ ] Convex swap (app track)
 
 ### Still later
 
@@ -107,6 +108,8 @@ uv run python rasterize.py --book passaporte-aluno --pages 10-40
 | 2026-09-22 | 2 classify live | `classify.py --book passaporte-aluno --pages 10-40` | PASS — 31/31 → `extracted/passaporte-aluno/pages.json` |
 | 2026-09-22 | 2 classify live | `classify.py --book passaporte-professor --pages 10-40` | PASS — 31/31 → `extracted/passaporte-professor/pages.json` |
 | 2026-09-22 | 2 extract | `pytest tests/test_extract.py` + `extract.py --pages 10-12` | PASS — 14 tests; 3 pages / 20 items extracted |
+| 2026-09-22 | 2 extract | `extract.py --pages 10-40 --run-id …0b8f810b` | PASS — 29 exercise pages / ~301 items |
+| 2026-09-22 | 2 extract_key | `extract_key.py --pages 10-40` | PASS — 22 key pages / 298 answers; 5 unit tests |
 | 2026-09-22 | 2 raster full | `scripts/rasterize-all.sh` (aluno, professor, valer, all pages) | PASS — 258+207+245 pages + thumbs; ~1.3 GB gitignored |
 
 ---
@@ -134,14 +137,15 @@ You are continuing **Passaporte** (gamified A1 Portuguese app).
 - **Git:** commit + push after every stage (`origin` = https://github.com/justiceotuya/passaporte)
 
 ## Current focus
-1. Expand `extract.py` to aluno pages 10–40, then build `extract_key.py` for professor answer pages
-2. Then `join.py` → draft unit JSON for gold review
-3. App track still open: Convex + Better Auth adapter
+1. Build `join.py` — match aluno extracts to professor keys on (unit, student_page, letter); write draft `content/passaporte/uNN.json` + `join_report.md`
+2. App track: Convex + Better Auth adapter (still open)
+3. Extract runs (gitignored):
+   - aluno `extracted/passaporte-aluno/20260922T163925Z-0b8f810b/`
+   - professor keys `extracted/passaporte-professor/20260922T164242Z-833219b4/`
 
 ## Commands
-- `cd pipeline && uv run python classify.py --book passaporte-professor --pages 10-40`
-- `cd pipeline && uv run python extract.py --book passaporte-aluno --pages 10-12`
-- Extract outputs: `extracted/<book>/<run_id>/p-NNN.json` (never overwritten; gitignored)
+- `cd pipeline && uv run python extract.py --book passaporte-aluno --pages 10-40 --run-id <id>`
+- `cd pipeline && uv run python extract_key.py --book passaporte-professor --pages 10-40`
 - After each stage: commit + `git push`
 
 ## Definition of done for your session

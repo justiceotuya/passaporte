@@ -51,10 +51,9 @@ Run commands will be filled in as packages are scaffolded. Until then, use the *
 **Exit suite (must stay green before any full-book run)**
 
 - [x] **Classify (calibration):** aluno + professor pages 10–40 → `pages.json`
-- [x] **Extract (smoke):** aluno pages 10–12 → `extracted/passaporte-aluno/<run_id>/`
-- [x] **Rasterize (full):** all pages, all three books
-- [ ] **Extract (calibration):** aluno 10–40
-- [ ] **extract_key / join / hints**
+- [x] **Extract (calibration):** aluno 10–40 (29 pages / ~301 items)
+- [x] **extract_key (calibration):** professor 10–40 (22 pages / 298 answers)
+- [ ] **join / hints**
 - [ ] Failed pages append to `failures.jsonl` and do not invent answers
 
 **Run (example):** `make calibrate` + `pytest pipeline/tests/`
