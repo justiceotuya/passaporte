@@ -11,7 +11,8 @@
 
 1. **Tests at every gate.** Exit suite in `TESTING.md` must be green + logged here before the next phase.
 2. Update this file at every finished milestone.
-3. Keep the handover prompt at the bottom accurate.
+3. **Commit and push after every finished stage** (once `origin` exists). Do not leave completed work only local.
+4. Keep the handover prompt at the bottom accurate.
 4. **Calibration only** for vision/PDF until Justice approves full-book run.
 5. Never commit `raw/`, `extracted/`, PDFs, page images, `*.db`, `.env*`.
 6. Design: `../templates/passaporte/` · Spec: design doc · Kuji parent = reference.
@@ -20,9 +21,11 @@
 
 ## Grill decisions (locked 2026-09-22)
 
-See earlier table: open signup · player-first · Zustand progress · Better Auth+SQLite now · MSW tests-only · Convex after Playwright · pnpm · uv · no live vision until key · invent fixtures · Google stub · local git only.
+See earlier table: open signup · player-first · Zustand progress · Better Auth+SQLite now · MSW tests-only · Convex after Playwright · pnpm · uv · no live vision until key · invent fixtures · Google stub · **commit+push every stage** (was local-only; Justice changed 2026-09-22).
 
 **MSW pin:** use `msw@2.7.x` (2.15 broke relative/path matching in our Node tests).
+
+**Git:** branch `cursor/passaporte-scaffold-player-slice` @ `98ce55c` — **push blocked** until GitHub auth (`gh auth login` or add `origin`).
 
 ---
 
@@ -104,13 +107,14 @@ You are continuing **Passaporte** (gamified A1 Portuguese app).
 5. `templates/passaporte/` — visual source of truth
 
 ## Locked architecture
-- Monorepo `passaporte/` own git root; local only until asked to push
+- Monorepo `passaporte/` own git root; **commit and push after every stage**
 - Next.js 15 · Better Auth + SQLite (`apps/web/data/auth.db`) · email/password · Google stubbed
 - Progress: Zustand + localStorage; thin `/api/progress`; MSW **tests only** (pin msw@2.7.x)
 - Convex deferred until Playwright proves one full fixture session
 - Content fixture: `content/passaporte/u01.json`
 - Pipeline: `rasterize.py` done; no Anthropic/vision until user adds key to `.env`
 - Open signup; English chrome; Portuguese in Source Serif 4 (book voice)
+- **Push blocker:** `gh` not logged in — run `gh auth login`, then `git push -u origin HEAD` from `cursor/passaporte-scaffold-player-slice`
 
 ## Current focus
 1. Add Playwright e2e: create account → /play → complete choice/true_false session → summary
