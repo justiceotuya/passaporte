@@ -154,3 +154,44 @@ export function gradeMatch(
     accentOnlyMiss: false,
   };
 }
+
+export function gradeOrder(
+  given: string[],
+  expected: string[],
+  attemptNo: number,
+  revealed = false,
+): GradeResult {
+  if (revealed) {
+    return { correct: false, xp: 0, accentOnlyMiss: false };
+  }
+  if (given.length !== expected.length) {
+    return { correct: false, xp: 0, accentOnlyMiss: false };
+  }
+  const correct = given.every(
+    (value, index) => normaliseAnswer(value) === normaliseAnswer(expected[index]),
+  );
+  return {
+    correct,
+    xp: correct ? (attemptNo === 1 ? 10 : 5) : 0,
+    accentOnlyMiss: false,
+  };
+}
+
+export function gradeTransform(
+  given: string,
+  expected: string,
+  accepted: string[],
+  attemptNo: number,
+  revealed = false,
+): GradeResult {
+  return gradeFillBlank(given, expected, accepted, attemptNo, revealed);
+}
+
+export function gradeListenChoice(
+  given: string,
+  expected: string,
+  attemptNo: number,
+  revealed = false,
+): GradeResult {
+  return gradeChoice(given, expected, attemptNo, revealed);
+}

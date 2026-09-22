@@ -23,6 +23,24 @@ export function isPlayableItem(item: PassaporteItem): boolean {
         : (item.pairs ?? []);
     return pairs.length >= 2 && pairs.length <= MATCH_PAIR_CAP;
   }
+  if (item.type === "order") {
+    const seq =
+      Array.isArray(item.answer) && typeof item.answer[0] === "string"
+        ? (item.answer as string[])
+        : (item.sequence ?? []);
+    return seq.length >= 2;
+  }
+  if (item.type === "transform") {
+    const answer = String(item.answer ?? "").trim();
+    return Boolean(answer) && answer !== "PENDING";
+  }
+  if (item.type === "listen_choice") {
+    return (
+      Boolean(item.transcript?.trim()) &&
+      Array.isArray(item.options) &&
+      item.options.length >= 2
+    );
+  }
   return false;
 }
 

@@ -2,8 +2,8 @@
 
 **Last updated:** 2026-09-22  
 **Owner:** Justice  
-**Status:** Convex live · Better Auth cut over when `NEXT_PUBLIC_CONVEX_URL` is set  
-**Next:** Gold review / unit-map · remaining item types · verify signup against Convex in browser
+**Status:** All closed item types playable · Convex auth cutover live  
+**Next:** Gold review / unit-map · browser smoke Convex signup · review queue / stats
 
 ---
 
@@ -21,11 +21,10 @@
 
 ## Grill decisions (locked 2026-09-22)
 
-Open signup · player-first · Zustand progress · Better Auth (Convex adapter when configured; SQLite fallback) · MSW tests-only (`msw@2.7.x`) · pnpm · uv · commit+push every stage.
+Open signup · player-first · Zustand progress · Better Auth (Convex when URL set; SQLite fallback) · MSW `2.7.x` · pnpm · uv · commit+push every stage.
 
-**Git:** branch `cursor/passaporte-scaffold-player-slice` · `origin` = https://github.com/justiceotuya/passaporte
-
-**Convex deployment:** `opulent-gull-941` (dev) — `SITE_URL` set on deployment.
+**Git:** `cursor/passaporte-scaffold-player-slice` · https://github.com/justiceotuya/passaporte  
+**Convex:** `opulent-gull-941`
 
 ---
 
@@ -33,18 +32,16 @@ Open signup · player-first · Zustand progress · Better Auth (Convex adapter w
 
 | When | What |
 | --- | --- |
-| 2026-09-22 | Scaffold → schema → player → pipeline calibration → hints/crop |
-| 2026-09-22 | Player: stimulus · fill_blank · match |
-| 2026-09-22 | Convex schema + progress bridge |
-| 2026-09-22 | **Auth cutover:** Convex Better Auth handler + `ConvexBetterAuthProvider` when URL set; SQLite fallback otherwise |
+| 2026-09-22 | Scaffold → pipeline calibration → hints/crop → Convex bridge → auth cutover |
+| 2026-09-22 | Player: choice · true_false · fill_blank · match · stimulus |
+| 2026-09-22 | **Player 5c:** `order` · `transform` · `listen_choice` (transcript collapsible) |
 
 ---
 
 ## Remaining
 
-- [ ] Smoke: sign-up / sign-in against Convex in browser (`pnpm web`)
-- [ ] Gold review · unit-map cleanup · raise teacher_book rate · better extract bboxes
-- [ ] Player: `order`, `transform`, `listen_choice`
+- [ ] Browser smoke: Convex signup/signin
+- [ ] Gold review · unit-map cleanup · raise teacher_book · better bboxes
 - [ ] Review queue · stats · hearts · admin · PostHog
 
 ---
@@ -54,8 +51,7 @@ Open signup · player-first · Zustand progress · Better Auth (Convex adapter w
 ```bash
 cd passaporte && pnpm install && cd pipeline && uv sync && cd ..
 pnpm web:test
-pnpm pipeline:test
-pnpm web:convex   # keep running while developing
+pnpm web:convex
 pnpm web
 ```
 
@@ -65,31 +61,21 @@ pnpm web
 
 | Date | Phase | Command | Result |
 | --- | --- | --- | --- |
-| 2026-09-22 | Convex MVP | `pnpm web:test` | PASS **43** |
-| 2026-09-22 | Auth cutover | `vitest run` + `next build` | PASS **43** · build green |
+| 2026-09-22 | Auth cutover | vitest + next build | PASS 43 · build green |
+| 2026-09-22 | 5c types | `vitest run` | PASS **46** — order · transform · listen_choice |
 
 ---
 
-## Handover prompt (paste to next model)
+## Handover prompt
 
 ```
-You are continuing **Passaporte**.
+You are continuing Passaporte.
 
-## Read first
-1. passaporte/PROGRESS.md
-2. passaporte/TESTING.md
-3. apps/web/convex/README.md
+Read: PROGRESS.md, TESTING.md, apps/web/convex/README.md
 
-## Locked
-- Convex deployment configured; Better Auth uses Convex when NEXT_PUBLIC_CONVEX_URL is set
-- SQLite auth remains the fallback without Convex URL
-- Progress: Zustand + /api/progress bridgeUserId → Convex
+Done: all closed item types in SessionPlayer; Convex Better Auth when URL set.
 
-## Current focus
-1. Browser smoke of Convex signup/signin
-2. Gold review / unit-map
-3. Remaining item types
+Next: gold review / unit-map; Convex signup smoke; review queue / stats.
 
-## Commands
-- pnpm web:convex · pnpm web · pnpm web:test
+Commands: pnpm web:test · pnpm web:convex · pnpm web
 ```

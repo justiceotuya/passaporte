@@ -9,10 +9,15 @@ import { FeedbackBanner } from "@/components/FeedbackBanner";
 import { StimulusImage } from "@/components/StimulusImage";
 import { FillBlankTyped } from "@/components/FillBlankTyped";
 import { MatchPairTap } from "@/components/MatchPairTap";
+import { OrderSequence } from "@/components/OrderSequence";
+import { ListenTranscript } from "@/components/ListenTranscript";
 import {
   gradeChoice,
   gradeFillBlank,
+  gradeListenChoice,
   gradeMatch,
+  gradeOrder,
+  gradeTransform,
   gradeTrueFalse,
 } from "@/lib/grader";
 import { buildSession, isPlayableItem } from "@/lib/session-builder";
@@ -28,6 +33,13 @@ function expectedMatchPairs(item: PassaporteItem): MatchPair[] {
     }
   }
   return item.pairs ?? [];
+}
+
+function expectedOrder(item: PassaporteItem): string[] {
+  if (Array.isArray(item.answer) && typeof item.answer[0] === "string") {
+    return item.answer as string[];
+  }
+  return item.sequence ?? [];
 }
 
 export function SessionPlayer({
@@ -145,6 +157,27 @@ export function SessionPlayer({
       return;
     }
 
+    if (current.type === "transform") {
+      commitResult(
+        given,
+        gradeTransform(
+          given,
+          String(current.answer),
+          current.accepted ?? [],
+          attemptNo,
+        ),
+      );
+      return;
+    }
+
+    if (current.type === "listen_choice") {
+      commitResult(
+        given,
+        gradeListenChoice(given, String(current.answer), attemptNo),
+      );
+      return;
+    }
+
     commitResult(given, gradeChoice(given, String(current.answer), attemptNo));
   }
 
@@ -153,6 +186,13 @@ export function SessionPlayer({
     const expected = expectedMatchPairs(current);
     const result = gradeMatch(pairs, expected, attemptNo);
     commitResult(JSON.stringify(pairs), result);
+  }
+
+  function submitOrder(ordered: string[]) {
+    if (!current || locked) return;
+    const expected = expectedOrder(current);
+    const result = gradeOrder(ordered, expected, attemptNo);
+    commitResult(JSON.stringify(ordered), result);
   }
 
   function continueAfterFeedback() {
@@ -199,7 +239,7 @@ export function SessionPlayer({
   if (items.length === 0) {
     return (
       <p className="p-6 text-ink-muted">
-        No playable items in this unit (choice, true_false, fill_blank, match).
+        No playable closed items in this unit.
       </p>
     );
   }
@@ -235,13 +275,24 @@ export function SessionPlayer({
     );
   }
 
-  const answerStr = String(current.answer);
+  const answerStr =
+    Array.isArray(current.answer) && typeof current.answer[0] === "string"
+      ? (current.answer as string[]).join(" → ")
+      : String(current.answer);
   const showReveal = phase === "feedback" && !lastCorrect && attemptNo >= 2;
   const fillUsesTiles =
     current.type === "fill_blank" &&
     Array.isArray(current.options) &&
     current.options.length >= 2;
   const matchPairs = expectedMatchPairs(current);
+  const orderSeq = expectedOrder(current);
+  const choiceLike =
+    current.type === "choice" ||
+    current.type === "listen_choice" ||
+    fillUsesTiles;
+  const typedLike =
+    (current.type === "fill_blank" && !fillUsesTiles) ||
+    current.type === "transform";
 
   return (
     <div
@@ -281,12 +332,18 @@ export function SessionPlayer({
       </h2>
       {current.hint_en ? <HintDisclosure hint={current.hint_en} /> : null}
 
+      {current.type === "listen_choice" && current.transcript ? (
+        <ListenTranscript transcript={current.transcript} />
+      ) : null}
+
       <div className="mt-6 flex flex-col gap-3">
         {current.type === "true_false" ? (
           <TrueFalsePair
             selected={selected as "true" | "false" | null}
             correctValue={
-              phase === "feedback" ? (answerStr as "true" | "false") : undefined
+              phase === "feedback"
+                ? (String(current.answer) as "true" | "false")
+                : undefined
             }
             locked={phase === "feedback"}
             onSelect={(value) => {
@@ -307,7 +364,19 @@ export function SessionPlayer({
           />
         ) : null}
 
-        {current.type === "fill_blank" && !fillUsesTiles ? (
+        {current.type === "order" ? (
+          <OrderSequence
+            key={`${current.id}-${attemptNo}`}
+            sequence={orderSeq}
+            locked={phase === "feedback"}
+            showSolution={showReveal}
+            onSubmit={(ordered) => {
+              if (phase === "playing") submitOrder(ordered);
+            }}
+          />
+        ) : null}
+
+        {typedLike ? (
           phase === "playing" ? (
             <FillBlankTyped
               value={typed}
@@ -316,14 +385,15 @@ export function SessionPlayer({
               disabled={locked}
             />
           ) : (
-            <p className="text-sm text-ink-muted" data-testid="fill-blank-reveal">
+            <p className="text-sm text-ink-muted" data-testid="typed-reveal">
               {showReveal ? `Answer: ${answerStr}` : `You wrote: ${selected}`}
             </p>
           )
         ) : null}
 
-        {(current.type === "choice" || fillUsesTiles) &&
+        {choiceLike &&
           (current.options ?? []).map((option) => {
+            const expected = String(current.answer);
             let state:
               | "default"
               | "selected"
@@ -331,7 +401,7 @@ export function SessionPlayer({
               | "incorrect"
               | "revealed" = "default";
             if (phase === "feedback") {
-              if (option === answerStr) {
+              if (option === expected) {
                 state =
                   showReveal && selected !== option ? "revealed" : "correct";
               } else if (option === selected) {
@@ -366,7 +436,9 @@ export function SessionPlayer({
                   ? "Try once more. Accents matter on the next attempt."
                   : current.type === "match"
                     ? "Check the highlighted pairs."
-                    : `Answer: ${answerStr}`
+                    : current.type === "order"
+                      ? "Check the order above."
+                      : `Answer: ${answerStr}`
             }
           />
           <button

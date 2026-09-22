@@ -93,5 +93,32 @@ describe("session builder", () => {
         }),
       ),
     ).toBe(false);
+    expect(
+      isPlayableItem(
+        fakeItem("pass-u01-p010-D-1", {
+          type: "order",
+          sequence: ["a", "b", "c"],
+          answer: ["a", "b", "c"],
+        }),
+      ),
+    ).toBe(true);
+    expect(
+      isPlayableItem(
+        fakeItem("pass-u01-p010-E-1", {
+          type: "transform",
+          answer: "PENDING",
+        }),
+      ),
+    ).toBe(false);
+    expect(
+      isPlayableItem(
+        fakeItem("pass-u01-p010-F-1", {
+          type: "listen_choice",
+          options: ["A", "B"],
+          transcript: "Olá",
+          answer: "A",
+        }),
+      ),
+    ).toBe(true);
   });
 });

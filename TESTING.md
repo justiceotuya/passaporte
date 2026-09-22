@@ -124,7 +124,10 @@ Note: outputs live under `raw/` and must stay **gitignored**.
 
 - [x] `fill_blank` tiles + typed + diacritics row
 - [x] `match` pair-tap
-- [ ] `order`, `transform`, `listen_choice` transcript
+- [x] `order` tap-to-sequence
+- [x] `transform` typed (skips `PENDING` answers)
+- [x] `listen_choice` collapsible transcript + options
+
 
 ### 5d Session end / SRS / stats
 

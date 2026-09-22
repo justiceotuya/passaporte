@@ -5,6 +5,7 @@ import {
   gradeChoice,
   gradeFillBlank,
   gradeMatch,
+  gradeOrder,
   normaliseAnswer,
   stripDiacritics,
 } from "@/lib/grader";
@@ -95,5 +96,10 @@ describe("grader", () => {
     expect(
       gradeMatch([{ left: "aqui", right: "B" }], expected, 1).correct,
     ).toBe(false);
+  });
+
+  it("grades order by sequence equality", () => {
+    expect(gradeOrder(["a", "b", "c"], ["a", "b", "c"], 1).correct).toBe(true);
+    expect(gradeOrder(["b", "a", "c"], ["a", "b", "c"], 1).correct).toBe(false);
   });
 });

@@ -6,6 +6,8 @@ import { FeedbackBanner } from "@/components/FeedbackBanner";
 import { StimulusImage } from "@/components/StimulusImage";
 import { FillBlankTyped } from "@/components/FillBlankTyped";
 import { MatchPairTap } from "@/components/MatchPairTap";
+import { OrderSequence } from "@/components/OrderSequence";
+import { ListenTranscript } from "@/components/ListenTranscript";
 
 describe("player components", () => {
   it("renders choice states", () => {
@@ -75,5 +77,23 @@ describe("player components", () => {
       { left: "aqui", right: "A" },
       { left: "ali", right: "B" },
     ]);
+  });
+
+  it("order sequence submits picked order", () => {
+    const onSubmit = vi.fn();
+    render(
+      <OrderSequence sequence={["one", "two"]} onSubmit={onSubmit} />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "one" }));
+    fireEvent.click(screen.getByRole("button", { name: "two" }));
+    fireEvent.click(screen.getByTestId("order-submit"));
+    expect(onSubmit).toHaveBeenCalledWith(["one", "two"]);
+  });
+
+  it("listen transcript toggles open", () => {
+    render(<ListenTranscript transcript="Olá, bom dia." />);
+    expect(screen.queryByText("Olá, bom dia.")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /show transcript/i }));
+    expect(screen.getByText("Olá, bom dia.")).toBeInTheDocument();
   });
 });
