@@ -101,6 +101,35 @@ test("completes a short fixture session on /play", async ({ page }) => {
   await expect(page.getByText(/you earned/i)).toBeVisible();
 });
 
+test("enlarges stimulus image in a lightbox", async ({ page }) => {
+  await page.goto("/play?size=15&unit=1");
+  await expect(page.getByTestId("session-player")).toBeVisible();
+
+  let found = false;
+  for (let i = 0; i < 15; i += 1) {
+    const zoom = page.getByTestId("stimulus-image-zoom");
+    if (await zoom.isVisible().catch(() => false)) {
+      found = true;
+      await zoom.click();
+      await expect(page.getByTestId("image-lightbox")).toBeVisible();
+      await page.keyboard.press("Escape");
+      await expect(page.getByTestId("image-lightbox")).toHaveCount(0);
+      await zoom.click();
+      await page.getByTestId("image-lightbox-close").click();
+      await expect(page.getByTestId("image-lightbox")).toHaveCount(0);
+      break;
+    }
+    await answerCurrentItem(page);
+    await expect(page.getByRole("status")).toBeVisible();
+    await page.getByTestId("continue-button").click();
+    if (await page.getByTestId("session-summary").isVisible().catch(() => false)) {
+      break;
+    }
+  }
+
+  expect(found, "expected a stimulus crop in the session").toBe(true);
+});
+
 test("can create an account from sign-in", async ({ page }) => {
   const email = `e2e-${Date.now()}@example.com`;
 

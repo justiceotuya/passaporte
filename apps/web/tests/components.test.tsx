@@ -34,9 +34,36 @@ describe("player components", () => {
 
   it("renders stimulus image with max height constraint", () => {
     render(<StimulusImage src="crops/pass-u01-p010-D-1.webp" />);
-    const img = screen.getByRole("img", { name: /stimulus/i });
+    const trigger = screen.getByTestId("stimulus-image-zoom");
+    const img = trigger.querySelector("img");
     expect(img).toHaveAttribute("src", "/crops/pass-u01-p010-D-1.webp");
-    expect(img.className).toMatch(/max-h-\[240px\]/);
+    expect(img?.className).toMatch(/max-h-\[240px\]/);
+  });
+
+  it("opens and closes stimulus image lightbox", () => {
+    render(<StimulusImage src="crops/pass-u01-p010-D-1.webp" />);
+    fireEvent.click(screen.getByRole("button", { name: /enlarge/i }));
+    expect(screen.getByRole("dialog", { name: /enlarged image/i })).toBeInTheDocument();
+    expect(screen.getByTestId("image-lightbox").querySelector("img")).toHaveAttribute(
+      "src",
+      "/crops/pass-u01-p010-D-1.webp",
+    );
+
+    fireEvent.click(screen.getByTestId("image-lightbox-close"));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("closes lightbox on Escape and backdrop click", () => {
+    render(<StimulusImage src="crops/pass-u01-p010-D-1.webp" />);
+    fireEvent.click(screen.getByRole("button", { name: /enlarge/i }));
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /enlarge/i }));
+    fireEvent.click(screen.getByTestId("image-lightbox-backdrop"));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
   it("fill_blank typed inserts diacritics and submits", () => {
