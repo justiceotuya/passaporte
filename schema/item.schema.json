@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://passaporte.local/schema/item.schema.json",
+  "title": "PassaporteItem",
+  "description": "One graded exercise item shipped in content/<book>/uNN.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "book",
+    "unit",
+    "page",
+    "exercise",
+    "type",
+    "skill",
+    "topic",
+    "instruction",
+    "prompt",
+    "answer",
+    "accepted",
+    "answer_source",
+    "review"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[a-z0-9]+-u[0-9]{2}-p[0-9]{3}-[A-Z]-[0-9]+$",
+      "description": "Stable id, e.g. pass-u03-p042-H-1"
+    },
+    "book": {
+      "type": "string",
+      "enum": ["passaporte", "valer"]
+    },
+    "unit": { "type": "integer", "minimum": 1 },
+    "page": { "type": "integer", "minimum": 1 },
+    "exercise": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Exercise letter from the book, e.g. H"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "choice",
+        "fill_blank",
+        "match",
+        "order",
+        "true_false",
+        "transform",
+        "listen_choice",
+        "open"
+      ]
+    },
+    "skill": {
+      "type": "string",
+      "enum": ["grammar", "vocabulary", "reading", "listening", "other"]
+    },
+    "topic": { "type": "string", "minLength": 1 },
+    "instruction": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Verbatim Portuguese instruction from the book"
+    },
+    "prompt": { "type": "string", "minLength": 1 },
+    "options": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "For choice / listen_choice / fill_blank tiles"
+    },
+    "pairs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["left", "right"],
+        "properties": {
+          "left": { "type": "string", "minLength": 1 },
+          "right": { "type": "string", "minLength": 1 }
+        }
+      },
+      "description": "For match items"
+    },
+    "sequence": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Correct order for order items (also used as answer representation)"
+    },
+    "answer": {
+      "description": "Canonical answer: string, boolean-as-string, or JSON-serialisable structure",
+      "oneOf": [
+        { "type": "string", "minLength": 1 },
+        { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["left", "right"],
+            "properties": {
+              "left": { "type": "string" },
+              "right": { "type": "string" }
+            }
+          },
+          "minItems": 1
+        }
+      ]
+    },
+    "accepted": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Alternate accepted answers after normalisation"
+    },
+    "hint_en": {
+      "type": "string",
+      "description": "One-sentence English hint; must not restate the answer. Required for closed playable items in shipped content."
+    },
+    "stimulus_image": {
+      "type": ["string", "null"],
+      "description": "Path under public/crops/, or null"
+    },
+    "transcript": {
+      "type": "string",
+      "description": "Listening transcript text for listen_choice"
+    },
+    "answer_source": {
+      "type": "string",
+      "enum": ["teacher_book", "student_book_key", "generated"]
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["pending", "approved", "rejected"]
+        },
+        "by": { "type": "string" },
+        "at": { "type": "string", "format": "date-time" },
+        "notes": { "type": "string" }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "enum": [
+              "choice",
+              "fill_blank",
+              "match",
+              "order",
+              "true_false",
+              "transform",
+              "listen_choice"
+            ]
+          }
+        },
+        "required": ["type"]
+      },
+      "then": {
+        "required": ["hint_en"],
+        "properties": {
+          "hint_en": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "type": { "const": "choice" } },
+        "required": ["type"]
+      },
+      "then": {
+        "required": ["options"],
+        "properties": {
+          "options": { "type": "array", "minItems": 2 }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "type": { "const": "listen_choice" } },
+        "required": ["type"]
+      },
+      "then": {
+        "required": ["options", "transcript"],
+        "properties": {
+          "options": { "type": "array", "minItems": 2 },
+          "transcript": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "type": { "const": "true_false" } },
+        "required": ["type"]
+      },
+      "then": {
+        "properties": {
+          "answer": { "type": "string", "enum": ["true", "false"] }
+        }
+      }
+    }
+  ]
+}

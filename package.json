@@ -1,0 +1,18 @@
+{
+  "name": "passaporte",
+  "private": true,
+  "packageManager": "pnpm@11.7.0",
+  "scripts": {
+    "smoke:scaffold": "bash scripts/smoke-scaffold.sh",
+    "test:schema": "pnpm --filter @passaporte/web exec vitest run schema && cd pipeline && uv run pytest tests/test_schema.py -q",
+    "test:phase0": "pnpm smoke:scaffold",
+    "test:phase1": "pnpm test:schema",
+    "test:web": "pnpm --filter @passaporte/web exec vitest run",
+    "web": "pnpm --filter @passaporte/web dev",
+    "web:test": "pnpm --filter @passaporte/web exec vitest run",
+    "pipeline:test": "cd pipeline && uv run pytest -q"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

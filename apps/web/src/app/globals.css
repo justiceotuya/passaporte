@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --book-ink: #f3d9a8;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  @apply bg-surface text-ink font-sans antialiased;
+  background-image: linear-gradient(180deg, #211b14 0%, #0f0d0b 100%);
+  background-attachment: fixed;
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex min-h-tap min-w-tap items-center justify-center rounded-pill bg-primary px-6 py-3 font-sans text-sm font-bold uppercase tracking-wide text-ink-on transition duration-fast ease-out;
+    box-shadow: 0 4px 0 theme("colors.primary.edge");
+  }
+
+  .btn-primary:active {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 theme("colors.primary.edge");
+  }
+
+  .btn-primary:disabled {
+    @apply opacity-40;
+  }
+
+  .card-surface {
+    @apply rounded-card border-2 border-ink/10 bg-surface-card;
+    border-bottom-width: 4px;
+  }
+
+  .book-text {
+    @apply font-book text-base leading-relaxed;
+    color: var(--book-ink);
+  }
+}

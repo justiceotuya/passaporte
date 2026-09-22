@@ -1,0 +1,74 @@
+import type { PassaporteItem } from "@/types/item";
+
+export type SessionPlan = {
+  itemIds: string[];
+  newCount: number;
+  dueCount: number;
+};
+
+const MIN_SIZE = 12;
+const MAX_SIZE = 15;
+const DUE_RATIO = 0.3;
+
+function shuffle<T>(items: T[]): T[] {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+/**
+ * Build a 12–15 item session: ~70% new from the unit, ~30% from due queue when non-empty.
+ */
+export function buildSession(input: {
+  unitItems: PassaporteItem[];
+  dueItemIds: string[];
+  size?: number;
+  random?: () => number;
+}): SessionPlan {
+  const size = Math.min(
+    MAX_SIZE,
+    Math.max(MIN_SIZE, input.size ?? MIN_SIZE),
+    input.unitItems.length + input.dueItemIds.length,
+  );
+
+  const unitIds = input.unitItems.map((i) => i.id);
+  const dueInUnit = input.dueItemIds.filter((id) => unitIds.includes(id));
+  const dueOutside = input.dueItemIds.filter((id) => !unitIds.includes(id));
+
+  const targetDue = dueInUnit.length + dueOutside.length === 0
+    ? 0
+    : Math.min(
+        Math.round(size * DUE_RATIO),
+        dueInUnit.length + dueOutside.length,
+        size,
+      );
+
+  const duePool = shuffle([...dueInUnit, ...dueOutside]);
+  const selectedDue = duePool.slice(0, targetDue);
+  const selectedDueSet = new Set(selectedDue);
+
+  const newPool = shuffle(unitIds.filter((id) => !selectedDueSet.has(id)));
+  const needNew = size - selectedDue.length;
+  const selectedNew = newPool.slice(0, needNew);
+
+  // If still short, fill from remaining unit items
+  const picked = new Set([...selectedDue, ...selectedNew]);
+  for (const id of unitIds) {
+    if (picked.size >= size) break;
+    if (!picked.has(id)) {
+      selectedNew.push(id);
+      picked.add(id);
+    }
+  }
+
+  const itemIds = shuffle([...selectedDue, ...selectedNew]).slice(0, size);
+
+  return {
+    itemIds,
+    newCount: itemIds.filter((id) => !selectedDueSet.has(id)).length,
+    dueCount: itemIds.filter((id) => selectedDueSet.has(id)).length,
+  };
+}

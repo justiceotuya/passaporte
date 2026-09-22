@@ -1,0 +1,19 @@
+[project]
+name = "passaporte-pipeline"
+version = "0.1.0"
+description = "PDF → reviewed item JSON for Passaporte"
+requires-python = ">=3.12"
+dependencies = [
+  "pydantic>=2.10",
+  "jsonschema>=4.23",
+  "referencing>=0.36",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.3",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

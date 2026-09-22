@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://passaporte.local/schema/unit.schema.json",
+  "title": "PassaporteUnit",
+  "description": "One unit file: content/<book>/uNN.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["book", "unit", "title", "items"],
+  "properties": {
+    "book": { "type": "string", "enum": ["passaporte", "valer"] },
+    "unit": { "type": "integer", "minimum": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "topics": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "https://passaporte.local/schema/item.schema.json" }
+    }
+  }
+}
