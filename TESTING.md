@@ -103,6 +103,7 @@ Run commands will be filled in as packages are scaffolded. Until then, use the *
 - [x] `stimulus_image` render (max 240px)
 - [x] `fill_blank` tiles + typed (diacritics row)
 - [x] `match` pair-tap (≤8 pairs)
+- [x] Home unit map + unit detail + lock/progress rules
 
 **Run:** `pnpm --filter @passaporte/web exec vitest run` · `pnpm web:e2e`
 

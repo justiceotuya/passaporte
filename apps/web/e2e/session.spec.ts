@@ -60,5 +60,6 @@ test("can create an account from sign-in", async ({ page }) => {
   await page.locator('input[autocomplete="new-password"]').fill("password123");
   await page.getByRole("button", { name: "Create account" }).click();
 
-  await expect(page).toHaveURL(/\/play/, { timeout: 30_000 });
+  await expect(page).toHaveURL(/\/(\?|$)/, { timeout: 30_000 });
+  await expect(page.getByTestId("unit-map")).toBeVisible({ timeout: 15_000 });
 });

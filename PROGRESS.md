@@ -2,8 +2,8 @@
 
 **Last updated:** 2026-09-22  
 **Owner:** Justice  
-**Status:** All closed item types playable · Convex auth cutover live  
-**Next:** Gold review / unit-map · browser smoke Convex signup · review queue / stats
+**Status:** Home unit map + unit detail live · all closed types playable · Convex auth ready  
+**Next:** Review queue page · stats · gold review / unit-map content cleanup
 
 ---
 
@@ -21,10 +21,9 @@
 
 ## Grill decisions (locked 2026-09-22)
 
-Open signup · player-first · Zustand progress · Better Auth (Convex when URL set; SQLite fallback) · MSW `2.7.x` · pnpm · uv · commit+push every stage.
+Open signup · player-first · Zustand progress · Better Auth (Convex when URL set) · MSW `2.7.x` · pnpm · uv · commit+push every stage.
 
-**Git:** `cursor/passaporte-scaffold-player-slice` · https://github.com/justiceotuya/passaporte  
-**Convex:** `opulent-gull-941`
+**Git:** `cursor/passaporte-scaffold-player-slice` · https://github.com/justiceotuya/passaporte
 
 ---
 
@@ -32,27 +31,27 @@ Open signup · player-first · Zustand progress · Better Auth (Convex when URL 
 
 | When | What |
 | --- | --- |
-| 2026-09-22 | Scaffold → pipeline calibration → hints/crop → Convex bridge → auth cutover |
-| 2026-09-22 | Player: choice · true_false · fill_blank · match · stimulus |
-| 2026-09-22 | **Player 5c:** `order` · `transform` · `listen_choice` (transcript collapsible) |
+| 2026-09-22 | Pipeline calibration · hints/crop · Convex · all closed item types |
+| 2026-09-22 | **Home unit map** (`/`) · **unit detail** (`/units/[n]`) · play `?unit=` · 60% unlock / 80% complete |
 
 ---
 
 ## Remaining
 
-- [ ] Browser smoke: Convex signup/signin
-- [ ] Gold review · unit-map cleanup · raise teacher_book · better bboxes
-- [ ] Review queue · stats · hearts · admin · PostHog
+- [ ] Dedicated Review queue page (map chip already links `/play?review=1`)
+- [ ] Stats · hearts · admin · PostHog
+- [ ] Gold review · content unit-map cleanup · better bboxes
+- [ ] Browser smoke Convex signup (with `pnpm web:convex` running)
 
 ---
 
 ## How to run
 
 ```bash
-cd passaporte && pnpm install && cd pipeline && uv sync && cd ..
+cd passaporte && pnpm install
 pnpm web:test
 pnpm web:convex
-pnpm web
+pnpm web   # map at / · unit at /units/1 · play at /play?unit=1
 ```
 
 ---
@@ -61,8 +60,8 @@ pnpm web
 
 | Date | Phase | Command | Result |
 | --- | --- | --- | --- |
-| 2026-09-22 | Auth cutover | vitest + next build | PASS 43 · build green |
-| 2026-09-22 | 5c types | `vitest run` | PASS **46** — order · transform · listen_choice |
+| 2026-09-22 | 5c types | vitest | PASS 46 |
+| 2026-09-22 | Home map | vitest + next build | PASS **50** · routes `/`, `/units/[unit]`, `/play` |
 
 ---
 
@@ -73,9 +72,9 @@ You are continuing Passaporte.
 
 Read: PROGRESS.md, TESTING.md, apps/web/convex/README.md
 
-Done: all closed item types in SessionPlayer; Convex Better Auth when URL set.
+Done: unit map + detail; all closed item types; Convex Better Auth when URL set.
 
-Next: gold review / unit-map; Convex signup smoke; review queue / stats.
+Next: review queue page; stats; gold content cleanup.
 
-Commands: pnpm web:test · pnpm web:convex · pnpm web
+Commands: pnpm web:test · pnpm web · pnpm web:convex
 ```

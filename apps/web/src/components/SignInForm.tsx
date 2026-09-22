@@ -37,7 +37,7 @@ export function SignInForm() {
           return;
         }
       }
-      router.push("/play");
+      router.push("/");
       router.refresh();
     } catch {
       setError("Something went wrong. Try again.");

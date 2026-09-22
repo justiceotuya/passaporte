@@ -1,15 +1,19 @@
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { listUnitSummaries } from "@/lib/content";
+import { UnitMap } from "@/components/UnitMap";
 
-export default async function HomePage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+export default function HomePage() {
+  const units = listUnitSummaries();
 
-  if (session) {
-    redirect("/play");
-  }
-
-  redirect("/sign-in");
+  return (
+    <main>
+      <UnitMap
+        units={units.map((u) => ({
+          unit: u.unit,
+          title: u.title,
+          itemCount: u.itemCount,
+          itemIds: u.itemIds,
+        }))}
+      />
+    </main>
+  );
 }
