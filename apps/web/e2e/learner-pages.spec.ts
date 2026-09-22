@@ -59,6 +59,10 @@ test("review / stats / settings pages and analytics mock", async ({ page }) => {
   await expect(page.getByTestId("app-nav-rail")).toBeVisible();
   await page.getByTestId("nav-settings-rail").click();
   await expect(page.getByTestId("settings-page")).toBeVisible();
+  await expect(page.getByTestId("setting-account")).toBeVisible();
+  await expect(
+    page.getByTestId("setting-account").getByTestId("auth-sign-in"),
+  ).toBeVisible();
 
   await page.goto("/units/1");
   await expect(page.getByTestId("unit-exercises")).toBeVisible();

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fredoka, Nunito, Source_Serif_4 } from "next/font/google";
 import { ConvexClientProvider } from "@/components/ConvexClientProvider";
 import { ThemeSync } from "@/components/ThemeSync";
+import { isConvexConfigured } from "@/lib/convex-env";
 import "./globals.css";
 
 const nunito = Nunito({
@@ -27,11 +28,21 @@ export const metadata: Metadata = {
   description: "Gamified A1 Portuguese practice",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  let initialToken: string | null = null;
+  if (isConvexConfigured()) {
+    try {
+      const { getToken } = await import("@/lib/auth-server");
+      initialToken = (await getToken()) ?? null;
+    } catch {
+      initialToken = null;
+    }
+  }
+
   return (
     <html
       lang="en"
@@ -40,7 +51,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="font-sans">
-        <ConvexClientProvider>
+        <ConvexClientProvider initialToken={initialToken}>
           <ThemeSync />
           {children}
         </ConvexClientProvider>

@@ -1,12 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 
 export function SignInForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackURL = searchParams.get("next") || "/";
+
+  const { data: session, isPending: sessionPending } = authClient.useSession();
+
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,6 +19,22 @@ export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [googleEnabled, setGoogleEnabled] = useState(false);
+
+  useEffect(() => {
+    void fetch("/api/auth/providers")
+      .then((res) => res.json())
+      .then((body: { google?: boolean }) => {
+        setGoogleEnabled(Boolean(body.google));
+      })
+      .catch(() => setGoogleEnabled(false));
+  }, []);
+
+  useEffect(() => {
+    if (!sessionPending && session?.user) {
+      router.replace(callbackURL);
+    }
+  }, [session, sessionPending, router, callbackURL]);
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -37,13 +58,35 @@ export function SignInForm() {
           return;
         }
       }
-      router.push("/");
+      router.push(callbackURL);
       router.refresh();
     } catch {
       setError("Something went wrong. Try again.");
     } finally {
       setPending(false);
     }
+  }
+
+  async function onGoogle() {
+    setError(null);
+    setPending(true);
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL,
+      });
+    } catch {
+      setError("Google sign-in failed. Check GOOGLE_CLIENT_ID/SECRET.");
+      setPending(false);
+    }
+  }
+
+  if (sessionPending) {
+    return (
+      <div className="mx-auto flex min-h-screen w-full max-w-md items-center justify-center px-4">
+        <p className="text-sm text-ink-muted">Checking session…</p>
+      </div>
+    );
   }
 
   return (
@@ -63,14 +106,22 @@ export function SignInForm() {
 
       <button
         type="button"
-        disabled
-        className="card-surface mb-4 flex min-h-tap w-full items-center justify-center gap-2 px-4 text-sm font-semibold text-ink-faint"
-        title="Google sign-in coming soon"
+        disabled={pending || !googleEnabled}
+        data-testid="sign-in-google"
+        onClick={() => void onGoogle()}
+        className="card-surface mb-4 flex min-h-tap w-full items-center justify-center gap-2 px-4 text-sm font-semibold disabled:text-ink-faint"
+        title={
+          googleEnabled
+            ? "Continue with Google"
+            : "Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to enable"
+        }
       >
         Continue with Google
-        <span className="rounded-pill bg-ink/10 px-2 py-0.5 text-[10px] uppercase tracking-wide">
-          Soon
-        </span>
+        {!googleEnabled ? (
+          <span className="rounded-pill bg-ink/10 px-2 py-0.5 text-[10px] uppercase tracking-wide">
+            Needs keys
+          </span>
+        ) : null}
       </button>
 
       <div className="mb-4 flex items-center gap-3 text-xs uppercase tracking-wide text-ink-faint">
@@ -132,7 +183,12 @@ export function SignInForm() {
           </p>
         ) : null}
 
-        <button type="submit" className="btn-primary w-full" disabled={pending}>
+        <button
+          type="submit"
+          className="btn-primary w-full"
+          disabled={pending}
+          data-testid="sign-in-submit"
+        >
           {pending ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
         </button>
       </form>
@@ -144,6 +200,7 @@ export function SignInForm() {
             <button
               type="button"
               className="font-semibold text-primary"
+              data-testid="sign-in-switch-signup"
               onClick={() => setMode("signup")}
             >
               Create an account
@@ -155,6 +212,7 @@ export function SignInForm() {
             <button
               type="button"
               className="font-semibold text-primary"
+              data-testid="sign-in-switch-signin"
               onClick={() => setMode("signin")}
             >
               Sign in
@@ -164,7 +222,9 @@ export function SignInForm() {
       </p>
 
       <p className="mt-8 text-center text-xs text-ink-faint">
-        <Link href="/play">Skip to player (dev)</Link>
+        <Link href="/">Continue without account</Link>
+        {" · "}
+        <Link href="/play">Skip to player</Link>
       </p>
     </div>
   );

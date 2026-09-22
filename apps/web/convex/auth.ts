@@ -15,14 +15,27 @@ const siteUrl = process.env.SITE_URL!;
  */
 export const authComponent = createClient<DataModel>(components.betterAuth);
 
+const googleId = process.env.GOOGLE_CLIENT_ID?.trim();
+const googleSecret = process.env.GOOGLE_CLIENT_SECRET?.trim();
+const googleEnabled = Boolean(googleId && googleSecret);
+
 export const createAuth = (ctx: GenericCtx<DataModel>) => {
   return betterAuth({
     baseURL: siteUrl,
+    secret: process.env.BETTER_AUTH_SECRET,
     database: authComponent.adapter(ctx),
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: false,
     },
+    socialProviders: googleEnabled
+      ? {
+          google: {
+            clientId: googleId!,
+            clientSecret: googleSecret!,
+          },
+        }
+      : undefined,
     plugins: [convex({ authConfig })],
   });
 };

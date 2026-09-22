@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useProgressStore } from "@/lib/progress-store";
 import { PageShell } from "@/components/PageShell";
+import { AuthAccount } from "@/components/AuthAccount";
 
 const SESSION_LENGTHS = [8, 12, 15] as const;
 
@@ -126,16 +126,13 @@ export function SettingsPanel() {
           </div>
         </fieldset>
 
-        <div className="card-surface flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm font-bold text-ink">Account</p>
-            <p className="mt-1 text-sm text-ink-muted">
-              Sign in to sync progress when Convex is configured.
-            </p>
-          </div>
-          <Link href="/sign-in" className="btn-primary" data-testid="setting-sign-in">
-            Sign in
-          </Link>
+        <div data-testid="setting-account">
+          <p className="mb-2 text-sm font-bold text-ink">Account</p>
+          <p className="mb-3 text-sm text-ink-muted">
+            Sign in to sync progress when Convex is configured. Google needs
+            GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET.
+          </p>
+          <AuthAccount />
         </div>
 
         <button

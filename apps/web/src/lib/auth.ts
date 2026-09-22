@@ -10,14 +10,49 @@ if (!fs.existsSync(dataDir)) {
 
 const dbPath = path.join(dataDir, "auth.db");
 
+const siteUrl =
+  process.env.BETTER_AUTH_URL ??
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  "http://localhost:3000";
+
+const googleId = process.env.GOOGLE_CLIENT_ID?.trim();
+const googleSecret = process.env.GOOGLE_CLIENT_SECRET?.trim();
+const googleEnabled = Boolean(googleId && googleSecret);
+
+function trustedOrigins(): string[] {
+  const origins = new Set<string>([
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:3010",
+    "http://127.0.0.1:3010",
+  ]);
+  for (const value of [siteUrl, process.env.NEXT_PUBLIC_SITE_URL]) {
+    if (!value) continue;
+    try {
+      origins.add(new URL(value).origin);
+    } catch {
+      /* ignore invalid */
+    }
+  }
+  return [...origins];
+}
+
 export const auth = betterAuth({
   database: new Database(dbPath),
+  baseURL: siteUrl,
+  secret: process.env.BETTER_AUTH_SECRET,
   emailAndPassword: {
     enabled: true,
   },
-  trustedOrigins: [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-  ],
-  // Google stays stubbed in the UI until OAuth client IDs exist.
+  socialProviders: googleEnabled
+    ? {
+        google: {
+          clientId: googleId!,
+          clientSecret: googleSecret!,
+        },
+      }
+    : undefined,
+  trustedOrigins: trustedOrigins(),
 });
+
+export const isGoogleAuthConfigured = googleEnabled;

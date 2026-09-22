@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useProgressStore } from "@/lib/progress-store";
+import { authClient } from "@/lib/auth-client";
+import { AuthAccount } from "@/components/AuthAccount";
 
 const links = [
   { href: "/", label: "Map", testId: "nav-map" },
@@ -15,6 +17,10 @@ export function AppNav() {
   const pathname = usePathname();
   const streakDays = useProgressStore((s) => s.streakDays);
   const dueCount = useProgressStore((s) => s.dueItemIds.length);
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+  const displayName = user?.name || user?.email || "Learner";
+  const initial = (displayName.trim()[0] || "P").toUpperCase();
 
   return (
     <>
@@ -91,16 +97,19 @@ export function AppNav() {
             );
           })}
         </div>
-        <div className="mt-auto flex min-h-14 items-center gap-3 rounded-2xl bg-ink/5 px-3.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-ink/10 text-sm font-bold">
-            P
+        <div className="mt-auto space-y-3">
+          <div className="flex min-h-14 items-center gap-3 rounded-2xl bg-ink/5 px-3.5">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-ink/10 text-sm font-bold">
+              {initial}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-bold text-ink">{displayName}</p>
+              <p className="text-xs font-medium text-primary">
+                {streakDays > 0 ? `${streakDays} day streak` : "Start a streak"}
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-sm font-bold text-ink">Learner</p>
-            <p className="text-xs font-medium text-primary">
-              {streakDays > 0 ? `${streakDays} day streak` : "Start a streak"}
-            </p>
-          </div>
+          <AuthAccount compact />
         </div>
       </nav>
     </>

@@ -43,10 +43,22 @@ When Convex URL is present:
 Without Convex URL (CI/e2e without deployment), Next falls back to SQLite
 Better Auth in `src/lib/auth.ts`.
 
-## Regenerating types
+## Google OAuth
+
+Set the same values in `apps/web/.env.local` **and** on the Convex deployment:
 
 ```bash
-cd apps/web && pnpm exec convex codegen
+# .env.local
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+
+# Convex
+cd apps/web
+pnpm exec convex env set GOOGLE_CLIENT_ID "..."
+pnpm exec convex env set GOOGLE_CLIENT_SECRET "..."
 ```
 
-Commit `convex/_generated/` when it changes.
+Google Cloud redirect URI: `{SITE_URL}/api/auth/callback/google`  
+(e.g. `http://localhost:3000/api/auth/callback/google`).
+
+The sign-in UI polls `/api/auth/providers` and enables Google when both secrets are set.
