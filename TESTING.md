@@ -93,9 +93,9 @@ Run commands will be filled in as packages are scaffolded. Until then, use the *
 - [x] Grader: normalise, accent rules, XP 10/5/0
 - [x] Session builder: 12–15, ~30% due
 - [x] Choice / true_false components + hint + inline feedback
-- [ ] Playwright full session (next)
+- [x] Playwright: short fixture session + sign-up smoke
 
-**Run:** `pnpm --filter @passaporte/web exec vitest run`
+**Run:** `pnpm --filter @passaporte/web exec vitest run` · `pnpm web:e2e`
 
 ---
 

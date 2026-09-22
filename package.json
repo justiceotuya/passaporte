@@ -10,6 +10,7 @@
     "test:web": "pnpm --filter @passaporte/web exec vitest run",
     "web": "pnpm --filter @passaporte/web dev",
     "web:test": "pnpm --filter @passaporte/web exec vitest run",
+    "web:e2e": "pnpm --filter @passaporte/web exec playwright test",
     "pipeline:test": "cd pipeline && uv run pytest -q"
   },
   "engines": {

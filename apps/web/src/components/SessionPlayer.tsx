@@ -12,7 +12,13 @@ import { useProgressStore } from "@/lib/progress-store";
 
 type Phase = "playing" | "feedback" | "summary";
 
-export function SessionPlayer({ unit }: { unit: PassaporteUnit }) {
+export function SessionPlayer({
+  unit,
+  sessionSize = 12,
+}: {
+  unit: PassaporteUnit;
+  sessionSize?: number;
+}) {
   const dueItemIds = useProgressStore((s) => s.dueItemIds);
   const recordAttempt = useProgressStore((s) => s.recordAttempt);
   const finishSession = useProgressStore((s) => s.finishSession);
@@ -31,9 +37,9 @@ export function SessionPlayer({ unit }: { unit: PassaporteUnit }) {
           (i) => i.type === "choice" || i.type === "true_false",
         ),
         dueItemIds,
-        size: 12,
+        size: sessionSize,
       }),
-    [unit.items, dueItemIds],
+    [unit.items, dueItemIds, sessionSize],
   );
 
   const itemById = useMemo(() => {
@@ -146,7 +152,10 @@ export function SessionPlayer({ unit }: { unit: PassaporteUnit }) {
 
   if (phase === "summary") {
     return (
-      <div className="mx-auto flex min-h-screen w-full max-w-lg flex-col px-4 py-8">
+      <div
+        className="mx-auto flex min-h-screen w-full max-w-lg flex-col px-4 py-8"
+        data-testid="session-summary"
+      >
         <h1 className="font-display text-3xl font-semibold">Session complete</h1>
         <p className="mt-2 text-ink-muted">
           You earned {sessionXp} XP this session.
@@ -174,9 +183,18 @@ export function SessionPlayer({ unit }: { unit: PassaporteUnit }) {
   const showReveal = phase === "feedback" && !lastCorrect && attemptNo >= 2;
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-lg flex-col px-4 py-6">
+    <div
+      className="mx-auto flex min-h-screen w-full max-w-lg flex-col px-4 py-6"
+      data-testid="session-player"
+      data-item-id={current.id}
+      data-item-type={current.type}
+      data-phase={phase}
+    >
       <div className="mb-4 flex items-center justify-between gap-3">
-        <p className="text-xs font-bold uppercase tracking-wide text-ink-faint">
+        <p
+          className="text-xs font-bold uppercase tracking-wide text-ink-faint"
+          data-testid="session-progress-label"
+        >
           Unit {unit.unit} · {index + 1}/{items.length}
         </p>
         <p className="text-xs font-bold uppercase tracking-wide text-primary">
@@ -250,7 +268,12 @@ export function SessionPlayer({ unit }: { unit: PassaporteUnit }) {
                   : `Answer: ${answerStr}`
             }
           />
-          <button type="button" className="btn-primary mt-6 w-full" onClick={continueAfterFeedback}>
+          <button
+            type="button"
+            className="btn-primary mt-6 w-full"
+            data-testid="continue-button"
+            onClick={continueAfterFeedback}
+          >
             Continue
           </button>
         </>

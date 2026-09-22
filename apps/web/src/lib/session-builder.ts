@@ -28,11 +28,14 @@ export function buildSession(input: {
   size?: number;
   random?: () => number;
 }): SessionPlan {
-  const size = Math.min(
+  const sizeCap = Math.min(
     MAX_SIZE,
-    Math.max(MIN_SIZE, input.size ?? MIN_SIZE),
     input.unitItems.length + input.dueItemIds.length,
   );
+  const size =
+    input.size != null
+      ? Math.min(sizeCap, Math.max(1, input.size))
+      : Math.min(sizeCap, MIN_SIZE);
 
   const unitIds = input.unitItems.map((i) => i.id);
   const dueInUnit = input.dueItemIds.filter((id) => unitIds.includes(id));

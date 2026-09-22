@@ -2,8 +2,8 @@
 
 **Last updated:** 2026-09-22  
 **Owner:** Justice  
-**Status:** Phases 0–1 done · Phase 3 tokens done · Phase 4 auth+mock progress done · Phase 5a–5b player slice done · Phase 2 rasterize CLI done (no live PDF/vision yet)  
-**Next:** Playwright e2e for one fixture session → then Convex swap; optionally run live rasterize if poppler installed
+**Status:** Phases 0–1 · tokens · auth+mock · player 5a–5b · **Playwright e2e** done · Phase 2 rasterize CLI done  
+**Next:** Convex + Better Auth Convex adapter (swap SQLite + localStorage); optionally live rasterize 10–40
 
 ---
 
@@ -40,6 +40,7 @@ See earlier table: open signup · player-first · Zustand progress · Better Aut
 | 2026-09-22 | Grader + session builder · SessionPlayer (`choice`/`true_false`) · `/play` · `/sign-in` |
 | 2026-09-22 | `pipeline/rasterize.py` + pytest (mocked pdftoppm) |
 | 2026-09-22 | Vitest **31** · pytest **16** · `next build` **green** |
+| 2026-09-22 | Playwright e2e: short `/play?size=3` session + sign-up → `/play` (**2** passed) |
 
 ---
 
@@ -47,9 +48,9 @@ See earlier table: open signup · player-first · Zustand progress · Better Aut
 
 ### Immediate next
 
-- [ ] Playwright: sign-up/sign-in → play fixture session → summary
-- [ ] Live `rasterize.py --book passaporte-aluno --pages 10-40` (needs `brew install poppler`)
-- [ ] After Playwright green: Convex + Better Auth Convex adapter; remove SQLite auth + localStorage progress
+- [x] Playwright: short fixture session + account create
+- [ ] Live `rasterize.py --book passaporte-aluno --pages 10-40` (poppler available)
+- [ ] Convex + Better Auth Convex adapter; remove SQLite auth + localStorage progress
 
 ### Still later
 
@@ -88,9 +89,10 @@ uv run python rasterize.py --book passaporte-aluno --pages 10-40
 | --- | --- | --- | --- |
 | 2026-09-22 | 0 | `pnpm test:phase0` | PASS |
 | 2026-09-22 | 1 | vitest schema + pytest schema | PASS 10+10 |
-| 2026-09-22 | 3–5b | `pnpm --filter @passaporte/web exec vitest run` | PASS **31** |
+| 2026-09-22 | 3–5b | `pnpm --filter @passaporte/web exec vitest run` | PASS **32** |
 | 2026-09-22 | 2 partial | `uv run pytest -q` | PASS **16** |
 | 2026-09-22 | 4 | `next build` | PASS |
+| 2026-09-22 | 5e | `pnpm web:e2e` | PASS **2** |
 
 ---
 

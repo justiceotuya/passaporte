@@ -22,12 +22,18 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const body = (await request.json()) as {
+  let body: {
     type: "attempt" | "finish";
     dueItemIds?: string[];
     xp?: number;
     missedItemIds?: string[];
   };
+
+  try {
+    body = (await request.json()) as typeof body;
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
 
   if (body.type === "finish") {
     memory.totalXp += body.xp ?? 0;

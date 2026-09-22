@@ -8,8 +8,16 @@ function loadUnit(): PassaporteUnit {
   return JSON.parse(readFileSync(file, "utf8")) as PassaporteUnit;
 }
 
-export default function PlayPage() {
+type Props = {
+  searchParams: Promise<{ size?: string }>;
+};
+
+export default async function PlayPage({ searchParams }: Props) {
   const unit = loadUnit();
+  const params = await searchParams;
+  const parsed = Number(params.size);
+  const sessionSize =
+    Number.isFinite(parsed) && parsed >= 1 && parsed <= 15 ? parsed : 12;
 
   return (
     <main>
@@ -19,7 +27,7 @@ export default function PlayPage() {
           {unit.title}
         </p>
       </header>
-      <SessionPlayer unit={unit} />
+      <SessionPlayer unit={unit} sessionSize={sessionSize} />
     </main>
   );
 }

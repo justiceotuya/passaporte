@@ -53,4 +53,12 @@ describe("session builder", () => {
     const plan = buildSession({ unitItems, dueItemIds: [], size: 12 });
     expect(plan.itemIds.length).toBe(5);
   });
+
+  it("respects an explicit small size for e2e / short drills", () => {
+    const unitItems = Array.from({ length: 20 }, (_, i) =>
+      fakeItem(`pass-u01-p010-A-${i + 1}`),
+    );
+    const plan = buildSession({ unitItems, dueItemIds: [], size: 3 });
+    expect(plan.itemIds.length).toBe(3);
+  });
 });
