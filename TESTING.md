@@ -52,9 +52,9 @@ Run commands will be filled in as packages are scaffolded. Until then, use the *
 
 - [ ] **Join:** missing item, extra item, letter mismatch, page mismatch → expected report buckets
 - [ ] **Hints:** hint containing the answer string (case-insensitive, accent-normalised) is rejected
-- [x] **Rasterize (calibration):** pages 10–40 — DONE
-- [x] **Rasterize (full):** all pages, all three books — DONE 2026-09-22 (258 + 207 + 245)
-- [ ] **Calibrate:** field-level accuracy printed vs `gold/passaporte_u01-02.json` (once gold exists); do not claim phase complete under 95% without Justice sign-off
+- [x] **Classify (calibration):** aluno pages 10–40 → `extracted/passaporte-aluno/pages.json` (31 pages, 2026-09-22)
+- [x] **Rasterize (full):** all pages, all three books
+- [ ] **Calibrate extract accuracy** vs gold once extract exists
 - [ ] Failed pages append to `failures.jsonl` and do not invent answers
 
 **Run (example):** `make calibrate` + `pytest pipeline/tests/`

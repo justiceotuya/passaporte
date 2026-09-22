@@ -2,8 +2,8 @@
 
 **Last updated:** 2026-09-22  
 **Owner:** Justice  
-**Status:** Full-book rasterize complete (all 3 PDFs, all pages) · app player + e2e green  
-**Next:** Convex + Better Auth adapter; pipeline `classify.py` only after Anthropic key
+**Status:** Classify calibration live (aluno 10–40) · full rasters · player + e2e green  
+**Next:** Classify professor calibration +/or full aluno; then `extract.py`. Convex swap still open on app track.
 
 ---
 
@@ -54,8 +54,9 @@ See earlier table: open signup · player-first · Zustand progress · Better Aut
 - [x] Playwright: short fixture session + account create
 - [x] Live `rasterize.py` pages 10–40 (aluno + professor)
 - [x] Full rasterize all pages — aluno (258), professor (207), valer (245)
+- [x] `classify.py` + calibration run aluno pages 10–40 → `extracted/passaporte-aluno/pages.json`
 - [ ] Convex + Better Auth Convex adapter; remove SQLite auth + localStorage progress
-- [ ] `classify.py` / extract (needs Anthropic key — do not run vision until key present)
+- [ ] Classify professor 10–40 / expand classify; then `extract.py`
 
 ### Still later
 
@@ -100,6 +101,8 @@ uv run python rasterize.py --book passaporte-aluno --pages 10-40
 | 2026-09-22 | 5e | `pnpm web:e2e` | PASS **2** |
 | 2026-09-22 | 2 raster | `uv run python rasterize.py --book passaporte-aluno|professor --pages 10-40` | PASS — 31+31 pages + thumbs; gitignored |
 | 2026-09-22 | 2 raster full | `bash scripts/rasterize-all.sh` (all pages × 3 books) | PASS — 258+207+245 pages + thumbs; ~1.35 GB gitignored |
+| 2026-09-22 | 2 classify | `uv run pytest tests/test_classify.py` | PASS |
+| 2026-09-22 | 2 classify live | `classify.py --book passaporte-aluno --pages 10-40` | PASS — 31/31 → `extracted/passaporte-aluno/pages.json` |
 | 2026-09-22 | 2 raster full | `scripts/rasterize-all.sh` (aluno, professor, valer, all pages) | PASS — 258+207+245 pages + thumbs; ~1.3 GB gitignored |
 
 ---
@@ -127,13 +130,13 @@ You are continuing **Passaporte** (gamified A1 Portuguese app).
 - **Git:** commit + push after every stage (`origin` = https://github.com/justiceotuya/passaporte)
 
 ## Current focus
-1. Introduce Convex + Better Auth Convex adapter; migrate progress off localStorage/Zustand persist
-2. Pipeline: `classify.py` next — **do not call Anthropic** until user puts key in `.env`
-3. Full page rasters on disk: `raw/passaporte-aluno/` (258), `raw/passaporte-professor/` (207), `raw/valer/` (245) + thumbs
+1. Continue pipeline: classify professor 10–40, then `extract.py` for exercise pages
+2. Or app: Convex + Better Auth Convex adapter
+3. Anthropic key is active in local `.env` (never commit). Classify model default: `claude-haiku-4-5-20251001` (override with `ANTHROPIC_CLASSIFY_MODEL`)
 
 ## Commands
+- `cd pipeline && uv run python classify.py --book passaporte-aluno --pages 10-40`
 - `pnpm web:test` · `pnpm web:e2e` · `pnpm pipeline:test` · `pnpm web`
-- `bash scripts/calibrate-rasterize.sh` · `bash scripts/rasterize-all.sh`
 - After each stage: commit + `git push -u origin HEAD`
 
 ## Definition of done for your session
