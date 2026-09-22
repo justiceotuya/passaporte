@@ -54,10 +54,11 @@ Run commands will be filled in as packages are scaffolded. Until then, use the *
 - [x] **Extract (calibration):** aluno 10–40 (29 pages / ~301 items)
 - [x] **extract_key (calibration):** professor 10–40 (22 pages / 298 answers)
 - [x] **join (calibration):** draft `content/passaporte/u01–u07.json` + `gold/join_report.md`
-- [ ] **hints / crop**
+- [x] **hints (calibration):** closed items `hint_en` generated; answer-leak check + retry
+- [x] **crop (calibration):** `needs_image` → `apps/web/public/crops/*.webp` (bbox or full-page fallback)
 - [ ] Failed pages append to `failures.jsonl` and do not invent answers
 
-**Run (example):** `make calibrate` + `pytest pipeline/tests/` + `pnpm pipeline:join`
+**Run (example):** `make calibrate` + `pytest pipeline/tests/` + `pnpm pipeline:join` + `pnpm pipeline:crop` + `pnpm pipeline:hints`
 
 ---
 

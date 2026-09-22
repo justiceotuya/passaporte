@@ -12,7 +12,9 @@
     "web:test": "pnpm --filter @passaporte/web exec vitest run",
     "web:e2e": "pnpm --filter @passaporte/web exec playwright test",
     "pipeline:test": "cd pipeline && uv run pytest -q",
-    "pipeline:join": "cd pipeline && uv run python join.py --report ../extracted/join_report.md"
+    "pipeline:join": "cd pipeline && uv run python join.py --report ../extracted/join_report.md",
+    "pipeline:hints": "cd pipeline && uv run python hints.py",
+    "pipeline:crop": "cd pipeline && uv run python crop.py"
   },
   "engines": {
     "node": ">=20"
