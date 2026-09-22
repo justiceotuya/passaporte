@@ -2,8 +2,8 @@
 
 **Last updated:** 2026-09-22  
 **Owner:** Justice  
-**Status:** Phases 0–1 · tokens · auth+mock · player · Playwright e2e · **live calibration rasterize (pages 10–40)** done  
-**Next:** Convex + Better Auth Convex adapter; then classify/extract (vision only after Anthropic key)
+**Status:** Full-book rasterize complete (all 3 PDFs, all pages) · app player + e2e green  
+**Next:** Convex + Better Auth adapter; pipeline `classify.py` only after Anthropic key
 
 ---
 
@@ -42,6 +42,8 @@ See earlier table: open signup · player-first · Zustand progress · Better Aut
 | 2026-09-22 | Vitest **31** · pytest **16** · `next build` **green** |
 | 2026-09-22 | Playwright e2e: short `/play?size=3` session + sign-up → `/play` (**2** passed) |
 | 2026-09-22 | Live rasterize calibration: aluno + professor pages **10–40** (31 pages × 150 DPI + thumbs each; ~123 MB under `raw/`, gitignored) |
+| 2026-09-22 | **Full rasterize all books/pages:** aluno 258 · professor 207 · valer 245 (each + thumbs; ~1.35 GB under `raw/`, gitignored) |
+| 2026-09-22 | **Full rasterize all books:** aluno 258 · professor 207 · valer 245 (pages + thumbs; ~1.3 GB under `raw/`, gitignored) |
 
 ---
 
@@ -51,6 +53,7 @@ See earlier table: open signup · player-first · Zustand progress · Better Aut
 
 - [x] Playwright: short fixture session + account create
 - [x] Live `rasterize.py` pages 10–40 (aluno + professor)
+- [x] Full rasterize all pages — aluno (258), professor (207), valer (245)
 - [ ] Convex + Better Auth Convex adapter; remove SQLite auth + localStorage progress
 - [ ] `classify.py` / extract (needs Anthropic key — do not run vision until key present)
 
@@ -96,6 +99,8 @@ uv run python rasterize.py --book passaporte-aluno --pages 10-40
 | 2026-09-22 | 4 | `next build` | PASS |
 | 2026-09-22 | 5e | `pnpm web:e2e` | PASS **2** |
 | 2026-09-22 | 2 raster | `uv run python rasterize.py --book passaporte-aluno|professor --pages 10-40` | PASS — 31+31 pages + thumbs; gitignored |
+| 2026-09-22 | 2 raster full | `bash scripts/rasterize-all.sh` (all pages × 3 books) | PASS — 258+207+245 pages + thumbs; ~1.35 GB gitignored |
+| 2026-09-22 | 2 raster full | `scripts/rasterize-all.sh` (aluno, professor, valer, all pages) | PASS — 258+207+245 pages + thumbs; ~1.3 GB gitignored |
 
 ---
 
@@ -124,11 +129,11 @@ You are continuing **Passaporte** (gamified A1 Portuguese app).
 ## Current focus
 1. Introduce Convex + Better Auth Convex adapter; migrate progress off localStorage/Zustand persist
 2. Pipeline: `classify.py` next — **do not call Anthropic** until user puts key in `.env`
-3. Calibration rasters already on disk: `raw/passaporte-aluno/` and `raw/passaporte-professor/` (p-010…p-040 + thumbs)
+3. Full page rasters on disk: `raw/passaporte-aluno/` (258), `raw/passaporte-professor/` (207), `raw/valer/` (245) + thumbs
 
 ## Commands
 - `pnpm web:test` · `pnpm web:e2e` · `pnpm pipeline:test` · `pnpm web`
-- `bash scripts/calibrate-rasterize.sh` (re-run pages 10–40)
+- `bash scripts/calibrate-rasterize.sh` · `bash scripts/rasterize-all.sh`
 - After each stage: commit + `git push -u origin HEAD`
 
 ## Definition of done for your session
