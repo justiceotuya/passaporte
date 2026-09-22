@@ -108,3 +108,49 @@ export function gradeChoice(
     revealed,
   });
 }
+
+export function gradeFillBlank(
+  given: string,
+  expected: string,
+  accepted: string[],
+  attemptNo: number,
+  revealed = false,
+): GradeResult {
+  return gradeAttempt({
+    given,
+    expected,
+    accepted,
+    attemptNo,
+    revealed,
+  });
+}
+
+export type MatchPairLike = { left: string; right: string };
+
+function pairKey(pair: MatchPairLike): string {
+  return `${normaliseAnswer(pair.left)}::${normaliseAnswer(pair.right)}`;
+}
+
+/** Set-equality of left/right pairs (order independent). */
+export function gradeMatch(
+  given: MatchPairLike[],
+  expected: MatchPairLike[],
+  attemptNo: number,
+  revealed = false,
+): GradeResult {
+  if (revealed) {
+    return { correct: false, xp: 0, accentOnlyMiss: false };
+  }
+  if (given.length !== expected.length) {
+    return { correct: false, xp: 0, accentOnlyMiss: false };
+  }
+  const expectedKeys = new Set(expected.map(pairKey));
+  const correct =
+    given.length === expectedKeys.size &&
+    given.every((pair) => expectedKeys.has(pairKey(pair)));
+  return {
+    correct,
+    xp: correct ? (attemptNo === 1 ? 10 : 5) : 0,
+    accentOnlyMiss: false,
+  };
+}

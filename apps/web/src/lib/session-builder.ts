@@ -9,6 +9,22 @@ export type SessionPlan = {
 const MIN_SIZE = 12;
 const MAX_SIZE = 15;
 const DUE_RATIO = 0.3;
+const MATCH_PAIR_CAP = 8;
+
+export function isPlayableItem(item: PassaporteItem): boolean {
+  if (item.type === "choice" || item.type === "true_false") return true;
+  if (item.type === "fill_blank") return true;
+  if (item.type === "match") {
+    const pairs =
+      Array.isArray(item.answer) &&
+      item.answer.length > 0 &&
+      typeof item.answer[0] === "object"
+        ? (item.answer as { left: string; right: string }[])
+        : (item.pairs ?? []);
+    return pairs.length >= 2 && pairs.length <= MATCH_PAIR_CAP;
+  }
+  return false;
+}
 
 function shuffle<T>(items: T[]): T[] {
   const copy = [...items];

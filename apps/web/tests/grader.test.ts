@@ -3,6 +3,8 @@ import {
   answersMatch,
   gradeAttempt,
   gradeChoice,
+  gradeFillBlank,
+  gradeMatch,
   normaliseAnswer,
   stripDiacritics,
 } from "@/lib/grader";
@@ -67,5 +69,31 @@ describe("grader", () => {
     expect(
       answersMatch("me chamo", "chamo-me", ["me chamo"], { enforceAccents: true }),
     ).toBe(true);
+  });
+
+  it("grades fill_blank with accepted variants", () => {
+    const result = gradeFillBlank("me chamo", "chamo-me", ["me chamo"], 1);
+    expect(result.correct).toBe(true);
+    expect(result.xp).toBe(10);
+  });
+
+  it("grades match by set equality", () => {
+    const expected = [
+      { left: "aqui", right: "A" },
+      { left: "ali", right: "B" },
+    ];
+    expect(
+      gradeMatch(
+        [
+          { left: "ali", right: "B" },
+          { left: "aqui", right: "A" },
+        ],
+        expected,
+        1,
+      ).correct,
+    ).toBe(true);
+    expect(
+      gradeMatch([{ left: "aqui", right: "B" }], expected, 1).correct,
+    ).toBe(false);
   });
 });

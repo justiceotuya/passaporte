@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { buildSession } from "@/lib/session-builder";
+import { buildSession, isPlayableItem } from "@/lib/session-builder";
 import type { PassaporteItem } from "@/types/item";
 
-function fakeItem(id: string): PassaporteItem {
+function fakeItem(id: string, overrides: Partial<PassaporteItem> = {}): PassaporteItem {
   return {
     id,
     book: "passaporte",
@@ -20,6 +20,7 @@ function fakeItem(id: string): PassaporteItem {
     hint_en: "hint",
     answer_source: "generated",
     review: { status: "approved" },
+    ...overrides,
   };
 }
 
@@ -60,5 +61,37 @@ describe("session builder", () => {
     );
     const plan = buildSession({ unitItems, dueItemIds: [], size: 3 });
     expect(plan.itemIds.length).toBe(3);
+  });
+
+  it("marks fill_blank and small match sets playable", () => {
+    expect(isPlayableItem(fakeItem("pass-u01-p010-A-1", { type: "fill_blank" }))).toBe(
+      true,
+    );
+    expect(
+      isPlayableItem(
+        fakeItem("pass-u01-p010-B-1", {
+          type: "match",
+          pairs: [
+            { left: "a", right: "1" },
+            { left: "b", right: "2" },
+          ],
+          answer: [
+            { left: "a", right: "1" },
+            { left: "b", right: "2" },
+          ],
+        }),
+      ),
+    ).toBe(true);
+    expect(
+      isPlayableItem(
+        fakeItem("pass-u01-p010-C-1", {
+          type: "match",
+          pairs: Array.from({ length: 12 }, (_, i) => ({
+            left: `L${i}`,
+            right: `${i}`,
+          })),
+        }),
+      ),
+    ).toBe(false);
   });
 });

@@ -96,6 +96,9 @@ Run commands will be filled in as packages are scaffolded. Until then, use the *
 - [x] Session builder: 12–15, ~30% due
 - [x] Choice / true_false components + hint + inline feedback
 - [x] Playwright: short fixture session + sign-up smoke
+- [x] `stimulus_image` render (max 240px)
+- [x] `fill_blank` tiles + typed (diacritics row)
+- [x] `match` pair-tap (≤8 pairs)
 
 **Run:** `pnpm --filter @passaporte/web exec vitest run` · `pnpm web:e2e`
 
@@ -115,7 +118,9 @@ Note: outputs live under `raw/` and must stay **gitignored**.
 
 ### 5c Remaining item types
 
-- [ ] One unit test or component test per type: `fill_blank` tiles, typed + diacritics row, `match` pair-tap, `order`, `transform`, `listen_choice` transcript
+- [x] `fill_blank` tiles + typed + diacritics row
+- [x] `match` pair-tap
+- [ ] `order`, `transform`, `listen_choice` transcript
 
 ### 5d Session end / SRS / stats
 

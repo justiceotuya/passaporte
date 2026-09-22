@@ -1,16 +1,34 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { PassaporteItem, PassaporteUnit } from "@/types/item";
+import type { MatchPair, PassaporteItem, PassaporteUnit } from "@/types/item";
 import { ChoiceOption } from "@/components/ChoiceOption";
 import { TrueFalsePair } from "@/components/TrueFalsePair";
 import { HintDisclosure } from "@/components/HintDisclosure";
 import { FeedbackBanner } from "@/components/FeedbackBanner";
-import { gradeChoice, gradeTrueFalse } from "@/lib/grader";
-import { buildSession } from "@/lib/session-builder";
+import { StimulusImage } from "@/components/StimulusImage";
+import { FillBlankTyped } from "@/components/FillBlankTyped";
+import { MatchPairTap } from "@/components/MatchPairTap";
+import {
+  gradeChoice,
+  gradeFillBlank,
+  gradeMatch,
+  gradeTrueFalse,
+} from "@/lib/grader";
+import { buildSession, isPlayableItem } from "@/lib/session-builder";
 import { useProgressStore } from "@/lib/progress-store";
 
 type Phase = "playing" | "feedback" | "summary";
+
+function expectedMatchPairs(item: PassaporteItem): MatchPair[] {
+  if (Array.isArray(item.answer) && item.answer.length > 0) {
+    const first = item.answer[0];
+    if (typeof first === "object" && first && "left" in first) {
+      return item.answer as MatchPair[];
+    }
+  }
+  return item.pairs ?? [];
+}
 
 export function SessionPlayer({
   unit,
@@ -33,9 +51,7 @@ export function SessionPlayer({
   const plan = useMemo(
     () =>
       buildSession({
-        unitItems: unit.items.filter(
-          (i) => i.type === "choice" || i.type === "true_false",
-        ),
+        unitItems: unit.items.filter(isPlayableItem),
         dueItemIds,
         size: sessionSize,
       }),
@@ -55,6 +71,7 @@ export function SessionPlayer({
   const [index, setIndex] = useState(0);
   const [attemptNo, setAttemptNo] = useState(1);
   const [selected, setSelected] = useState<string | null>(null);
+  const [typed, setTyped] = useState("");
   const [phase, setPhase] = useState<Phase>("playing");
   const [lastCorrect, setLastCorrect] = useState(false);
   const [sessionXp, setSessionXp] = useState(0);
@@ -62,17 +79,15 @@ export function SessionPlayer({
   const [locked, setLocked] = useState(false);
 
   const current = items[index];
-  const progress = items.length === 0 ? 0 : ((index + (phase === "summary" ? 1 : 0)) / items.length) * 100;
+  const progress =
+    items.length === 0
+      ? 0
+      : ((index + (phase === "summary" ? 1 : 0)) / items.length) * 100;
 
-  function submitAnswer(given: string) {
-    if (!current || locked) return;
+  function commitResult(given: string, result: { correct: boolean; xp: number }) {
+    if (!current) return;
     setSelected(given);
     setLocked(true);
-
-    const result =
-      current.type === "true_false"
-        ? gradeTrueFalse(given as "true" | "false", String(current.answer), attemptNo)
-        : gradeChoice(given, String(current.answer), attemptNo);
 
     recordAttempt({
       itemId: current.id,
@@ -87,24 +102,54 @@ export function SessionPlayer({
     void fetch("/api/progress", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: "attempt", itemId: current.id, correct: result.correct }),
+      body: JSON.stringify({
+        type: "attempt",
+        itemId: current.id,
+        correct: result.correct,
+      }),
     }).catch(() => undefined);
 
     setLastCorrect(result.correct);
     setSessionXp((xp) => xp + result.xp);
 
-    if (result.correct) {
-      setPhase("feedback");
-      return;
+    if (!result.correct && attemptNo >= 2) {
+      setMissed((m) => [...m, current.id]);
     }
-
-    if (attemptNo < 2) {
-      setPhase("feedback");
-      return;
-    }
-
-    setMissed((m) => [...m, current.id]);
     setPhase("feedback");
+  }
+
+  function submitAnswer(given: string) {
+    if (!current || locked) return;
+
+    if (current.type === "true_false") {
+      commitResult(
+        given,
+        gradeTrueFalse(given as "true" | "false", String(current.answer), attemptNo),
+      );
+      return;
+    }
+
+    if (current.type === "fill_blank") {
+      commitResult(
+        given,
+        gradeFillBlank(
+          given,
+          String(current.answer),
+          current.accepted ?? [],
+          attemptNo,
+        ),
+      );
+      return;
+    }
+
+    commitResult(given, gradeChoice(given, String(current.answer), attemptNo));
+  }
+
+  function submitMatch(pairs: MatchPair[]) {
+    if (!current || locked) return;
+    const expected = expectedMatchPairs(current);
+    const result = gradeMatch(pairs, expected, attemptNo);
+    commitResult(JSON.stringify(pairs), result);
   }
 
   function continueAfterFeedback() {
@@ -113,6 +158,7 @@ export function SessionPlayer({
     if (!lastCorrect && attemptNo < 2) {
       setAttemptNo(2);
       setSelected(null);
+      setTyped("");
       setLocked(false);
       setPhase("playing");
       return;
@@ -120,7 +166,9 @@ export function SessionPlayer({
 
     const next = index + 1;
     if (next >= items.length) {
-      const missedIds = lastCorrect ? missed : [...new Set([...missed, current.id])];
+      const missedIds = lastCorrect
+        ? missed
+        : [...new Set([...missed, current.id])];
       finishSession({ sessionId, xp: sessionXp, missedItemIds: missedIds });
       void fetch("/api/progress", {
         method: "POST",
@@ -138,6 +186,7 @@ export function SessionPlayer({
     setIndex(next);
     setAttemptNo(1);
     setSelected(null);
+    setTyped("");
     setLocked(false);
     setPhase("playing");
   }
@@ -145,7 +194,7 @@ export function SessionPlayer({
   if (items.length === 0) {
     return (
       <p className="p-6 text-ink-muted">
-        No playable choice / true_false items in this unit.
+        No playable items in this unit (choice, true_false, fill_blank, match).
       </p>
     );
   }
@@ -163,7 +212,9 @@ export function SessionPlayer({
         <div className="card-surface mt-6 space-y-3 p-5">
           <p className="text-sm uppercase tracking-wide text-ink-faint">Totals</p>
           <p className="text-lg font-bold">Lifetime XP · {totalXp}</p>
-          <p className="text-lg font-bold text-primary">Streak · {streakDays} day{streakDays === 1 ? "" : "s"}</p>
+          <p className="text-lg font-bold text-primary">
+            Streak · {streakDays} day{streakDays === 1 ? "" : "s"}
+          </p>
           <p className="text-sm text-ink-muted">
             Missed items queued for review: {missed.length}
           </p>
@@ -181,6 +232,11 @@ export function SessionPlayer({
 
   const answerStr = String(current.answer);
   const showReveal = phase === "feedback" && !lastCorrect && attemptNo >= 2;
+  const fillUsesTiles =
+    current.type === "fill_blank" &&
+    Array.isArray(current.options) &&
+    current.options.length >= 2;
+  const matchPairs = expectedMatchPairs(current);
 
   return (
     <div
@@ -210,6 +266,11 @@ export function SessionPlayer({
       </div>
 
       <p className="book-text mb-4">{current.instruction}</p>
+
+      {current.stimulus_image ? (
+        <StimulusImage src={current.stimulus_image} />
+      ) : null}
+
       <h2 className="mb-2 text-xl font-semibold tracking-tight text-ink">
         {current.prompt}
       </h2>
@@ -227,13 +288,47 @@ export function SessionPlayer({
               if (phase === "playing") submitAnswer(value);
             }}
           />
-        ) : (
+        ) : null}
+
+        {current.type === "match" ? (
+          <MatchPairTap
+            key={`${current.id}-${attemptNo}`}
+            pairs={matchPairs}
+            locked={phase === "feedback"}
+            showSolution={showReveal}
+            onComplete={(pairs) => {
+              if (phase === "playing") submitMatch(pairs);
+            }}
+          />
+        ) : null}
+
+        {current.type === "fill_blank" && !fillUsesTiles ? (
+          phase === "playing" ? (
+            <FillBlankTyped
+              value={typed}
+              onChange={setTyped}
+              onSubmit={() => submitAnswer(typed)}
+              disabled={locked}
+            />
+          ) : (
+            <p className="text-sm text-ink-muted" data-testid="fill-blank-reveal">
+              {showReveal ? `Answer: ${answerStr}` : `You wrote: ${selected}`}
+            </p>
+          )
+        ) : null}
+
+        {(current.type === "choice" || fillUsesTiles) &&
           (current.options ?? []).map((option) => {
-            let state: "default" | "selected" | "correct" | "incorrect" | "revealed" =
-              "default";
+            let state:
+              | "default"
+              | "selected"
+              | "correct"
+              | "incorrect"
+              | "revealed" = "default";
             if (phase === "feedback") {
               if (option === answerStr) {
-                state = showReveal && selected !== option ? "revealed" : "correct";
+                state =
+                  showReveal && selected !== option ? "revealed" : "correct";
               } else if (option === selected) {
                 state = "incorrect";
               }
@@ -250,8 +345,7 @@ export function SessionPlayer({
                 onClick={() => submitAnswer(option)}
               />
             );
-          })
-        )}
+          })}
       </div>
 
       {phase === "feedback" ? (
@@ -265,7 +359,9 @@ export function SessionPlayer({
                   : "Got it on the second try."
                 : attemptNo < 2
                   ? "Try once more. Accents matter on the next attempt."
-                  : `Answer: ${answerStr}`
+                  : current.type === "match"
+                    ? "Check the highlighted pairs."
+                    : `Answer: ${answerStr}`
             }
           />
           <button
