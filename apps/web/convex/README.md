@@ -1,24 +1,21 @@
 # Convex backend (Passaporte)
 
-Progress, sessions, attempts, and (after cutover) Better Auth live here.
+Progress, sessions, attempts, and Better Auth live here when
+`NEXT_PUBLIC_CONVEX_URL` is set.
 
 ## First-time setup
 
-`convex` is a dependency of `@passaporte/web` (`apps/web/package.json`). Always run the CLI from **`apps/web`** (or via the root `pnpm web:convex` script). Do **not** run `npx convex` from the monorepo root — root `package.json` has no `convex` dependency, and the CLI will exit with:
-
-> In order to run `npx convex dev`, add `convex` to your package.json dependencies.
+`convex` is a dependency of `@passaporte/web`. Run the CLI from **`apps/web`**
+(or `pnpm web:convex` from the monorepo root).
 
 ```bash
-# from monorepo root
 pnpm install
-pnpm web:convex
-# or explicitly:
 cd apps/web
-pnpm exec convex login   # interactive — required once per machine
-pnpm exec convex dev     # creates deployment, writes .env.local, codegen
+pnpm exec convex login   # once per machine
+pnpm exec convex dev     # or: pnpm web:convex from root
 ```
 
-Then set Convex env vars (CLI will prompt / you can set explicitly):
+Deployment env (already needed for auth):
 
 ```bash
 cd apps/web
@@ -26,7 +23,7 @@ pnpm exec convex env set SITE_URL http://localhost:3000
 pnpm exec convex env set BETTER_AUTH_SECRET "$(openssl rand -base64 32)"
 ```
 
-Copy into repo-root `.env.local` (gitignored) whatever `convex dev` prints:
+`.env.local` (gitignored) should include:
 
 ```
 CONVEX_DEPLOYMENT=dev:...
@@ -35,22 +32,21 @@ NEXT_PUBLIC_CONVEX_SITE_URL=https://....convex.site
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-## Auth cutover
+## Auth cutover (done)
 
-Until Convex is configured, **Next keeps Better Auth + SQLite** (`src/lib/auth.ts`).
-Progress syncs to Convex via `/api/progress` using a temporary `bridgeUserId`
-from the Better Auth session when `NEXT_PUBLIC_CONVEX_URL` is set.
+When Convex URL is present:
 
-After `convex dev` is healthy, switch Next auth routes to the Convex adapter
-(`src/lib/auth-server.ts` + `ConvexBetterAuthProvider`) as documented in
-https://labs.convex.dev/better-auth/framework-guides/next
+- `/api/auth/*` → Convex Better Auth handler (`src/lib/auth-server.ts`)
+- `ConvexClientProvider` → `ConvexBetterAuthProvider`
+- Progress still mirrors via `/api/progress` + `bridgeUserId` (HTTP client)
+
+Without Convex URL (CI/e2e without deployment), Next falls back to SQLite
+Better Auth in `src/lib/auth.ts`.
 
 ## Regenerating types
 
 ```bash
-cd apps/web
-pnpm exec convex codegen
-# or: pnpm convex:codegen
+cd apps/web && pnpm exec convex codegen
 ```
 
 Commit `convex/_generated/` when it changes.

@@ -1,7 +1,9 @@
 "use client";
 
 import { type ReactNode, useMemo } from "react";
-import { ConvexProvider, ConvexReactClient } from "convex/react";
+import { ConvexReactClient } from "convex/react";
+import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
+import { authClient } from "@/lib/auth-client";
 import { isConvexConfigured } from "@/lib/convex-env";
 
 let client: ConvexReactClient | null = null;
@@ -15,19 +17,30 @@ function getConvexClient(): ConvexReactClient | null {
 }
 
 /**
- * Wraps the app with Convex when `NEXT_PUBLIC_CONVEX_URL` is set.
- * Without it (local/e2e default), children render unchanged so SQLite auth
- * and Zustand progress keep working.
- *
- * After `npx convex login` + adapter cutover, swap this for
- * `ConvexBetterAuthProvider` from `@convex-dev/better-auth/react`.
+ * Convex + Better Auth when configured; otherwise plain children (SQLite auth).
+ * `ConvexBetterAuthProvider` includes the Convex React context.
  */
-export function ConvexClientProvider({ children }: { children: ReactNode }) {
+export function ConvexClientProvider({
+  children,
+  initialToken,
+}: {
+  children: ReactNode;
+  initialToken?: string | null;
+}) {
   const convex = useMemo(() => getConvexClient(), []);
 
   if (!convex) {
     return <>{children}</>;
   }
 
-  return <ConvexProvider client={convex}>{children}</ConvexProvider>;
+  return (
+    <ConvexBetterAuthProvider
+      client={convex}
+      // better-auth / @convex-dev/better-auth peer type mismatch on useSession
+      authClient={authClient as never}
+      initialToken={initialToken}
+    >
+      {children}
+    </ConvexBetterAuthProvider>
+  );
 }
