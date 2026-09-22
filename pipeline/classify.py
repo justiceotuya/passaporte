@@ -192,6 +192,23 @@ def classify_image(
         return PageClassification.model_validate(data)
 
 
+def load_existing_pages(path: Path) -> dict[int, PageClassification]:
+    if not path.is_file():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    out: dict[int, PageClassification] = {}
+    for row in data.get("pages") or []:
+        try:
+            item = PageClassification.model_validate(row)
+            out[item.page] = item
+        except ValidationError:
+            continue
+    return out
+
+
 def classify_book(
     *,
     book: str,
@@ -201,6 +218,8 @@ def classify_book(
     model: str = DEFAULT_MODEL,
     client: Any | None = None,
     sleep_s: float = 0.0,
+    merge: bool = True,
+    skip_existing: bool = True,
 ) -> Path:
     if book not in BOOKS:
         raise ClassifyError(f"Unknown book '{book}'. Expected one of {BOOKS}")
@@ -213,8 +232,16 @@ def classify_book(
 
         client = Anthropic(api_key=api_key)
 
-    results: list[PageClassification] = []
+    dest_dir = out_dir / book
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    dest = dest_dir / "pages.json"
+    existing = load_existing_pages(dest) if merge else {}
+
+    results_by_page: dict[int, PageClassification] = dict(existing)
     for page in pages:
+        if skip_existing and page in existing:
+            print(f"skip {book} p-{page:03d} (already classified)")
+            continue
         path = thumb_path(raw_dir, book, page)
         if not path.is_file():
             append_failure(
@@ -235,7 +262,7 @@ def classify_book(
                 page=page,
                 book=book,
             )
-            results.append(result)
+            results_by_page[page] = result
             print(f"ok  {book} p-{page:03d} → {result.page_kind.value} unit={result.unit}")
         except Exception as exc:  # noqa: BLE001 — log and continue per page
             append_failure(
@@ -251,15 +278,13 @@ def classify_book(
         if sleep_s:
             time.sleep(sleep_s)
 
+    pages_sorted = [results_by_page[p] for p in sorted(results_by_page)]
     index = PagesIndex(
         book=book,
         model=model,
         created_at=datetime.now(timezone.utc).isoformat(),
-        pages=results,
+        pages=pages_sorted,
     )
-    dest_dir = out_dir / book
-    dest_dir.mkdir(parents=True, exist_ok=True)
-    dest = dest_dir / "pages.json"
     dest.write_text(index.model_dump_json(indent=2), encoding="utf-8")
     return dest
 
@@ -274,6 +299,16 @@ def build_parser() -> argparse.ArgumentParser:
         type=float,
         default=0.15,
         help="Seconds between API calls (rate limit cushion)",
+    )
+    parser.add_argument(
+        "--no-merge",
+        action="store_true",
+        help="Replace pages.json instead of merging by page number",
+    )
+    parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Re-classify pages even if already present in pages.json",
     )
     return parser
 
@@ -294,6 +329,8 @@ def main(argv: list[str] | None = None) -> int:
             pages=pages,
             model=args.model,
             sleep_s=args.sleep,
+            merge=not args.no_merge,
+            skip_existing=not args.force,
         )
     except ClassifyError as exc:
         print(f"error: {exc}", file=sys.stderr)
