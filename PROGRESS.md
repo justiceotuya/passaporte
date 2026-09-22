@@ -116,15 +116,16 @@ You are continuing **Passaporte** (gamified A1 Portuguese app).
 - Content fixture: `content/passaporte/u01.json`
 - Pipeline: `rasterize.py` done; no Anthropic/vision until user adds key to `.env`
 - Open signup; English chrome; Portuguese in Source Serif 4 (book voice)
-- **Push blocker:** `gh` not logged in — run `gh auth login`, then `git push -u origin HEAD` from `cursor/passaporte-scaffold-player-slice`
+- **Git:** commit + push after every stage (`origin` = https://github.com/justiceotuya/passaporte)
 
 ## Current focus
-1. Add Playwright e2e: create account → /play → complete choice/true_false session → summary
-2. Optionally run live rasterize pages 10–40 if poppler available
-3. After e2e green: introduce Convex + swap auth adapter; migrate progress off localStorage
+1. Introduce Convex + Better Auth Convex adapter; migrate progress off localStorage/Zustand persist
+2. Optionally run live rasterize pages 10–40 (`pdftoppm` is installed)
+3. Then remaining item types / unit map
 
 ## Commands
-- `pnpm web:test` · `pnpm pipeline:test` · `pnpm web` · `cd apps/web && pnpm auth:migrate`
+- `pnpm web:test` · `pnpm web:e2e` · `pnpm pipeline:test` · `pnpm web`
+- After each stage: commit + `git push -u origin HEAD`
 
 ## Definition of done for your session
 Update PROGRESS.md + test log; rewrite Current focus / Next actions in this handover block.
