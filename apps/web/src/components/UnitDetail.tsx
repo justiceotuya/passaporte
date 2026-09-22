@@ -60,7 +60,7 @@ export function UnitDetail({ unit, locked }: Props) {
   );
   const exercises = groupByExercise(unit);
   const playHref = `/play?unit=${unit.unit}`;
-  const reviewHref = `/play?unit=${unit.unit}&review=1`;
+  const reviewHref = `/review`;
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-lg flex-col px-4 pb-36 pt-4">

@@ -47,7 +47,10 @@ export function SignInForm() {
   }
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-4 py-10">
+    <div
+      className="mx-auto flex min-h-screen w-full max-w-md flex-col justify-center px-4 py-10"
+      data-testid="sign-in-form"
+    >
       <p className="mb-2 text-xs font-bold uppercase tracking-wide text-primary">
         Passaporte
       </p>
@@ -123,7 +126,11 @@ export function SignInForm() {
           </div>
         </label>
 
-        {error ? <p className="text-sm text-error">{error}</p> : null}
+        {error ? (
+          <p className="text-sm text-error" role="alert">
+            {error}
+          </p>
+        ) : null}
 
         <button type="submit" className="btn-primary w-full" disabled={pending}>
           {pending ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useProgressStore } from "@/lib/progress-store";
 import { buildUnitProgressList } from "@/lib/unit-progress";
+import { AppNav } from "@/components/AppNav";
 
 export type MapUnit = {
   unit: number;
@@ -53,7 +54,7 @@ export function UnitMap({ units }: Props) {
 
       {dueItemIds.length > 0 ? (
         <Link
-          href="/play?review=1"
+          href="/review"
           className="mb-6 flex min-h-tap items-center justify-between rounded-2xl border border-info/40 bg-info/10 px-4"
           data-testid="review-due-chip"
         >
@@ -61,7 +62,7 @@ export function UnitMap({ units }: Props) {
             Review due · {dueItemIds.length}
           </span>
           <span className="rounded-pill bg-info px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-ink-on">
-            Play
+            Open
           </span>
         </Link>
       ) : null}
@@ -167,28 +168,7 @@ export function UnitMap({ units }: Props) {
         })}
       </ol>
 
-      <nav className="fixed bottom-0 left-0 right-0 border-t border-ink/10 bg-surface/95 backdrop-blur">
-        <div className="mx-auto flex max-w-lg">
-          <Link
-            href="/"
-            className="flex min-h-[64px] flex-1 flex-col items-center justify-center text-xs font-bold text-primary"
-          >
-            Map
-          </Link>
-          <Link
-            href="/play?review=1"
-            className="flex min-h-[64px] flex-1 flex-col items-center justify-center text-xs font-bold text-ink-faint"
-          >
-            Review
-          </Link>
-          <Link
-            href="/sign-in"
-            className="flex min-h-[64px] flex-1 flex-col items-center justify-center text-xs font-bold text-ink-faint"
-          >
-            Account
-          </Link>
-        </div>
-      </nav>
+      <AppNav />
     </div>
   );
 }

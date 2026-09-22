@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 3000;
+const PORT = Number(process.env.PLAYWRIGHT_PORT ?? 3010);
 const baseURL = `http://127.0.0.1:${PORT}`;
 
 export default defineConfig({
@@ -19,13 +19,16 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: {
+        ...devices["Desktop Chrome"],
+        channel: "chrome",
+      },
     },
   ],
   webServer: {
-    command: `pnpm exec next dev -H 127.0.0.1 -p ${PORT}`,
+    command: `pnpm exec next start -H 127.0.0.1 -p ${PORT}`,
     url: baseURL,
     reuseExistingServer: true,
-    timeout: 120_000,
+    timeout: 180_000,
   },
 });

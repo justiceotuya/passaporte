@@ -13,7 +13,10 @@ const MATCH_PAIR_CAP = 8;
 
 export function isPlayableItem(item: PassaporteItem): boolean {
   if (item.type === "choice" || item.type === "true_false") return true;
-  if (item.type === "fill_blank") return true;
+  if (item.type === "fill_blank") {
+    const answer = String(item.answer ?? "").trim();
+    return Boolean(answer) && answer !== "PENDING";
+  }
   if (item.type === "match") {
     const pairs =
       Array.isArray(item.answer) &&
