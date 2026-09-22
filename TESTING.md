@@ -56,7 +56,7 @@ Run commands will be filled in as packages are scaffolded. Until then, use the *
 - [x] **join (calibration):** draft `content/passaporte/u01–u07.json` + `gold/join_report.md`
 - [x] **hints (calibration):** closed items `hint_en` generated; answer-leak check + retry
 - [x] **crop (calibration):** `needs_image` → `apps/web/public/crops/*.webp` (bbox or full-page fallback)
-- [ ] Failed pages append to `failures.jsonl` and do not invent answers
+- [x] Failed pages append to `failures.jsonl` and do not invent answers
 
 **Run (example):** `make calibrate` + `pytest pipeline/tests/` + `pnpm pipeline:join` + `pnpm pipeline:crop` + `pnpm pipeline:hints`
 

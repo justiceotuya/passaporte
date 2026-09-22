@@ -152,9 +152,10 @@ def test_join_matched_and_buckets(tmp_path: Path) -> None:
     assert a_item["answer_source"] == "teacher_book"
 
 
-def test_missing_item_alignment_uses_generated(tmp_path: Path) -> None:
+def test_missing_item_alignment_omits_and_logs_failure(tmp_path: Path) -> None:
     aluno = tmp_path / "aluno"
     prof = tmp_path / "prof"
+    failures = tmp_path / "failures.jsonl"
     _write(
         aluno / "p-012.json",
         {
@@ -206,9 +207,17 @@ def test_missing_item_alignment_uses_generated(tmp_path: Path) -> None:
         professor_dir=prof,
         content_dir=tmp_path / "content",
         report_path=tmp_path / "report.md",
+        failures_path=failures,
     )
     assert buckets.count_mismatch
     unit = json.loads((tmp_path / "content" / "u02.json").read_text())
     by_id = {i["id"]: i for i in unit["items"]}
     assert by_id["pass-u02-p012-A-1"]["answer_source"] == "teacher_book"
-    assert by_id["pass-u02-p012-A-2"]["answer_source"] == "generated"
+    assert "pass-u02-p012-A-2" not in by_id
+    lines = [json.loads(line) for line in failures.read_text().splitlines() if line.strip()]
+    assert any(
+        row["stage"] == "join"
+        and row["item_index"] == 2
+        and "not invented" in row["error"]
+        for row in lines
+    )

@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from failures import FAILURES_PATH, append_failure
 from models import (
     AnswerSource,
     BookId,
@@ -204,7 +205,7 @@ def build_content_item(
     item: dict[str, Any],
     key_item: dict[str, Any] | None,
     key_meta: dict[str, Any] | None,
-) -> PassaporteItem:
+) -> PassaporteItem | None:
     item_type = type_from_str(item.get("type"))
     skill = skill_from_str(item.get("skill") or (key_meta or {}).get("skill"))
     topic = (item.get("topic") or "unknown").strip() or "unknown"
@@ -229,24 +230,13 @@ def build_content_item(
         item_type = ItemType.OPEN
         sequence = None
 
-    if key_item and key_item.get("answer"):
-        answer = normalise_answer(str(key_item["answer"]), item_type)
-        accepted = [str(a) for a in (key_item.get("accepted") or []) if str(a).strip()]
-        answer_source = AnswerSource.TEACHER_BOOK
-    else:
-        # Placeholder so closed items validate; hints/join review will fix.
-        if options:
-            answer = options[0]
-        elif item_type == ItemType.TRUE_FALSE:
-            answer = "true"
-        elif pairs:
-            answer = pairs
-        elif sequence:
-            answer = sequence
-        else:
-            answer = "PENDING"
-        accepted = []
-        answer_source = AnswerSource.GENERATED
+    # Never invent answers — omit the item when the teacher key is missing.
+    if not (key_item and key_item.get("answer")):
+        return None
+
+    answer = normalise_answer(str(key_item["answer"]), item_type)
+    accepted = [str(a) for a in (key_item.get("accepted") or []) if str(a).strip()]
+    answer_source = AnswerSource.TEACHER_BOOK
 
     if item_type == ItemType.TRUE_FALSE and answer not in ("true", "false"):
         answer = normalise_answer(str(answer), ItemType.TRUE_FALSE)
@@ -288,12 +278,14 @@ def join_runs(
     professor_dir: Path,
     content_dir: Path = DEFAULT_CONTENT,
     report_path: Path | None = None,
+    failures_path: Path | None = None,
 ) -> tuple[JoinBuckets, list[Path]]:
     if not aluno_dir.is_dir():
         raise JoinError(f"Missing aluno extract dir: {aluno_dir}")
     if not professor_dir.is_dir():
         raise JoinError(f"Missing professor extract dir: {professor_dir}")
 
+    fail_log = failures_path or FAILURES_PATH
     aluno_pages = load_page_jsons(aluno_dir)
     key_pages = load_page_jsons(professor_dir)
     key_index = index_keys(key_pages)
@@ -345,6 +337,16 @@ def join_runs(
                     unassigned.append(
                         {"ref": f"{ref}-{idx}", "page": page, "letter": letter, "item": item}
                     )
+                    append_failure(
+                        {
+                            "stage": "join",
+                            "page": page,
+                            "letter": letter,
+                            "item_index": idx,
+                            "error": "unassigned unit",
+                        },
+                        path=fail_log,
+                    )
                     continue
                 try:
                     content_item = build_content_item(
@@ -357,6 +359,29 @@ def join_runs(
                     )
                 except Exception as exc:  # noqa: BLE001 — surface in report, keep joining
                     skipped.append(f"{ref}-{idx}: {exc}")
+                    append_failure(
+                        {
+                            "stage": "join",
+                            "page": page,
+                            "letter": letter,
+                            "item_index": idx,
+                            "error": str(exc),
+                        },
+                        path=fail_log,
+                    )
+                    continue
+                if content_item is None:
+                    skipped.append(f"{ref}-{idx}: missing teacher answer")
+                    append_failure(
+                        {
+                            "stage": "join",
+                            "page": page,
+                            "letter": letter,
+                            "item_index": idx,
+                            "error": "missing teacher key — answer not invented",
+                        },
+                        path=fail_log,
+                    )
                     continue
                 items_by_unit[unit].append(content_item)
 
