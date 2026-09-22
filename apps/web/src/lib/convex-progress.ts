@@ -48,6 +48,7 @@ export async function convexFinishSession(input: {
   unitId: string;
   xp: number;
   missedItemIds: string[];
+  answeredItems?: { itemId: string; correct: boolean }[];
 }): Promise<ProgressSnapshot | null> {
   if (!isConvexConfigured()) return null;
   const c = client();

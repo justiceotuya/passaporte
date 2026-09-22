@@ -57,6 +57,7 @@ export async function POST(request: Request) {
     dueItemIds?: string[];
     xp?: number;
     missedItemIds?: string[];
+    answeredItems?: { itemId: string; correct: boolean }[];
   };
 
   try {
@@ -99,6 +100,7 @@ export async function POST(request: Request) {
           unitId: body.unitId ?? "unknown",
           xp: body.xp ?? 0,
           missedItemIds: body.missedItemIds ?? [],
+          answeredItems: body.answeredItems,
         });
         if (remote) {
           memory.dueItemIds = remote.dueItemIds;

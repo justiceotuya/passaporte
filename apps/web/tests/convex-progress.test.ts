@@ -23,9 +23,14 @@ describe("Convex progress", () => {
       unitId: "passaporte-u01",
       xp: 15,
       missedItemIds: ["pass-u01-p010-A-1"],
+      answeredItems: [
+        { itemId: "pass-u01-p010-A-1", correct: false },
+        { itemId: "pass-u01-p010-A-2", correct: true },
+      ],
     });
 
     expect(finish.dueItemIds).toContain("pass-u01-p010-A-1");
+    expect(finish.dueItemIds).not.toContain("pass-u01-p010-A-2");
     expect(finish.xp).toBe(15);
 
     const snapshot = await asUser.query(api.progress.getSnapshot, {});

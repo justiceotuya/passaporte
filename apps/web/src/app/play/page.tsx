@@ -22,7 +22,7 @@ export default async function PlayPage({ searchParams }: Props) {
   const unit = pickUnit(params.unit);
   const parsed = Number(params.size);
   const sessionSize =
-    Number.isFinite(parsed) && parsed >= 1 && parsed <= 15 ? parsed : 12;
+    Number.isFinite(parsed) && parsed >= 1 && parsed <= 15 ? parsed : undefined;
 
   const playable = unit.items.filter(isPlayableItem);
   const reviewOnly = params.review === "1";

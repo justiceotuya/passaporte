@@ -140,12 +140,19 @@ export const finishSession = mutation({
     unitId: v.string(),
     xp: v.number(),
     missedItemIds: v.array(v.string()),
+    answeredItems: v.optional(
+      v.array(
+        v.object({
+          itemId: v.string(),
+          correct: v.boolean(),
+        }),
+      ),
+    ),
   },
   handler: async (ctx, args) => {
     const userId = await requireUserId(ctx, args.bridgeUserId);
     const endedAt = Date.now();
 
-    // Client may pass a local session id string; update matching Convex doc if present.
     const existing = await ctx.db
       .query("sessions")
       .withIndex("by_user", (q) => q.eq("userId", userId))
@@ -171,7 +178,15 @@ export const finishSession = mutation({
       });
     }
 
+    const outcomes = new Map<string, boolean>();
+    for (const row of args.answeredItems ?? []) {
+      outcomes.set(row.itemId, row.correct);
+    }
     for (const itemId of args.missedItemIds) {
+      outcomes.set(itemId, false);
+    }
+
+    for (const [itemId, correct] of outcomes) {
       const existingState = await ctx.db
         .query("itemState")
         .withIndex("by_user_item", (q) =>
@@ -179,24 +194,47 @@ export const finishSession = mutation({
         )
         .unique();
 
-      // Match Zustand: missed items are due for the next session immediately.
-      // intervalDays stays 1 so a later successful SM-2 update can expand.
-      const dueAt = endedAt;
+      const prev = existingState
+        ? {
+            ease: existingState.ease,
+            intervalDays: existingState.intervalDays,
+            dueAt: existingState.dueAt,
+            mastery: existingState.mastery,
+          }
+        : null;
+
+      let ease = prev?.ease ?? 2.5;
+      let intervalDays = prev?.intervalDays ?? 0;
+      let mastery = prev?.mastery ?? 0;
+      let dueAt: number;
+      if (!correct) {
+        ease = Math.max(1.3, ease - 0.2);
+        intervalDays = 1;
+        mastery = 0;
+        // Immediately due so the review queue picks it up now.
+        dueAt = endedAt;
+      } else {
+        ease = ease + 0.1;
+        intervalDays = intervalDays <= 0 ? 1 : Math.max(1, Math.round(intervalDays * ease));
+        mastery = Math.min(1, mastery + 0.34);
+        dueAt = endedAt + intervalDays * DAY_MS;
+      }
+
       if (existingState) {
         await ctx.db.patch(existingState._id, {
-          ease: 2.5,
-          intervalDays: 1,
+          ease,
+          intervalDays,
           dueAt,
-          mastery: 0,
+          mastery,
         });
       } else {
         await ctx.db.insert("itemState", {
           userId,
           itemId,
-          ease: 2.5,
-          intervalDays: 1,
+          ease,
+          intervalDays,
           dueAt,
-          mastery: 0,
+          mastery,
         });
       }
     }

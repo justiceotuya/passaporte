@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { MatchPair, PassaporteItem, PassaporteUnit } from "@/types/item";
 import { ChoiceOption } from "@/components/ChoiceOption";
 import { TrueFalsePair } from "@/components/TrueFalsePair";
@@ -21,9 +21,12 @@ import {
   gradeTrueFalse,
 } from "@/lib/grader";
 import { buildSession, isPlayableItem } from "@/lib/session-builder";
-import { useProgressStore } from "@/lib/progress-store";
+import { useProgressStore, type AnsweredItem } from "@/lib/progress-store";
+import { track } from "@/lib/analytics";
 
 type Phase = "playing" | "feedback" | "summary";
+
+const STARTING_HEARTS = 3;
 
 function expectedMatchPairs(item: PassaporteItem): MatchPair[] {
   if (Array.isArray(item.answer) && item.answer.length > 0) {
@@ -44,7 +47,7 @@ function expectedOrder(item: PassaporteItem): string[] {
 
 export function SessionPlayer({
   unit,
-  sessionSize = 12,
+  sessionSize,
 }: {
   unit: PassaporteUnit;
   sessionSize?: number;
@@ -54,20 +57,25 @@ export function SessionPlayer({
   const finishSession = useProgressStore((s) => s.finishSession);
   const totalXp = useProgressStore((s) => s.totalXp);
   const streakDays = useProgressStore((s) => s.streakDays);
+  const heartsEnabled = useProgressStore((s) => s.settings.heartsEnabled);
+  const hintsEnabled = useProgressStore((s) => s.settings.hintsEnabled);
+  const settingsSessionLength = useProgressStore((s) => s.settings.sessionLength);
 
   const sessionId = useMemo(
     () => `local-${unit.unit}-${Date.now()}`,
     [unit.unit],
   );
 
+  const effectiveSize = sessionSize ?? settingsSessionLength;
+
   const plan = useMemo(
     () =>
       buildSession({
         unitItems: unit.items.filter(isPlayableItem),
         dueItemIds,
-        size: sessionSize,
+        size: effectiveSize,
       }),
-    [unit.items, dueItemIds, sessionSize],
+    [unit.items, dueItemIds, effectiveSize],
   );
 
   const itemById = useMemo(() => {
@@ -88,13 +96,62 @@ export function SessionPlayer({
   const [lastCorrect, setLastCorrect] = useState(false);
   const [sessionXp, setSessionXp] = useState(0);
   const [missed, setMissed] = useState<string[]>([]);
+  const [answeredItems, setAnsweredItems] = useState<AnsweredItem[]>([]);
+  const [hearts, setHearts] = useState(STARTING_HEARTS);
   const [locked, setLocked] = useState(false);
+  const [endedEarly, setEndedEarly] = useState(false);
+  const startedRef = useRef(false);
+
+  useEffect(() => {
+    if (startedRef.current || items.length === 0) return;
+    startedRef.current = true;
+    track("session_start", {
+      unit: unit.unit,
+      size: items.length,
+      heartsEnabled,
+    });
+  }, [items.length, unit.unit, heartsEnabled]);
 
   const current = items[index];
   const progress =
     items.length === 0
       ? 0
       : ((index + (phase === "summary" ? 1 : 0)) / items.length) * 100;
+
+  function finalizeSession(opts: {
+    xp: number;
+    missedIds: string[];
+    answered: AnsweredItem[];
+    early: boolean;
+  }) {
+    finishSession({
+      sessionId,
+      xp: opts.xp,
+      missedItemIds: opts.missedIds,
+      answeredItems: opts.answered,
+    });
+    void fetch("/api/progress", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type: "finish",
+        sessionId,
+        unitId: `passaporte-u${String(unit.unit).padStart(2, "0")}`,
+        xp: opts.xp,
+        missedItemIds: opts.missedIds,
+        answeredItems: opts.answered,
+      }),
+    }).catch(() => undefined);
+    track("session_complete", {
+      unit: unit.unit,
+      xp: opts.xp,
+      missed: opts.missedIds.length,
+      answered: opts.answered.length,
+      early: opts.early,
+    });
+    setEndedEarly(opts.early);
+    setPhase("summary");
+  }
 
   function commitResult(given: string, result: { correct: boolean; xp: number }) {
     if (!current) return;
@@ -124,12 +181,44 @@ export function SessionPlayer({
       }),
     }).catch(() => undefined);
 
+    track("item_answered", {
+      itemId: current.id,
+      correct: result.correct,
+      attemptNo,
+      type: current.type,
+    });
+
     setLastCorrect(result.correct);
     setSessionXp((xp) => xp + result.xp);
+
+    let nextHearts = hearts;
+    if (heartsEnabled && !result.correct) {
+      nextHearts = Math.max(0, hearts - 1);
+      setHearts(nextHearts);
+    }
 
     if (!result.correct && attemptNo >= 2) {
       setMissed((m) => [...m, current.id]);
     }
+
+    if (heartsEnabled && !result.correct && nextHearts <= 0) {
+      const outcomeCorrect = false;
+      const answered: AnsweredItem[] = [
+        ...answeredItems.filter((row) => row.itemId !== current.id),
+        { itemId: current.id, correct: outcomeCorrect },
+      ];
+      const missedIds = [...new Set([...missed, current.id])];
+      setAnsweredItems(answered);
+      setMissed(missedIds);
+      finalizeSession({
+        xp: sessionXp + result.xp,
+        missedIds,
+        answered,
+        early: true,
+      });
+      return;
+    }
+
     setPhase("feedback");
   }
 
@@ -207,24 +296,27 @@ export function SessionPlayer({
       return;
     }
 
+    const itemOutcome: AnsweredItem = {
+      itemId: current.id,
+      correct: lastCorrect,
+    };
+    const nextAnswered = [
+      ...answeredItems.filter((row) => row.itemId !== current.id),
+      itemOutcome,
+    ];
+    setAnsweredItems(nextAnswered);
+
     const next = index + 1;
     if (next >= items.length) {
       const missedIds = lastCorrect
         ? missed
         : [...new Set([...missed, current.id])];
-      finishSession({ sessionId, xp: sessionXp, missedItemIds: missedIds });
-      void fetch("/api/progress", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "finish",
-          sessionId,
-          unitId: `passaporte-u${String(unit.unit).padStart(2, "0")}`,
-          xp: sessionXp,
-          missedItemIds: missedIds,
-        }),
-      }).catch(() => undefined);
-      setPhase("summary");
+      finalizeSession({
+        xp: sessionXp,
+        missedIds,
+        answered: nextAnswered,
+        early: false,
+      });
       return;
     }
 
@@ -249,8 +341,11 @@ export function SessionPlayer({
       <div
         className="mx-auto flex min-h-screen w-full max-w-lg flex-col px-4 py-8"
         data-testid="session-summary"
+        data-ended-early={endedEarly ? "true" : "false"}
       >
-        <h1 className="font-display text-3xl font-semibold">Session complete</h1>
+        <h1 className="font-display text-3xl font-semibold">
+          {endedEarly ? "Out of hearts" : "Session complete"}
+        </h1>
         <p className="mt-2 text-ink-muted">
           You earned {sessionXp} XP this session.
         </p>
@@ -301,6 +396,7 @@ export function SessionPlayer({
       data-item-id={current.id}
       data-item-type={current.type}
       data-phase={phase}
+      data-hearts={heartsEnabled ? hearts : "off"}
     >
       <div className="mb-4 flex items-center justify-between gap-3">
         <p
@@ -309,9 +405,21 @@ export function SessionPlayer({
         >
           Unit {unit.unit} · {index + 1}/{items.length}
         </p>
-        <p className="text-xs font-bold uppercase tracking-wide text-primary">
-          {sessionXp} XP
-        </p>
+        <div className="flex items-center gap-3">
+          {heartsEnabled ? (
+            <p
+              className="text-xs font-bold uppercase tracking-wide text-error"
+              data-testid="session-hearts"
+              aria-label={`${hearts} hearts remaining`}
+            >
+              {"♥".repeat(hearts)}
+              {"♡".repeat(Math.max(0, STARTING_HEARTS - hearts))}
+            </p>
+          ) : null}
+          <p className="text-xs font-bold uppercase tracking-wide text-primary">
+            {sessionXp} XP
+          </p>
+        </div>
       </div>
 
       <div className="mb-6 h-2 overflow-hidden rounded-pill bg-ink/10">
@@ -330,7 +438,9 @@ export function SessionPlayer({
       <h2 className="mb-2 text-xl font-semibold tracking-tight text-ink">
         {current.prompt}
       </h2>
-      {current.hint_en ? <HintDisclosure hint={current.hint_en} /> : null}
+      {hintsEnabled && current.hint_en ? (
+        <HintDisclosure hint={current.hint_en} />
+      ) : null}
 
       {current.type === "listen_choice" && current.transcript ? (
         <ListenTranscript transcript={current.transcript} />

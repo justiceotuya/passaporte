@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { applySm2, isDue, type Sm2State } from "@/lib/sm2";
 
 export type AttemptRecord = {
   itemId: string;
@@ -13,18 +14,35 @@ export type AttemptRecord = {
   xp: number;
 };
 
+export type LearnerSettings = {
+  accentStrictness: "lenient" | "strict";
+  sessionLength: number;
+  heartsEnabled: boolean;
+  hintsEnabled: boolean;
+  typedMode: boolean;
+};
+
+export type AnsweredItem = {
+  itemId: string;
+  correct: boolean;
+};
+
 export type ProgressState = {
   attempts: AttemptRecord[];
+  itemStates: Record<string, Sm2State>;
   dueItemIds: string[];
   streakDays: number;
   lastSessionDate: string | null;
   totalXp: number;
+  settings: LearnerSettings;
   recordAttempt: (attempt: AttemptRecord) => void;
   finishSession: (input: {
     sessionId: string;
     xp: number;
     missedItemIds: string[];
+    answeredItems?: AnsweredItem[];
   }) => void;
+  updateSettings: (patch: Partial<LearnerSettings>) => void;
   reset: () => void;
 };
 
@@ -32,22 +50,38 @@ function todayKey(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
+function recomputeDue(itemStates: Record<string, Sm2State>, now = Date.now()): string[] {
+  return Object.entries(itemStates)
+    .filter(([, state]) => isDue(state, now))
+    .map(([id]) => id);
+}
+
+const defaultSettings: LearnerSettings = {
+  accentStrictness: "lenient",
+  sessionLength: 12,
+  heartsEnabled: false,
+  hintsEnabled: true,
+  typedMode: false,
+};
+
 export const useProgressStore = create<ProgressState>()(
   persist(
     (set, get) => ({
       attempts: [],
+      itemStates: {},
       dueItemIds: [],
       streakDays: 0,
       lastSessionDate: null,
       totalXp: 0,
+      settings: defaultSettings,
       recordAttempt: (attempt) => {
         set((state) => ({
           attempts: [...state.attempts, attempt],
         }));
       },
-      finishSession: ({ xp, missedItemIds }) => {
+      finishSession: ({ xp, missedItemIds, answeredItems }) => {
         const today = todayKey();
-        const { lastSessionDate, streakDays, dueItemIds } = get();
+        const { lastSessionDate, streakDays, itemStates } = get();
         let nextStreak = streakDays;
         if (lastSessionDate !== today) {
           const yesterday = new Date();
@@ -56,25 +90,44 @@ export const useProgressStore = create<ProgressState>()(
           nextStreak = lastSessionDate === yKey ? streakDays + 1 : 1;
         }
 
-        const due = new Set(dueItemIds);
-        for (const id of missedItemIds) due.add(id);
+        const now = Date.now();
+        const nextStates = { ...itemStates };
+        const outcomes = new Map<string, boolean>();
+        for (const row of answeredItems ?? []) {
+          outcomes.set(row.itemId, row.correct);
+        }
+        for (const id of missedItemIds) {
+          outcomes.set(id, false);
+        }
+
+        for (const [itemId, correct] of outcomes) {
+          nextStates[itemId] = applySm2(nextStates[itemId], correct, now);
+        }
 
         set((state) => ({
           totalXp: state.totalXp + xp,
           streakDays: nextStreak,
           lastSessionDate: today,
-          dueItemIds: [...due],
+          itemStates: nextStates,
+          dueItemIds: recomputeDue(nextStates, now),
+        }));
+      },
+      updateSettings: (patch) => {
+        set((state) => ({
+          settings: { ...state.settings, ...patch },
         }));
       },
       reset: () =>
         set({
           attempts: [],
+          itemStates: {},
           dueItemIds: [],
           streakDays: 0,
           lastSessionDate: null,
           totalXp: 0,
+          settings: defaultSettings,
         }),
     }),
-    { name: "passaporte-progress-v1" },
+    { name: "passaporte-progress-v2" },
   ),
 );
