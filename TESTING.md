@@ -82,9 +82,13 @@ Run commands will be filled in as packages are scaffolded. Until then, use the *
 - [x] SQLite auth DB under `apps/web/data/` (gitignored)
 - [x] MSW mocks auth + progress HTTP in Vitest (`msw@2.7.x` — pin; 2.15 path matching broke tests)
 - [x] Zustand + localStorage progress store
-- [ ] Convex deferred until Playwright core loop
+- [x] Convex schema + progress mutations/queries + provider (SQLite auth kept until `convex login`)
+- [x] `/api/progress` bridges to Convex when `NEXT_PUBLIC_CONVEX_URL` is set
+- [x] `convex-test` covers recordAttempt / finishSession / unauthenticated reject
 
-**Run:** `pnpm --filter @passaporte/web exec vitest run msw` + `pnpm --filter @passaporte/web exec next build`
+**Run:** `pnpm --filter @passaporte/web exec vitest run` (+ `pnpm web:convex` after login)
+
+**Blocker:** full Better Auth → Convex adapter cutover needs interactive `npx convex login` on the machine.
 
 ---
 

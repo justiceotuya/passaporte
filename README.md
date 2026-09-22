@@ -14,6 +14,7 @@ Private gamified A1 Portuguese trainer. Spec: `../uploads/Passaporte - Gamified 
 
 ```
 apps/web/       Next.js app (learner + admin later)
+  convex/       Convex schema + progress + Better Auth scaffold
 pipeline/       Python extraction (uv)
 schema/         Shared item.schema.json
 content/        Unit JSON (git-tracked)
@@ -32,6 +33,10 @@ cd pipeline && uv sync && cd ..
 
 # PDFs (if raw/pdf missing)
 mkdir -p raw && ln -sfn ../../raw/pdf raw/pdf
+
+# Convex (interactive login once per machine)
+cd apps/web && npx convex login && npx convex dev
+# See apps/web/convex/README.md for env vars
 ```
 
 ## Tests
@@ -40,16 +45,17 @@ mkdir -p raw && ln -sfn ../../raw/pdf raw/pdf
 pnpm test:phase0    # scaffold smoke
 pnpm test:phase1    # schema validation (TS + Python)
 pnpm pipeline:test  # all pipeline pytest
-pnpm web:test       # Vitest in apps/web
+pnpm web:test       # Vitest in apps/web (includes convex-test)
+pnpm web:convex     # convex dev watcher
 ```
 
 ## Agreements (grill 2026-09-22)
 
-- Own git root under `passaporte/`; local only until you ask to push
+- Own git root under `passaporte/`; commit + push every stage
 - Open signup (template UI); Google stubbed until OAuth creds
-- Better Auth + local SQLite now → Convex adapter after core Playwright loop
-- Progress: Zustand + localStorage until Convex
-- MSW in **tests only** (auth + progress HTTP)
+- Better Auth + local SQLite active; Convex schema + progress bridge staged; full adapter after `convex login`
+- Progress: Zustand optimistic UI + `/api/progress` → Convex when configured
+- MSW in **tests only** (auth + progress HTTP); pin `msw@2.7.x`
 - Player-first on invented `content/passaporte/u01.json`
 - Pipeline: no live vision until Anthropic key in `.env`
 - `uv` for Python; pnpm workspaces for JS

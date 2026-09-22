@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Fredoka, Nunito, Source_Serif_4 } from "next/font/google";
+import { ConvexClientProvider } from "@/components/ConvexClientProvider";
 import "./globals.css";
 
 const nunito = Nunito({
@@ -35,7 +36,9 @@ export default function RootLayout({
       lang="en"
       className={`dark ${nunito.variable} ${fredoka.variable} ${sourceSerif.variable}`}
     >
-      <body className="font-sans">{children}</body>
+      <body className="font-sans">
+        <ConvexClientProvider>{children}</ConvexClientProvider>
+      </body>
     </html>
   );
 }

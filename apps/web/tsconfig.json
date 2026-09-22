@@ -19,9 +19,16 @@
     "paths": {
       "@/*": ["./src/*"],
       "@schema/*": ["../../schema/*"],
-      "@content/*": ["../../content/*"]
+      "@content/*": ["../../content/*"],
+      "@convex/*": ["./convex/*"]
     }
   },
-  "include": ["next-env.d.ts", "src/**/*", "tests/**/*", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "src/**/*",
+    "tests/**/*",
+    "convex/**/*",
+    ".next/types/**/*.ts"
+  ],
   "exclude": ["node_modules"]
 }

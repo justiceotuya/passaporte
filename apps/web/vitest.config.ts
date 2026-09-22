@@ -16,6 +16,7 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
       "@schema": path.resolve(__dirname, "../../schema"),
       "@content": path.resolve(__dirname, "../../content"),
+      "@convex": path.resolve(__dirname, "./convex"),
     },
   },
 });

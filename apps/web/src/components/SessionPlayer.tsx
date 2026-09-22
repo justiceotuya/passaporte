@@ -106,6 +106,9 @@ export function SessionPlayer({
         type: "attempt",
         itemId: current.id,
         correct: result.correct,
+        answerGiven: given,
+        attemptNo,
+        sessionId,
       }),
     }).catch(() => undefined);
 
@@ -175,6 +178,8 @@ export function SessionPlayer({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           type: "finish",
+          sessionId,
+          unitId: `passaporte-u${String(unit.unit).padStart(2, "0")}`,
           xp: sessionXp,
           missedItemIds: missedIds,
         }),
