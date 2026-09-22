@@ -52,7 +52,7 @@ Run commands will be filled in as packages are scaffolded. Until then, use the *
 
 - [ ] **Join:** missing item, extra item, letter mismatch, page mismatch → expected report buckets
 - [ ] **Hints:** hint containing the answer string (case-insensitive, accent-normalised) is rejected
-- [ ] **Rasterize (calibration):** pages 10–40 produce PNGs without crash; count matches expected range
+- [ ] **Rasterize (calibration):** pages 10–40 produce PNGs without crash; count matches expected range — **DONE 2026-09-22** (31 pages × 2 books + thumbs)
 - [ ] **Calibrate:** field-level accuracy printed vs `gold/passaporte_u01-02.json` (once gold exists); do not claim phase complete under 95% without Justice sign-off
 - [ ] Failed pages append to `failures.jsonl` and do not invent answers
 
@@ -104,9 +104,11 @@ Run commands will be filled in as packages are scaffolded. Until then, use the *
 **Exit suite (partial)**
 
 - [x] `rasterize.py` CLI + unit tests (mocked pdftoppm)
-- [ ] Live calibration raster of pages 10–40 (needs poppler; no vision yet)
+- [x] Live calibration raster of pages 10–40 (aluno + professor) — 31 pages each @ 150 DPI + 60 DPI thumbs
 
-**Run:** `cd pipeline && uv run pytest tests/test_rasterize.py -q`
+**Run:** `bash scripts/calibrate-rasterize.sh` · `cd pipeline && uv run pytest tests/test_rasterize.py -q`
+
+Note: outputs live under `raw/` and must stay **gitignored**.
 
 ### 5c Remaining item types
 

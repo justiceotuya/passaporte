@@ -2,8 +2,8 @@
 
 **Last updated:** 2026-09-22  
 **Owner:** Justice  
-**Status:** Phases 0–1 · tokens · auth+mock · player 5a–5b · **Playwright e2e** done · Phase 2 rasterize CLI done  
-**Next:** Convex + Better Auth Convex adapter (swap SQLite + localStorage); optionally live rasterize 10–40
+**Status:** Phases 0–1 · tokens · auth+mock · player · Playwright e2e · **live calibration rasterize (pages 10–40)** done  
+**Next:** Convex + Better Auth Convex adapter; then classify/extract (vision only after Anthropic key)
 
 ---
 
@@ -41,6 +41,7 @@ See earlier table: open signup · player-first · Zustand progress · Better Aut
 | 2026-09-22 | `pipeline/rasterize.py` + pytest (mocked pdftoppm) |
 | 2026-09-22 | Vitest **31** · pytest **16** · `next build` **green** |
 | 2026-09-22 | Playwright e2e: short `/play?size=3` session + sign-up → `/play` (**2** passed) |
+| 2026-09-22 | Live rasterize calibration: aluno + professor pages **10–40** (31 pages × 150 DPI + thumbs each; ~123 MB under `raw/`, gitignored) |
 
 ---
 
@@ -49,8 +50,9 @@ See earlier table: open signup · player-first · Zustand progress · Better Aut
 ### Immediate next
 
 - [x] Playwright: short fixture session + account create
-- [ ] Live `rasterize.py --book passaporte-aluno --pages 10-40` (poppler available)
+- [x] Live `rasterize.py` pages 10–40 (aluno + professor)
 - [ ] Convex + Better Auth Convex adapter; remove SQLite auth + localStorage progress
+- [ ] `classify.py` / extract (needs Anthropic key — do not run vision until key present)
 
 ### Still later
 
@@ -93,6 +95,7 @@ uv run python rasterize.py --book passaporte-aluno --pages 10-40
 | 2026-09-22 | 2 partial | `uv run pytest -q` | PASS **16** |
 | 2026-09-22 | 4 | `next build` | PASS |
 | 2026-09-22 | 5e | `pnpm web:e2e` | PASS **2** |
+| 2026-09-22 | 2 raster | `uv run python rasterize.py --book passaporte-aluno|professor --pages 10-40` | PASS — 31+31 pages + thumbs; gitignored |
 
 ---
 
@@ -120,11 +123,12 @@ You are continuing **Passaporte** (gamified A1 Portuguese app).
 
 ## Current focus
 1. Introduce Convex + Better Auth Convex adapter; migrate progress off localStorage/Zustand persist
-2. Optionally run live rasterize pages 10–40 (`pdftoppm` is installed)
-3. Then remaining item types / unit map
+2. Pipeline: `classify.py` next — **do not call Anthropic** until user puts key in `.env`
+3. Calibration rasters already on disk: `raw/passaporte-aluno/` and `raw/passaporte-professor/` (p-010…p-040 + thumbs)
 
 ## Commands
 - `pnpm web:test` · `pnpm web:e2e` · `pnpm pipeline:test` · `pnpm web`
+- `bash scripts/calibrate-rasterize.sh` (re-run pages 10–40)
 - After each stage: commit + `git push -u origin HEAD`
 
 ## Definition of done for your session
