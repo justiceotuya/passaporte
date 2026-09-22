@@ -11,7 +11,8 @@
     "web": "pnpm --filter @passaporte/web dev",
     "web:test": "pnpm --filter @passaporte/web exec vitest run",
     "web:e2e": "pnpm --filter @passaporte/web exec playwright test",
-    "pipeline:test": "cd pipeline && uv run pytest -q"
+    "pipeline:test": "cd pipeline && uv run pytest -q",
+    "pipeline:join": "cd pipeline && uv run python join.py --report ../extracted/join_report.md"
   },
   "engines": {
     "node": ">=20"

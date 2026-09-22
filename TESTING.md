@@ -53,10 +53,11 @@ Run commands will be filled in as packages are scaffolded. Until then, use the *
 - [x] **Classify (calibration):** aluno + professor pages 10–40 → `pages.json`
 - [x] **Extract (calibration):** aluno 10–40 (29 pages / ~301 items)
 - [x] **extract_key (calibration):** professor 10–40 (22 pages / 298 answers)
-- [ ] **join / hints**
+- [x] **join (calibration):** draft `content/passaporte/u01–u07.json` + `gold/join_report.md`
+- [ ] **hints / crop**
 - [ ] Failed pages append to `failures.jsonl` and do not invent answers
 
-**Run (example):** `make calibrate` + `pytest pipeline/tests/`
+**Run (example):** `make calibrate` + `pytest pipeline/tests/` + `pnpm pipeline:join`
 
 ---
 

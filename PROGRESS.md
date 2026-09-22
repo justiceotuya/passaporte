@@ -2,8 +2,8 @@
 
 **Last updated:** 2026-09-22  
 **Owner:** Justice  
-**Status:** Extract aluno 10–40 + extract_key professor 10–40 done · classify + rasters + player green  
-**Next:** `join.py` to merge exercises with keys into draft `content/` units
+**Status:** Join calibration done · draft units u01–u07 + gold/join_report.md  
+**Next:** `hints.py` / crop · gold review of teacher_book items · Convex after Playwright
 
 ---
 
@@ -13,9 +13,9 @@
 2. Update this file at every finished milestone.
 3. **Commit and push after every finished stage** (once `origin` exists). Do not leave completed work only local.
 4. Keep the handover prompt at the bottom accurate.
-4. **Calibration only** for vision/PDF until Justice approves full-book run.
-5. Never commit `raw/`, `extracted/`, PDFs, page images, `*.db`, `.env*`.
-6. Design: `../templates/passaporte/` · Spec: design doc · Kuji parent = reference.
+5. **Calibration only** for vision/PDF until Justice approves full-book run.
+6. Never commit `raw/`, `extracted/`, PDFs, page images, `*.db`, `.env*`.
+7. Design: `../templates/passaporte/` · Spec: design doc · Kuji parent = reference.
 
 ---
 
@@ -25,7 +25,7 @@ See earlier table: open signup · player-first · Zustand progress · Better Aut
 
 **MSW pin:** use `msw@2.7.x` (2.15 broke relative/path matching in our Node tests).
 
-**Git:** branch `cursor/passaporte-scaffold-player-slice` @ `98ce55c` — **push blocked** until GitHub auth (`gh auth login` or add `origin`).
+**Git:** branch `cursor/passaporte-scaffold-player-slice` · remote `origin` = https://github.com/justiceotuya/passaporte
 
 ---
 
@@ -43,7 +43,7 @@ See earlier table: open signup · player-first · Zustand progress · Better Aut
 | 2026-09-22 | Playwright e2e: short `/play?size=3` session + sign-up → `/play` (**2** passed) |
 | 2026-09-22 | Live rasterize calibration: aluno + professor pages **10–40** (31 pages × 150 DPI + thumbs each; ~123 MB under `raw/`, gitignored) |
 | 2026-09-22 | **Full rasterize all books/pages:** aluno 258 · professor 207 · valer 245 (each + thumbs; ~1.35 GB under `raw/`, gitignored) |
-| 2026-09-22 | **Full rasterize all books:** aluno 258 · professor 207 · valer 245 (pages + thumbs; ~1.3 GB under `raw/`, gitignored) |
+| 2026-09-22 | **join.py** — match (student_page, letter) + item_index; draft `content/passaporte/u01–u07.json`; report `gold/join_report.md` |
 
 ---
 
@@ -58,12 +58,14 @@ See earlier table: open signup · player-first · Zustand progress · Better Aut
 - [x] Classify professor pages 10–40 → `extracted/passaporte-professor/pages.json`
 - [x] `extract.py` aluno pages 10–40 → `extracted/passaporte-aluno/20260922T163925Z-0b8f810b/` (29 pages, 301 items)
 - [x] `extract_key.py` professor pages 10–40 → `extracted/passaporte-professor/20260922T164242Z-833219b4/` (22 pages, 298 answers)
-- [ ] `join.py` → draft unit JSON for gold review
+- [x] `join.py` → draft unit JSON + join report (calibration)
+- [ ] Gold review · fix unit map noise · raise teacher_book match rate
+- [ ] `hints.py` / crop
 - [ ] Convex swap (app track)
 
 ### Still later
 
-- Remaining item types · unit map · review queue · stats · hearts · admin review · PostHog · real content extraction (vision when Anthropic key present)
+- Remaining item types · review queue · stats · hearts · admin review · PostHog · full-book vision only when asked
 
 ---
 
@@ -76,8 +78,9 @@ cd pipeline && uv sync && cd ..
 
 pnpm test:phase0
 pnpm test:phase1
-pnpm web:test          # 31 vitest
+pnpm web:test          # vitest
 pnpm pipeline:test     # pytest
+pnpm pipeline:join     # join calibration extracts → content/ + report
 
 pnpm web               # http://localhost:3000 → sign-in or /play
 # First time auth tables: cd apps/web && pnpm auth:migrate
@@ -88,6 +91,14 @@ Rasterize (when poppler installed):
 ```bash
 cd pipeline
 uv run python rasterize.py --book passaporte-aluno --pages 10-40
+```
+
+Join (uses default calibration run ids in `join.py`):
+
+```bash
+cd pipeline
+uv run python join.py --report ../extracted/join_report.md
+# tracked summary: gold/join_report.md
 ```
 
 ---
@@ -111,6 +122,7 @@ uv run python rasterize.py --book passaporte-aluno --pages 10-40
 | 2026-09-22 | 2 extract | `extract.py --pages 10-40 --run-id …0b8f810b` | PASS — 29 exercise pages / ~301 items |
 | 2026-09-22 | 2 extract_key | `extract_key.py --pages 10-40` | PASS — 22 key pages / 298 answers; 5 unit tests |
 | 2026-09-22 | 2 raster full | `scripts/rasterize-all.sh` (aluno, professor, valer, all pages) | PASS — 258+207+245 pages + thumbs; ~1.3 GB gitignored |
+| 2026-09-22 | 2 join | `pytest tests/test_join.py` + `join.py` + vitest schema | PASS — **4** join tests; pytest **39**; schema **10**; draft u01–u07; matched=2 mismatch=18 empty_key=8 exercise_only=97 key_only=53; teacher_book≈32 |
 
 ---
 
@@ -131,21 +143,21 @@ You are continuing **Passaporte** (gamified A1 Portuguese app).
 - Next.js 15 · Better Auth + SQLite (`apps/web/data/auth.db`) · email/password · Google stubbed
 - Progress: Zustand + localStorage; thin `/api/progress`; MSW **tests only** (pin msw@2.7.x)
 - Convex deferred until Playwright proves one full fixture session
-- Content fixture: `content/passaporte/u01.json`
-- Pipeline: `rasterize.py` done; no Anthropic/vision until user adds key to `.env`
+- Content: draft units from join in `content/passaporte/u01–u07.json` (many `generated` answers; see `gold/join_report.md`)
+- Pipeline: rasterize → classify → extract → extract_key → **join** done for pages 10–40
 - Open signup; English chrome; Portuguese in Source Serif 4 (book voice)
 - **Git:** commit + push after every stage (`origin` = https://github.com/justiceotuya/passaporte)
 
 ## Current focus
-1. Build `join.py` — match aluno extracts to professor keys on (unit, student_page, letter); write draft `content/passaporte/uNN.json` + `join_report.md`
+1. Gold review / unit-map cleanup to raise teacher_book hit rate; then `hints.py` + crop
 2. App track: Convex + Better Auth adapter (still open)
 3. Extract runs (gitignored):
    - aluno `extracted/passaporte-aluno/20260922T163925Z-0b8f810b/`
    - professor keys `extracted/passaporte-professor/20260922T164242Z-833219b4/`
 
 ## Commands
-- `cd pipeline && uv run python extract.py --book passaporte-aluno --pages 10-40 --run-id <id>`
-- `cd pipeline && uv run python extract_key.py --book passaporte-professor --pages 10-40`
+- `pnpm pipeline:join`
+- `cd pipeline && uv run python join.py --aluno-run … --professor-run …`
 - After each stage: commit + `git push`
 
 ## Definition of done for your session
