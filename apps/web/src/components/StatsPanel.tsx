@@ -2,7 +2,7 @@
 
 import { useProgressStore } from "@/lib/progress-store";
 import { computeLearnerStats } from "@/lib/learner-stats";
-import { AppNav } from "@/components/AppNav";
+import { PageShell } from "@/components/PageShell";
 
 export function StatsPanel() {
   const totalXp = useProgressStore((s) => s.totalXp);
@@ -22,10 +22,7 @@ export function StatsPanel() {
   const accuracyPct = Math.round(stats.accuracy * 100);
 
   return (
-    <div
-      className="mx-auto flex min-h-screen w-full max-w-lg flex-col px-4 pb-24 pt-6"
-      data-testid="stats-page"
-    >
+    <PageShell testId="stats-page">
       <header className="mb-6">
         <h1 className="font-display text-3xl font-semibold text-ink">Stats</h1>
         <p className="mt-1 text-sm text-ink-muted">
@@ -33,7 +30,7 @@ export function StatsPanel() {
         </p>
       </header>
 
-      <dl className="grid grid-cols-2 gap-3">
+      <dl className="grid grid-cols-2 gap-3 md:grid-cols-3">
         <StatCard label="Lifetime XP" value={String(stats.totalXp)} testId="stat-xp" />
         <StatCard
           label="Streak"
@@ -61,9 +58,7 @@ export function StatsPanel() {
           testId="stat-mastered"
         />
       </dl>
-
-      <AppNav />
-    </div>
+    </PageShell>
   );
 }
 

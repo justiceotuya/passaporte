@@ -12,12 +12,12 @@ export default async function AdminReviewPage() {
     bypass: isAdminBypassEnabled(),
   });
 
-  if (!access.ok) {
+  if (access.ok === false) {
     if (access.status === 401) {
       redirect("/sign-in");
     }
     return (
-      <main className="mx-auto max-w-lg px-4 py-16" data-testid="admin-forbidden">
+      <main className="mx-auto max-w-lg px-4 py-16 md:max-w-2xl" data-testid="admin-forbidden">
         <h1 className="font-display text-2xl font-semibold">Admin only</h1>
         <p className="mt-2 text-ink-muted">{access.error}</p>
         <Link href="/" className="btn-primary mt-6 inline-flex">
@@ -30,7 +30,7 @@ export default async function AdminReviewPage() {
   const items = listReviewQueue("pending").slice(0, 40);
 
   return (
-    <main className="mx-auto min-h-screen w-full max-w-lg px-4 py-8">
+    <main className="mx-auto min-h-screen w-full max-w-lg px-4 py-8 md:max-w-3xl lg:max-w-4xl lg:px-10">
       <header className="mb-6 flex items-center justify-between gap-3">
         <div>
           <p className="text-xs font-bold uppercase tracking-wide text-primary">

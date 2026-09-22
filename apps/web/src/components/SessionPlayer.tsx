@@ -60,6 +60,8 @@ export function SessionPlayer({
   const heartsEnabled = useProgressStore((s) => s.settings.heartsEnabled);
   const hintsEnabled = useProgressStore((s) => s.settings.hintsEnabled);
   const settingsSessionLength = useProgressStore((s) => s.settings.sessionLength);
+  const typedMode = useProgressStore((s) => s.settings.typedMode);
+  const accentStrictness = useProgressStore((s) => s.settings.accentStrictness);
 
   const sessionId = useMemo(
     () => `local-${unit.unit}-${Date.now()}`,
@@ -241,6 +243,8 @@ export function SessionPlayer({
           String(current.answer),
           current.accepted ?? [],
           attemptNo,
+          false,
+          accentStrictness,
         ),
       );
       return;
@@ -254,6 +258,8 @@ export function SessionPlayer({
           String(current.answer),
           current.accepted ?? [],
           attemptNo,
+          false,
+          accentStrictness,
         ),
       );
       return;
@@ -339,7 +345,7 @@ export function SessionPlayer({
   if (phase === "summary") {
     return (
       <div
-        className="mx-auto flex min-h-screen w-full max-w-lg flex-col px-4 py-8"
+        className="mx-auto flex min-h-[70vh] w-full max-w-lg flex-col px-4 py-8 md:max-w-2xl lg:max-w-[760px]"
         data-testid="session-summary"
         data-ended-early={endedEarly ? "true" : "false"}
       >
@@ -377,6 +383,7 @@ export function SessionPlayer({
   const showReveal = phase === "feedback" && !lastCorrect && attemptNo >= 2;
   const fillUsesTiles =
     current.type === "fill_blank" &&
+    !typedMode &&
     Array.isArray(current.options) &&
     current.options.length >= 2;
   const matchPairs = expectedMatchPairs(current);
@@ -391,7 +398,7 @@ export function SessionPlayer({
 
   return (
     <div
-      className="mx-auto flex min-h-screen w-full max-w-lg flex-col px-4 py-6"
+      className="mx-auto flex min-h-[70vh] w-full max-w-lg flex-col px-4 py-6 md:max-w-2xl lg:max-w-[760px]"
       data-testid="session-player"
       data-item-id={current.id}
       data-item-type={current.type}

@@ -23,6 +23,13 @@ const unit = JSON.parse(
 
 const answers = new Map(unit.items.map((item) => [item.id, item]));
 
+test.beforeEach(async ({ page }) => {
+  await page.goto("/settings");
+  await page.evaluate(() => {
+    window.localStorage.removeItem("passaporte-progress-v2");
+  });
+});
+
 test("smoke play shipped unit u07", async ({ page }) => {
   await page.goto("/play?unit=7&size=2");
   await expect(page.getByTestId("session-player")).toBeVisible();

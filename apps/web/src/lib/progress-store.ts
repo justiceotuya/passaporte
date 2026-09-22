@@ -20,6 +20,7 @@ export type LearnerSettings = {
   heartsEnabled: boolean;
   hintsEnabled: boolean;
   typedMode: boolean;
+  appearance: "light" | "dark";
 };
 
 export type AnsweredItem = {
@@ -62,6 +63,7 @@ const defaultSettings: LearnerSettings = {
   heartsEnabled: false,
   hintsEnabled: true,
   typedMode: false,
+  appearance: "light",
 };
 
 export const useProgressStore = create<ProgressState>()(
@@ -128,6 +130,19 @@ export const useProgressStore = create<ProgressState>()(
           settings: defaultSettings,
         }),
     }),
-    { name: "passaporte-progress-v2" },
+    {
+      name: "passaporte-progress-v2",
+      merge: (persisted, current) => {
+        const p = (persisted ?? {}) as Partial<ProgressState>;
+        return {
+          ...current,
+          ...p,
+          settings: {
+            ...current.settings,
+            ...(p.settings ?? {}),
+          },
+        };
+      },
+    },
   ),
 );

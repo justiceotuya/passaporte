@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fredoka, Nunito, Source_Serif_4 } from "next/font/google";
 import { ConvexClientProvider } from "@/components/ConvexClientProvider";
+import { ThemeSync } from "@/components/ThemeSync";
 import "./globals.css";
 
 const nunito = Nunito({
@@ -34,10 +35,15 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`dark ${nunito.variable} ${fredoka.variable} ${sourceSerif.variable}`}
+      data-theme="light"
+      className={`light ${nunito.variable} ${fredoka.variable} ${sourceSerif.variable}`}
+      suppressHydrationWarning
     >
       <body className="font-sans">
-        <ConvexClientProvider>{children}</ConvexClientProvider>
+        <ConvexClientProvider>
+          <ThemeSync />
+          {children}
+        </ConvexClientProvider>
       </body>
     </html>
   );

@@ -2,8 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --book-ink: #f3d9a8;
+/* Brand dark (templates default) — RGB channels for Tailwind opacity modifiers */
+:root,
+html.dark,
+html[data-theme="dark"] {
+  --color-surface: 33 27 20;
+  --color-surface-deep: 15 13 11;
+  --color-surface-card: rgba(252, 245, 239, 0.05);
+  --color-ink: 252 245 239;
+  --color-ink-on: 24 20 15;
+  --color-ink-muted: rgba(252, 245, 239, 0.6);
+  --color-ink-faint: rgba(252, 245, 239, 0.4);
+  --color-book-ink: 243 217 168;
+  --color-success: 7 200 116;
+  --color-success-edge: 5 102 59;
+  --color-error: 255 100 103;
+  --color-error-edge: 138 47 49;
+  --bg-gradient: linear-gradient(180deg, #211b14 0%, #0f0d0b 100%);
+}
+
+/* Light mode (tokens sheet + TESTING.md AA pairs) */
+html.light,
+html[data-theme="light"] {
+  --color-surface: 252 245 239;
+  --color-surface-deep: 243 234 225;
+  --color-surface-card: #f3eae1;
+  --color-ink: 24 20 15;
+  --color-ink-on: 252 245 239;
+  --color-ink-muted: rgba(24, 20, 15, 0.65);
+  --color-ink-faint: rgba(24, 20, 15, 0.45);
+  --color-book-ink: 61 47 31;
+  --color-success: 10 122 72;
+  --color-success-edge: 6 90 52;
+  --color-error: 192 45 48;
+  --color-error-edge: 138 31 33;
+  --bg-gradient: linear-gradient(180deg, #fcf5ef 0%, #f3eae1 100%);
 }
 
 html,
@@ -12,8 +45,10 @@ body {
 }
 
 body {
-  @apply bg-surface text-ink font-sans antialiased;
-  background-image: linear-gradient(180deg, #211b14 0%, #0f0d0b 100%);
+  @apply font-sans antialiased;
+  color: rgb(var(--color-ink));
+  background-color: rgb(var(--color-surface));
+  background-image: var(--bg-gradient);
   background-attachment: fixed;
 }
 
@@ -38,7 +73,6 @@ body {
   }
 
   .book-text {
-    @apply font-book text-base leading-relaxed;
-    color: var(--book-ink);
+    @apply font-book text-base leading-relaxed text-ink-book;
   }
 }

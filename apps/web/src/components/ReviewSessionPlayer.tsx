@@ -28,7 +28,7 @@ export function ReviewSessionPlayer({
   if (reviewUnit.items.length === 0) {
     return (
       <div
-        className="mx-auto flex min-h-[50vh] w-full max-w-lg flex-col px-4 py-8"
+        className="mx-auto flex min-h-[50vh] w-full max-w-lg flex-col px-4 py-8 md:max-w-2xl lg:max-w-[760px]"
         data-testid="review-session-empty"
       >
         <h1 className="font-display text-2xl font-semibold">Nothing due</h1>

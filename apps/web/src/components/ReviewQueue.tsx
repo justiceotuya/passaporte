@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useProgressStore } from "@/lib/progress-store";
-import { AppNav } from "@/components/AppNav";
+import { PageShell } from "@/components/PageShell";
 
 export function ReviewQueue({
   itemLabels,
@@ -19,10 +19,7 @@ export function ReviewQueue({
   }));
 
   return (
-    <div
-      className="mx-auto flex min-h-screen w-full max-w-lg flex-col px-4 pb-24 pt-6"
-      data-testid="review-page"
-    >
+    <PageShell testId="review-page">
       <header className="mb-6">
         <h1 className="font-display text-3xl font-semibold text-ink">Review</h1>
         <p className="mt-1 text-sm text-ink-muted">
@@ -48,7 +45,7 @@ export function ReviewQueue({
           >
             Due · {rows.length}
           </p>
-          <ul className="flex flex-col gap-3">
+          <ul className="grid gap-3 md:grid-cols-2">
             {rows.map((row) => (
               <li
                 key={row.id}
@@ -70,8 +67,6 @@ export function ReviewQueue({
           </Link>
         </>
       )}
-
-      <AppNav />
-    </div>
+    </PageShell>
   );
 }

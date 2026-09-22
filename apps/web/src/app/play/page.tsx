@@ -37,17 +37,26 @@ export default async function PlayPage({ searchParams }: Props) {
     Number.isFinite(parsed) && parsed >= 1 && parsed <= 15 ? parsed : undefined;
 
   return (
-    <main>
-      <header className="mx-auto flex w-full max-w-lg items-center justify-between px-4 pt-4">
+    <main className="min-h-screen">
+      <header className="mx-auto flex w-full max-w-lg items-center justify-between px-4 pt-4 md:max-w-2xl lg:max-w-[760px] lg:px-10 lg:pt-8">
         <Link
           href={reviewOnly ? "/review" : `/units/${unit.unit}`}
           className="font-display text-lg font-semibold text-primary"
         >
           Passaporte
         </Link>
-        <p className="text-xs font-bold uppercase tracking-wide text-ink-faint">
-          {reviewOnly ? "Review" : `U${unit.unit}`}
-        </p>
+        <div className="flex items-center gap-3">
+          <p className="text-xs font-bold uppercase tracking-wide text-ink-faint">
+            {reviewOnly ? "Review" : `U${unit.unit}`}
+          </p>
+          <Link
+            href="/settings"
+            className="text-xs font-bold uppercase tracking-wide text-ink-muted"
+            data-testid="play-settings-link"
+          >
+            Settings
+          </Link>
+        </div>
       </header>
       {reviewOnly ? (
         <ReviewSessionPlayer unit={unit} sessionSize={sessionSize} />

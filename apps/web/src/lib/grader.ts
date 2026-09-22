@@ -44,6 +44,8 @@ export function gradeAttempt(input: {
   accepted?: string[];
   attemptNo: number;
   revealed?: boolean;
+  /** When "strict", accents are required from attempt 1. */
+  accentStrictness?: "lenient" | "strict";
 }): GradeResult {
   const accepted = input.accepted ?? [];
 
@@ -51,7 +53,8 @@ export function gradeAttempt(input: {
     return { correct: false, xp: 0, accentOnlyMiss: false };
   }
 
-  const enforceAccents = input.attemptNo >= 2;
+  const enforceAccents =
+    input.accentStrictness === "strict" || input.attemptNo >= 2;
   const exactOk = answersMatch(input.given, input.expected, accepted, {
     enforceAccents: true,
   });
@@ -70,7 +73,7 @@ export function gradeAttempt(input: {
     };
   }
 
-  // First attempt: accent-tolerant
+  // First attempt (lenient): accent-tolerant
   const correct = foldedOk;
   return {
     correct,
@@ -115,6 +118,7 @@ export function gradeFillBlank(
   accepted: string[],
   attemptNo: number,
   revealed = false,
+  accentStrictness: "lenient" | "strict" = "lenient",
 ): GradeResult {
   return gradeAttempt({
     given,
@@ -122,6 +126,7 @@ export function gradeFillBlank(
     accepted,
     attemptNo,
     revealed,
+    accentStrictness,
   });
 }
 
@@ -183,8 +188,16 @@ export function gradeTransform(
   accepted: string[],
   attemptNo: number,
   revealed = false,
+  accentStrictness: "lenient" | "strict" = "lenient",
 ): GradeResult {
-  return gradeFillBlank(given, expected, accepted, attemptNo, revealed);
+  return gradeFillBlank(
+    given,
+    expected,
+    accepted,
+    attemptNo,
+    revealed,
+    accentStrictness,
+  );
 }
 
 export function gradeListenChoice(

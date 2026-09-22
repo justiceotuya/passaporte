@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useProgressStore } from "@/lib/progress-store";
 import { buildUnitProgressList } from "@/lib/unit-progress";
-import { AppNav } from "@/components/AppNav";
+import { PageShell } from "@/components/PageShell";
 
 export type MapUnit = {
   unit: number;
@@ -34,15 +34,15 @@ export function UnitMap({ units }: Props) {
   const byUnit = new Map(progress.map((p) => [p.unit, p]));
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-lg flex-col px-4 pb-24 pt-6">
-      <header className="mb-6 flex items-start justify-between gap-3">
+    <PageShell>
+      <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="font-display text-3xl font-semibold text-ink">
+          <h1 className="font-display text-3xl font-semibold text-ink lg:text-4xl">
             Passaporte
           </h1>
           <p className="mt-1 text-sm text-ink-muted">Passaporte para Português 1</p>
         </div>
-        <div className="flex flex-col items-end gap-2">
+        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
           <span className="rounded-pill bg-primary/15 px-3 py-2 text-sm font-bold text-primary">
             Streak · {streakDays}
           </span>
@@ -71,10 +71,19 @@ export function UnitMap({ units }: Props) {
         Units
       </p>
 
-      <ol className="relative flex flex-col gap-5" data-testid="unit-map">
+      {/* Mobile: path list · Laptop+: 2-col grid (desktop template) */}
+      <ol
+        className="relative flex flex-col gap-5 md:grid md:grid-cols-2 md:gap-4"
+        data-testid="unit-map"
+      >
         <div
-          className="pointer-events-none absolute bottom-8 left-[33px] top-8 w-0.5 bg-[repeating-linear-gradient(180deg,rgba(252,245,239,0.18)_0_6px,transparent_6px_14px)]"
+          className="pointer-events-none absolute bottom-8 left-[33px] top-8 w-0.5 bg-ink/20 md:hidden"
           aria-hidden
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(180deg, currentColor 0 6px, transparent 6px 14px)",
+            backgroundColor: "transparent",
+          }}
         />
         {units.map((unit) => {
           const state = byUnit.get(unit.unit);
@@ -84,25 +93,27 @@ export function UnitMap({ units }: Props) {
           const complete = lockState === "complete";
           const inProgress = lockState === "in_progress";
           const ringColor = complete
-            ? "#07C874"
+            ? "var(--color-success)"
             : inProgress
               ? "#F67A1D"
-              : "rgba(252,245,239,0.15)";
+              : "rgb(var(--color-ink) / 0.15)";
           const ringPct = complete ? 100 : percent;
 
           const row = (
             <div
-              className={`relative flex items-center gap-4 ${locked ? "opacity-45" : ""}`}
+              className={`card-surface relative flex items-center gap-4 p-4 ${locked ? "opacity-45" : ""} ${
+                inProgress ? "border-primary/40" : ""
+              }`}
               data-testid={`unit-node-${unit.unit}`}
               data-lock-state={lockState}
             >
               <div
-                className="relative z-10 flex h-[68px] w-[68px] flex-none items-center justify-center rounded-full"
+                className="relative z-10 flex h-[60px] w-[60px] flex-none items-center justify-center rounded-full md:h-[68px] md:w-[68px]"
                 style={{
-                  background: `conic-gradient(${ringColor} 0 ${ringPct}%, rgba(252,245,239,0.1) ${ringPct}%)`,
+                  background: `conic-gradient(${ringColor} 0 ${ringPct}%, rgb(var(--color-ink) / 0.1) ${ringPct}%)`,
                 }}
               >
-                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-surface-card text-lg font-bold">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-surface text-lg font-bold md:h-14 md:w-14">
                   {complete ? (
                     <span className="text-success">✓</span>
                   ) : locked ? (
@@ -119,7 +130,7 @@ export function UnitMap({ units }: Props) {
                 </div>
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-lg font-bold">
+                <p className="truncate text-base font-bold md:text-lg">
                   {unit.unit} · {shortTitle(unit.title, unit.unit)}
                 </p>
                 <p
@@ -143,7 +154,7 @@ export function UnitMap({ units }: Props) {
                 </p>
               </div>
               {!locked ? (
-                <span className="rounded-pill bg-primary px-4 py-2 text-xs font-bold uppercase tracking-wide text-ink-on">
+                <span className="hidden rounded-pill bg-primary px-4 py-2 text-xs font-bold uppercase tracking-wide text-ink-on sm:inline-flex">
                   {inProgress || complete ? "Play" : "Open"}
                 </span>
               ) : null}
@@ -167,8 +178,6 @@ export function UnitMap({ units }: Props) {
           );
         })}
       </ol>
-
-      <AppNav />
-    </div>
+    </PageShell>
   );
 }

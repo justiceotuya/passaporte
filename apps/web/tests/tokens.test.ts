@@ -8,9 +8,12 @@ describe("design tokens", () => {
     expect(colors.success).toBeTruthy();
     expect(colors.error).toBeTruthy();
     expect(colors.warning).toBeTruthy();
-    expect((colors.ink as { book?: string }).book).toBe("#F3D9A8");
+    expect((colors.ink as { book?: string }).book).toMatch(/--color-book-ink/);
     expect((colors.success as { light?: string }).light).toBe("#0A7A48");
     expect((colors.error as { light?: string }).light).toBe("#C02D30");
+    expect((colors.surface as { DEFAULT?: string }).DEFAULT).toMatch(
+      /--color-surface/,
+    );
   });
 
   it("includes book font family for Portuguese content", () => {

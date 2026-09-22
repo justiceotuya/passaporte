@@ -1,5 +1,13 @@
 import { expect, test } from "@playwright/test";
 
+async function clearProgress(page: import("@playwright/test").Page) {
+  await page.goto("/settings");
+  await page.evaluate(() => {
+    window.localStorage.removeItem("passaporte-progress-v2");
+  });
+  await page.reload();
+}
+
 test("review / stats / settings pages and analytics mock", async ({ page }) => {
   await page.addInitScript(() => {
     const events: { event: string; props?: Record<string, unknown> }[] = [];
@@ -20,11 +28,16 @@ test("review / stats / settings pages and analytics mock", async ({ page }) => {
     };
   });
 
-  await page.goto("/settings");
+  await clearProgress(page);
   await expect(page.getByTestId("settings-page")).toBeVisible();
+  await expect(page.getByTestId("setting-appearance")).toBeVisible();
+  await page.getByTestId("setting-appearance-dark").click();
+  await page.getByTestId("setting-accent-strict").click();
+  await page.getByTestId("setting-typed-mode").check();
   await page.getByTestId("setting-hearts").check();
   await page.getByRole("button", { name: "8", exact: true }).click();
   await expect(page.getByTestId("setting-hearts")).toBeChecked();
+  await expect(page.getByTestId("setting-typed-mode")).toBeChecked();
 
   await page.goto("/stats");
   await expect(page.getByTestId("stats-page")).toBeVisible();
@@ -35,12 +48,26 @@ test("review / stats / settings pages and analytics mock", async ({ page }) => {
   await expect(page.getByTestId("review-page")).toBeVisible();
   await expect(page.getByTestId("review-empty")).toBeVisible();
 
+  // Phone: bottom tab bar
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.getByTestId("app-nav")).toBeVisible();
   await page.getByTestId("nav-map").click();
   await expect(page.getByTestId("unit-map")).toBeVisible();
+
+  // Desktop: side rail (PassaporteDesktop)
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await expect(page.getByTestId("app-nav-rail")).toBeVisible();
+  await page.getByTestId("nav-settings-rail").click();
+  await expect(page.getByTestId("settings-page")).toBeVisible();
+
+  await page.goto("/units/1");
+  await expect(page.getByTestId("unit-exercises")).toBeVisible();
+  await expect(page.getByTestId("app-nav-rail")).toBeVisible();
 
   await page.goto("/play?size=2");
   await expect(page.getByTestId("session-player")).toBeVisible();
   await expect(page.getByTestId("session-hearts")).toBeVisible();
+  await expect(page.getByTestId("play-settings-link")).toBeVisible();
 
   const events = await page.evaluate(() => {
     return (window as unknown as { __ph: { event: string }[] }).__ph ?? [];
@@ -49,7 +76,7 @@ test("review / stats / settings pages and analytics mock", async ({ page }) => {
 });
 
 test("settings hearts persist across reload", async ({ page }) => {
-  await page.goto("/settings");
+  await clearProgress(page);
   await page.getByTestId("setting-hints").uncheck();
   await page.reload();
   await expect(page.getByTestId("setting-hints")).not.toBeChecked();

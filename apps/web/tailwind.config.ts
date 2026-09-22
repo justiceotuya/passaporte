@@ -2,23 +2,23 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: ["./src/**/*.{ts,tsx}"],
-  darkMode: "class",
+  darkMode: ["class", '[data-theme="dark"]'],
   theme: {
     extend: {
       colors: {
         surface: {
-          DEFAULT: "#211B14",
-          deep: "#0F0D0B",
-          card: "rgba(252,245,239,0.05)",
+          DEFAULT: "rgb(var(--color-surface) / <alpha-value>)",
+          deep: "rgb(var(--color-surface-deep) / <alpha-value>)",
+          card: "var(--color-surface-card)",
           light: "#FCF5EF",
           lightCard: "#F3EAE1",
         },
         ink: {
-          DEFAULT: "#FCF5EF",
-          on: "#18140F",
-          muted: "rgba(252,245,239,0.60)",
-          faint: "rgba(252,245,239,0.40)",
-          book: "#F3D9A8",
+          DEFAULT: "rgb(var(--color-ink) / <alpha-value>)",
+          on: "rgb(var(--color-ink-on) / <alpha-value>)",
+          muted: "var(--color-ink-muted)",
+          faint: "var(--color-ink-faint)",
+          book: "rgb(var(--color-book-ink) / <alpha-value>)",
         },
         primary: {
           DEFAULT: "#F67A1D",
@@ -26,13 +26,13 @@ const config: Config = {
           deep: "#C85A0E",
         },
         success: {
-          DEFAULT: "#07C874",
-          edge: "#05663B",
+          DEFAULT: "rgb(var(--color-success) / <alpha-value>)",
+          edge: "rgb(var(--color-success-edge) / <alpha-value>)",
           light: "#0A7A48",
         },
         error: {
-          DEFAULT: "#FF6467",
-          edge: "#8A2F31",
+          DEFAULT: "rgb(var(--color-error) / <alpha-value>)",
+          edge: "rgb(var(--color-error-edge) / <alpha-value>)",
           light: "#C02D30",
         },
         warning: {

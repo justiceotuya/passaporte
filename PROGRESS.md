@@ -2,8 +2,8 @@
 
 **Last updated:** 2026-09-22  
 **Owner:** Justice  
-**Status:** Phases 5d–7 complete · review/stats/settings · admin review · content ship CI  
-**Next:** Gold content cleanup · full-book pipeline approval · browser smoke Convex signup with `pnpm web:convex`
+**Status:** Phases 0–7 complete · light/dark + desktop rail · full settings · failures.jsonl gate  
+**Next:** Gold content cleanup · better bboxes · full-book pipeline when approved · Convex signup smoke with `pnpm web:convex`
 
 ---
 
@@ -36,6 +36,9 @@ Open signup · player-first · Zustand progress · Better Auth (Convex when URL 
 | 2026-09-22 | **5d** SM-2 + hearts + analytics · **5e** /review /stats /settings + e2e |
 | 2026-09-22 | **6** `/admin/review` keyboard a/e/r/→ · gated API |
 | 2026-09-22 | **7** `content:validate` · ship gate · CI · shipped **u07** smoke |
+| 2026-09-22 | **Phase 2 leftover** join omits missing keys → `failures.jsonl` (no invented answers) |
+| 2026-09-22 | **Responsive shell** · desktop 240px rail · laptop wider column · light default + dark toggle |
+| 2026-09-22 | **Settings complete** · appearance, accents, typed mode, session length, reset, sign-in |
 
 ---
 
@@ -43,7 +46,7 @@ Open signup · player-first · Zustand progress · Better Auth (Convex when URL 
 
 - [ ] Gold review · content unit-map cleanup · better bboxes
 - [ ] Browser smoke Convex signup (with `pnpm web:convex` running)
-- [ ] Failures.jsonl pipeline exit item (Phase 2 leftover)
+- [ ] Full-book pipeline run (needs Justice approval)
 
 ---
 
@@ -70,6 +73,7 @@ pnpm web   # map / review / stats / settings / play
 | 2026-09-22 | 5e pages+e2e | `pnpm web:test` · `pnpm web:e2e` | PASS **59** unit · **4/4** e2e |
 | 2026-09-22 | 6 admin | vitest + admin e2e | PASS **68** · admin API gated |
 | 2026-09-22 | 7 ship | `pnpm content:validate` · `ship-gate` | PASS 7 units · u07 shipped |
+| 2026-09-22 | failures + UI shell | `uv run pytest tests/test_failures.py tests/test_join.py` · `pnpm web:test` · `pnpm web:e2e` | PASS **6** pipeline · **68** web · **8/8** e2e |
 
 ---
 
@@ -80,9 +84,9 @@ You are continuing Passaporte.
 
 Read: PROGRESS.md, TESTING.md, apps/web/convex/README.md
 
-Done through Phase 7: SM-2/hearts, review/stats/settings, admin review, content validate + ship gate (u07), CI workflow.
+Done through Phase 7 + failures.jsonl gate + light/dark appearance + desktop rail nav + complete settings.
 
-Next: gold content cleanup; full-book pipeline when approved; Convex signup smoke with web:convex running.
+Next: gold content cleanup; better bboxes; full-book pipeline when approved; Convex signup smoke with web:convex running.
 
 Commands: pnpm web:test · pnpm content:validate · pnpm content:ship-gate · pnpm web · pnpm web:e2e · pnpm web:convex
 ```

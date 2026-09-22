@@ -32,10 +32,16 @@ describe("progress store SM-2 finishSession", () => {
       heartsEnabled: true,
       sessionLength: 8,
       hintsEnabled: false,
+      appearance: "dark",
+      accentStrictness: "strict",
+      typedMode: true,
     });
     const settings = useProgressStore.getState().settings;
     expect(settings.heartsEnabled).toBe(true);
     expect(settings.sessionLength).toBe(8);
     expect(settings.hintsEnabled).toBe(false);
+    expect(settings.appearance).toBe("dark");
+    expect(settings.accentStrictness).toBe("strict");
+    expect(settings.typedMode).toBe(true);
   });
 });
