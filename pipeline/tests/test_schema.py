@@ -131,11 +131,32 @@ def test_choice_without_options_fails(
 
 
 def test_true_false_bad_answer_fails(
-    fixture_unit: dict, item_validator: jsonschema.Draft202012Validator
+    item_validator: jsonschema.Draft202012Validator,
 ) -> None:
-    item = deepcopy(next(i for i in fixture_unit["items"] if i["type"] == "true_false"))
-    item["answer"] = "yes"
+    # Synthesize — live u01 may not include true_false after full-book join.
+    item = {
+        "id": "pass-u01-p001-A-1",
+        "book": "passaporte",
+        "unit": 1,
+        "page": 1,
+        "exercise": "A",
+        "type": "true_false",
+        "skill": "grammar",
+        "topic": "schema-test",
+        "instruction": "Verdadeiro ou falso?",
+        "prompt": "Example statement.",
+        "answer": "true",
+        "accepted": [],
+        "hint_en": "Decide from the statement alone.",
+        "answer_source": "teacher_book",
+        "review": {"status": "pending", "by": "test", "at": "2026-09-23T00:00:00Z"},
+    }
+    item_validator.validate(item)
+    PassaporteItem.model_validate(item)
+
+    bad = deepcopy(item)
+    bad["answer"] = "yes"
     with pytest.raises(jsonschema.ValidationError):
-        item_validator.validate(item)
+        item_validator.validate(bad)
     with pytest.raises(ValidationError):
-        PassaporteItem.model_validate(item)
+        PassaporteItem.model_validate(bad)
