@@ -4,6 +4,8 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { applySm2, isDue, type Sm2State } from "@/lib/sm2";
 
+import type { AppearanceSetting } from "@/lib/appearance";
+
 export type AttemptRecord = {
   itemId: string;
   correct: boolean;
@@ -20,7 +22,7 @@ export type LearnerSettings = {
   heartsEnabled: boolean;
   hintsEnabled: boolean;
   typedMode: boolean;
-  appearance: "light" | "dark";
+  appearance: AppearanceSetting;
 };
 
 export type AnsweredItem = {
@@ -63,7 +65,7 @@ const defaultSettings: LearnerSettings = {
   heartsEnabled: false,
   hintsEnabled: true,
   typedMode: false,
-  appearance: "light",
+  appearance: "system",
 };
 
 export const useProgressStore = create<ProgressState>()(

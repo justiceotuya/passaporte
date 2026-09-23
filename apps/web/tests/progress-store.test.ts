@@ -44,4 +44,8 @@ describe("progress store SM-2 finishSession", () => {
     expect(settings.accentStrictness).toBe("strict");
     expect(settings.typedMode).toBe(true);
   });
+
+  it("defaults appearance to system", () => {
+    expect(useProgressStore.getState().settings.appearance).toBe("system");
+  });
 });

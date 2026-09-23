@@ -24,25 +24,32 @@ export function SettingsPanel() {
         <div className="card-surface p-4" data-testid="setting-appearance">
           <p className="text-sm font-bold text-ink">Appearance</p>
           <p className="mt-1 text-sm text-ink-muted">
-            Light mode uses AA success/error pairs on cream. Dark matches the brand templates.
+            System follows your device color scheme. Light uses AA success/error on cream;
+            dark matches the brand templates.
           </p>
           <div className="mt-4 flex gap-2">
-            {(["light", "dark"] as const).map((mode) => {
-              const active = settings.appearance === mode;
+            {(
+              [
+                { id: "system", label: "System" },
+                { id: "light", label: "Light" },
+                { id: "dark", label: "Dark" },
+              ] as const
+            ).map((mode) => {
+              const active = settings.appearance === mode.id;
               return (
                 <button
-                  key={mode}
+                  key={mode.id}
                   type="button"
-                  className={`min-h-tap flex-1 rounded-pill text-sm font-bold capitalize ${
+                  className={`min-h-tap flex-1 rounded-pill text-sm font-bold ${
                     active
                       ? "bg-primary text-ink-on"
                       : "border border-ink/20 text-ink-muted"
                   }`}
                   aria-pressed={active}
-                  data-testid={`setting-appearance-${mode}`}
-                  onClick={() => updateSettings({ appearance: mode })}
+                  data-testid={`setting-appearance-${mode.id}`}
+                  onClick={() => updateSettings({ appearance: mode.id })}
                 >
-                  {mode}
+                  {mode.label}
                 </button>
               );
             })}

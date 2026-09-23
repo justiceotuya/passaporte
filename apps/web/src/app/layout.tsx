@@ -52,6 +52,11 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className="font-sans">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var k='passaporte-progress-v2';var raw=localStorage.getItem(k);var appearance='system';if(raw){var parsed=JSON.parse(raw);appearance=(parsed&&parsed.state&&parsed.state.settings&&parsed.state.settings.appearance)||appearance;}var dark=appearance==='dark'||(appearance!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);var root=document.documentElement;root.dataset.theme=dark?'dark':'light';root.classList.toggle('dark',dark);root.classList.toggle('light',!dark);}catch(e){}})();`,
+          }}
+        />
         <ConvexClientProvider initialToken={initialToken}>
           <ThemeSync />
           <AppToaster />
