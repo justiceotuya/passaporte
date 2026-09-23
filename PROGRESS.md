@@ -2,8 +2,8 @@
 
 **Last updated:** 2026-09-23  
 **Owner:** Justice  
-**Status:** Full-book **extract complete** (aluno 219/219 · professor 176/176) · p-116 = A–D only (classify over-listed E–J)  
-**Next:** Join runs → `pnpm pipeline:hints` · `pnpm pipeline:crop` · Google OAuth keys · gold cleanup
+**Status:** Full-book pipeline through hints+crop **done** · 36 units / 363 items · 293 hints · 7 crops  
+**Next:** Improve join matching (low match rate) · gold approve items · Google OAuth keys · Convex smoke
 
 ---
 
@@ -38,14 +38,16 @@ Open signup · player-first · Zustand progress · Better Auth (Convex when URL 
 | 2026-09-23 | **Resume harden** · `set -euo pipefail` · extract completeness check before ALL DONE · extract resumed with `--run-id` |
 | 2026-09-23 | **Extract gap resume** · allow numbered exercise labels · coerce bad bbox/skill · screen `passaporte-extract` filling 7 aluno + 12 professor misses |
 | 2026-09-23 | **Extract complete** · aluno `20260923T002149Z-d2ef0ba5` (219) · professor `20260923T014601Z-db7b1051` (176) · dense-page letter chunking + 16k max_tokens |
+| 2026-09-23 | **Join full-book** · 36 units · 363 items · defaults updated to new run ids · hints+crop queued |
+| 2026-09-23 | **Hints + crop** · 293 hints updated · 70 pending (69 open + 1 match) · 7 stimulus crops |
 
 ---
 
 ## Remaining
 
-- [ ] Join aluno `20260923T002149Z-d2ef0ba5` + professor `20260923T014601Z-db7b1051` → hints → crop
+- [ ] Improve join matching (27 matched / 653 exercise_only — student_page alignment)
+- [ ] Gold review / approve closed items (ship-gate fails until approved) · better bboxes
 - [ ] Set `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` (local + Convex) to enable Google button
-- [ ] Gold review · better bboxes
 - [ ] Browser smoke Convex signup with `pnpm web:convex`
 
 ---
@@ -56,50 +58,15 @@ Open signup · player-first · Zustand progress · Better Auth (Convex when URL 
 | --- | --- | --- |
 | Classify aluno | **done** | 258/258 |
 | Classify professor | **done** | 207/207 |
-| Extract aluno | **running** | `20260923T002149Z-d2ef0ba5` · resumed from 16/219 (skips existing) |
-| Extract_key professor | pending | starts after aluno extract finishes (new run; ignore empty `20260923T002644Z-49c87a47`) |
-| Join / hints / crop | pending | after real EXTRACT ALL DONE |
-
-**Process:** `screen -r passaporte-classify` (pid session `passaporte-classify`)  
-**Logs:** `extracted/logs/extract-aluno.log` · `extracted/logs/extract-professor.log` · `extracted/logs/full-book-resume.out`
-
-### Monitor
+| Extract aluno | **done** | `20260923T002149Z-d2ef0ba5` · 219/219 |
+| Extract_key professor | **done** | `20260923T014601Z-db7b1051` · 176/176 |
+| Join | **done** | 36 units · 363 items · report `extracted/join_report.md` |
+| Hints | **done** | 293 updated · open items skip hints by design |
+| Crop | **done** | 7 `needs_image` crops |
 
 ```bash
-screen -ls
-pgrep -af 'extract.py|extract_key'
-tail -f extracted/logs/extract-aluno.log
-ls extracted/passaporte-aluno/20260923T002149Z-d2ef0ba5/p-*.json | wc -l   # expect ~219
-```
-
-### When extract finishes (both books)
-
-```bash
-grep 'EXTRACT ALL DONE\|ALL DONE' extracted/logs/extract-aluno.log extracted/logs/extract-professor.log extracted/logs/full-book-resume.out | tail -5
-# note new professor run under extracted/passaporte-professor/ (non-empty)
-
-cd pipeline && uv run python join.py \
-  --aluno-run ../extracted/passaporte-aluno/20260923T002149Z-d2ef0ba5 \
-  --professor-run ../extracted/passaporte-professor/<PROF_RUN> \
-  --report ../extracted/join_report.md
-
+cd pipeline && uv run python join.py  # defaults → full-book run ids
 pnpm pipeline:hints && pnpm pipeline:crop
-```
-
-If the screen dies mid-extract:
-
-```bash
-cd "/Users/justiceotuya/Downloads/Kuji Design System/passaporte"
-screen -dmS passaporte-classify bash -lc '
-  set -a; source .env; set +a
-  export PYTHONUNBUFFERED=1
-  set -euo pipefail
-  cd pipeline
-  uv run python extract.py --book passaporte-aluno --run-id 20260923T002149Z-d2ef0ba5 2>&1 | tee -a ../extracted/logs/extract-aluno.log
-  uv run python extract_key.py --book passaporte-professor 2>&1 | tee -a ../extracted/logs/extract-professor.log
-  echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] EXTRACT ALL DONE"
-'
-# Or: EXTRACT_ALUNO_RUN=20260923T002149Z-d2ef0ba5 bash scripts/resume-full-book.sh
 ```
 
 ---
@@ -111,11 +78,7 @@ cd passaporte && pnpm install
 pnpm web:test
 pnpm web          # app
 pnpm web:convex   # Convex auth/progress
-
-# Full-book PDF (long-running)
-EXTRACT_ALUNO_RUN=20260923T002149Z-d2ef0ba5 bash scripts/resume-full-book.sh
-# Attach: screen -r passaporte-classify
-# Alt: pnpm pipeline:full-book
+pnpm pipeline:join && pnpm pipeline:hints && pnpm pipeline:crop
 ```
 
 ---
@@ -127,6 +90,7 @@ EXTRACT_ALUNO_RUN=20260923T002149Z-d2ef0ba5 bash scripts/resume-full-book.sh
 | 2026-09-22 | failures + UI | pytest join/failures · web:test · web:e2e | PASS |
 | 2026-09-22 | auth + classify merge | `pnpm web:test` · `pytest tests/test_classify.py` | PASS **69** web · **7** classify |
 | 2026-09-23 | classify letter sanitize | `uv run pytest tests/test_classify.py` | PASS **7** |
+| 2026-09-23 | join + content | `join.py` full-book · `pnpm content:validate` | PASS **36** units (ship-gate fails until gold approve) |
 
 ---
 
@@ -135,11 +99,11 @@ EXTRACT_ALUNO_RUN=20260923T002149Z-d2ef0ba5 bash scripts/resume-full-book.sh
 ```
 You are continuing Passaporte.
 
-Read: PROGRESS.md, TESTING.md, apps/web/convex/README.md
+Read: PROGRESS.md, TESTING.md, extracted/join_report.md
 
-Done: auth, classify 258/207, resume script harden (no false ALL DONE), extract resumed with --run-id 20260923T002149Z-d2ef0ba5.
+Done: full-book classify+extract+join+hints+crop. Content in content/passaporte (36 units, 363 items).
 
-Next: monitor extract-aluno.log until ~219 JSON + professor extract_key; then join + hints + crop. Google OAuth keys still pending.
+Next: improve join matching (student_page), gold-approve items for ship-gate, Google OAuth keys, Convex smoke.
 
-Commands: screen -r passaporte-classify · tail -f extracted/logs/extract-aluno.log · pnpm web:test
+Commands: pnpm web · pnpm web:convex · pnpm content:validate · pnpm pipeline:join
 ```

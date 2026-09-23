@@ -29,8 +29,8 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_EXTRACTED = ROOT / "extracted"
 DEFAULT_CONTENT = ROOT / "content" / "passaporte"
 
-ALUNO_RUN = "20260922T163925Z-0b8f810b"
-PROF_RUN = "20260922T164242Z-833219b4"
+ALUNO_RUN = "20260923T002149Z-d2ef0ba5"
+PROF_RUN = "20260923T014601Z-db7b1051"
 
 
 class JoinError(RuntimeError):
