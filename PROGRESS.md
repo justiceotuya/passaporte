@@ -2,8 +2,8 @@
 
 **Last updated:** 2026-09-23  
 **Owner:** Justice  
-**Status:** Full-book **classify complete** (aluno 258 + professor 207) · **extract aluno running** in `screen`  
-**Next:** Wait for extract aluno + extract_key professor → join with new run IDs → `pnpm pipeline:hints` · `pnpm pipeline:crop` · Google OAuth keys · gold cleanup
+**Status:** Classify **done** · aluno extract **resumed** in `screen` (`--run-id 20260923T002149Z-d2ef0ba5`) · resume script hardened (`set -e` + completeness gate)  
+**Next:** Wait for extract aluno (~219) + extract_key professor (~176) → join → `pnpm pipeline:hints` · `pnpm pipeline:crop` · Google OAuth keys · gold cleanup
 
 ---
 
@@ -34,13 +34,14 @@ Open signup · player-first · Zustand progress · Better Auth (Convex when URL 
 | 2026-09-22 | Phases 0–7 · SRS · admin · ship gate · responsive · light/dark |
 | 2026-09-22 | **Auth E2E** · email signup/signin · Google provider (env-gated) · sign-out · nav account · `?next=` callback · SSR token |
 | 2026-09-22 | **Classify merge** · skip existing pages · `pnpm pipeline:full-book` script started |
-| 2026-09-23 | **Full-book classify** · aluno **258/258** · professor **207/207** · fixed p-222 letter sanitize (numbered exercises no longer block save) · resume script coverage/stall detection |
+| 2026-09-23 | **Full-book classify** · aluno **258/258** · professor **207/207** · p-222 letter sanitize |
+| 2026-09-23 | **Resume harden** · `set -euo pipefail` · extract completeness check before ALL DONE · extract resumed with `--run-id` |
 
 ---
 
 ## Remaining
 
-- [ ] Full-book **extract** (aluno ~219 exercise pages + professor ~176 answer_key) running in `screen -S passaporte-classify` → then join + hints + crop
+- [ ] Full-book **extract** (aluno ~219 exercise pages + professor ~176 answer_key) in `screen -S passaporte-classify` → then join + hints + crop
 - [ ] Set `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` (local + Convex) to enable Google button
 - [ ] Gold review · better bboxes
 - [ ] Browser smoke Convex signup with `pnpm web:convex`
@@ -51,31 +52,29 @@ Open signup · player-first · Zustand progress · Better Auth (Convex when URL 
 
 | Stage | Status | Notes |
 | --- | --- | --- |
-| Classify aluno | **done** | 258/258 · gap was p-222 (`exercise_letters` `["5","6"]` failed validation; now sanitized) |
+| Classify aluno | **done** | 258/258 |
 | Classify professor | **done** | 207/207 |
-| Extract aluno | **running** | run dir `extracted/passaporte-aluno/20260923T002149Z-d2ef0ba5` · ~219 exercise pages |
-| Extract_key professor | pending | starts automatically after aluno extract in resume script |
-| Join / hints / crop | pending | use new run IDs from logs when extract finishes |
+| Extract aluno | **running** | `20260923T002149Z-d2ef0ba5` · resumed from 16/219 (skips existing) |
+| Extract_key professor | pending | starts after aluno extract finishes (new run; ignore empty `20260923T002644Z-49c87a47`) |
+| Join / hints / crop | pending | after real EXTRACT ALL DONE |
 
-**Process:** `screen -r passaporte-classify` (detached) · `scripts/resume-full-book.sh`  
-**Logs:** `extracted/logs/full-book-resume.out` · `extracted/logs/extract-aluno.log` · (later) `extract-professor.log`
+**Process:** `screen -r passaporte-classify` (pid session `passaporte-classify`)  
+**Logs:** `extracted/logs/extract-aluno.log` · `extracted/logs/extract-professor.log` · `extracted/logs/full-book-resume.out`
 
 ### Monitor
 
 ```bash
 screen -ls
-pgrep -af 'resume-full-book|extract.py|extract_key|classify.py'
-python3 -c "import json; print('aluno',len(json.load(open('extracted/passaporte-aluno/pages.json'))['pages']),'prof',len(json.load(open('extracted/passaporte-professor/pages.json'))['pages']))"
-tail -f extracted/logs/full-book-resume.out
-# Extract progress: count files under the new run dir
-ls extracted/passaporte-aluno/20260923T002149Z-d2ef0ba5 | wc -l
+pgrep -af 'extract.py|extract_key'
+tail -f extracted/logs/extract-aluno.log
+ls extracted/passaporte-aluno/20260923T002149Z-d2ef0ba5/p-*.json | wc -l   # expect ~219
 ```
 
 ### When extract finishes (both books)
 
 ```bash
-# Confirm ALL DONE in log, note professor run id under extracted/passaporte-professor/
-grep -E 'ALL DONE|run|Wrote|extract' extracted/logs/full-book-resume.out | tail -40
+grep 'EXTRACT ALL DONE\|ALL DONE' extracted/logs/extract-aluno.log extracted/logs/extract-professor.log extracted/logs/full-book-resume.out | tail -5
+# note new professor run under extracted/passaporte-professor/ (non-empty)
 
 cd pipeline && uv run python join.py \
   --aluno-run ../extracted/passaporte-aluno/20260923T002149Z-d2ef0ba5 \
@@ -88,9 +87,17 @@ pnpm pipeline:hints && pnpm pipeline:crop
 If the screen dies mid-extract:
 
 ```bash
-bash scripts/resume-full-book.sh
-# or: screen -dmS passaporte-classify bash scripts/resume-full-book.sh
-# Classify will no-op (already complete); extract may need a fresh start — check extract logs.
+cd "/Users/justiceotuya/Downloads/Kuji Design System/passaporte"
+screen -dmS passaporte-classify bash -lc '
+  set -a; source .env; set +a
+  export PYTHONUNBUFFERED=1
+  set -euo pipefail
+  cd pipeline
+  uv run python extract.py --book passaporte-aluno --run-id 20260923T002149Z-d2ef0ba5 2>&1 | tee -a ../extracted/logs/extract-aluno.log
+  uv run python extract_key.py --book passaporte-professor 2>&1 | tee -a ../extracted/logs/extract-professor.log
+  echo "[$(date -u +%Y-%m-%dT%H:%M:%SZ)] EXTRACT ALL DONE"
+'
+# Or: EXTRACT_ALUNO_RUN=20260923T002149Z-d2ef0ba5 bash scripts/resume-full-book.sh
 ```
 
 ---
@@ -102,12 +109,10 @@ cd passaporte && pnpm install
 pnpm web:test
 pnpm web          # app
 pnpm web:convex   # Convex auth/progress
-# Google: add GOOGLE_CLIENT_ID/SECRET to apps/web/.env.local + convex env set
-# Redirect URI: http://localhost:3000/api/auth/callback/google
 
-# Full-book PDF (long-running; prefers detached screen)
-bash scripts/resume-full-book.sh          # or: screen -dmS passaporte-classify bash scripts/resume-full-book.sh
-# Attach: screen -r passaporte-classify · Logs: extracted/logs/full-book-resume.out
+# Full-book PDF (long-running)
+EXTRACT_ALUNO_RUN=20260923T002149Z-d2ef0ba5 bash scripts/resume-full-book.sh
+# Attach: screen -r passaporte-classify
 # Alt: pnpm pipeline:full-book
 ```
 
@@ -130,9 +135,9 @@ You are continuing Passaporte.
 
 Read: PROGRESS.md, TESTING.md, apps/web/convex/README.md
 
-Done: auth email + Google (env-gated), classify merge/skip, full-book classify (aluno 258 + professor 207), p-222 letter sanitize.
+Done: auth, classify 258/207, resume script harden (no false ALL DONE), extract resumed with --run-id 20260923T002149Z-d2ef0ba5.
 
-Next: monitor extract in screen passaporte-classify / extracted/logs/full-book-resume.out; when extract aluno + extract_key professor finish, join with run ids (aluno 20260923T002149Z-d2ef0ba5 + new professor run), then pnpm pipeline:hints && pnpm pipeline:crop. Add Google OAuth client keys to enable the button.
+Next: monitor extract-aluno.log until ~219 JSON + professor extract_key; then join + hints + crop. Google OAuth keys still pending.
 
-Commands: pnpm web · pnpm web:convex · bash scripts/resume-full-book.sh · pnpm web:test · pnpm web:e2e
+Commands: screen -r passaporte-classify · tail -f extracted/logs/extract-aluno.log · pnpm web:test
 ```
