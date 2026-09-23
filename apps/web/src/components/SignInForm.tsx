@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
+import { useAuthProviders } from "@/hooks/use-auth-providers";
 
 type AuthMode = "signin" | "signup";
 
@@ -31,7 +32,7 @@ function showError(message: string, setInline: (msg: string | null) => void) {
 export function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackURL = searchParams.get("next") || "/";
+  const callbackURL = searchParams.get("next") || "/map";
 
   const { data: session, isPending: sessionPending } = authClient.useSession();
 
@@ -39,7 +40,9 @@ export function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [googlePending, setGooglePending] = useState(false);
-  const [googleEnabled, setGoogleEnabled] = useState(false);
+
+  const { data: providers } = useAuthProviders();
+  const googleEnabled = providers?.google ?? false;
 
   const form = useForm({
     defaultValues: {
@@ -79,15 +82,6 @@ export function SignInForm() {
       }
     },
   });
-
-  useEffect(() => {
-    void fetch("/api/auth/providers")
-      .then((res) => res.json())
-      .then((body: { google?: boolean }) => {
-        setGoogleEnabled(Boolean(body.google));
-      })
-      .catch(() => setGoogleEnabled(false));
-  }, []);
 
   useEffect(() => {
     const oauthError = searchParams.get("error");

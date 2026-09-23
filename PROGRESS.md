@@ -42,6 +42,12 @@ Open signup · player-first · Zustand progress · Better Auth (Convex when URL 
 | 2026-09-23 | **Join matching fix** · remap claimed `student_page` (printed→PDF, default −2) · item-index shift/positional align · stale unit cleanup · crop run id updated |
 | 2026-09-23 | **Gold approve** · 37 units in `shipped-units.json` · closed items `review.status=approved` · ship-gate PASS |
 | 2026-09-23 | **Convex signup smoke** · `convex dev` + Playwright auth providers + create-account · PASS |
+| 2026-09-23 | **English instructions** · `instruction_en` + Settings language (default EN) · `pipeline:instructions-en` |
+| 2026-09-23 | **instruction_en generated** · **919**/919 items · `pnpm content:validate` PASS **38** units |
+| 2026-09-23 | **TanStack Query** · providers query + progress/review mutations via `@tanstack/react-query` |
+| 2026-09-23 | **Landing** · `PassaporteLanding` from template · `/` marketing · unit map at `/map` |
+| 2026-09-23 | **Query hooks** · `useAuthProviders` · `useSyncProgress` · `useProgressSnapshot` · `useReviewQueue` · ProgressHydrator |
+| 2026-09-23 | **TanStack Query** · providers query + progress/review mutations via `@tanstack/react-query` |
 
 ---
 
@@ -92,8 +98,10 @@ cd passaporte && pnpm install
 pnpm web:test
 pnpm web          # app
 pnpm web:convex   # Convex auth/progress
-pnpm pipeline:join && pnpm pipeline:hints && pnpm pipeline:crop
+pnpm pipeline:join && pnpm pipeline:hints && pnpm pipeline:instructions-en && pnpm pipeline:crop
 ```
+
+Learners see exercise instructions in English by default (`instruction_en`); Settings → Instructions switches to Portuguese book wording. Prompts/options stay Portuguese.
 
 ---
 
@@ -108,6 +116,7 @@ pnpm pipeline:join && pnpm pipeline:hints && pnpm pipeline:crop
 | 2026-09-23 | join match fix | `uv run pytest tests/test_join.py` · `join.py` · hints · crop · `pnpm content:validate` | PASS **10** join · **38** units / **919** items · ship-gate still fails (pending gold) |
 | 2026-09-23 | gold approve | `approve-unit` ×37 · `pnpm content:validate` · `pnpm content:ship-gate` | PASS **38** units validated · ship-gate **37** |
 | 2026-09-23 | convex smoke | `convex dev` · Playwright auth providers + create-account | PASS **2** |
+| 2026-09-23 | instruction_en | `pipeline:instructions-en` · `pnpm content:validate` · `pytest test_instructions_en` | PASS **919** EN · **38** units · **4** pytest |
 
 ---
 

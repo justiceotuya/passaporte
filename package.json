@@ -19,6 +19,7 @@
     "pipeline:test": "cd pipeline && uv run pytest -q",
     "pipeline:join": "cd pipeline && uv run python join.py --report ../extracted/join_report.md",
     "pipeline:hints": "cd pipeline && uv run python hints.py",
+    "pipeline:instructions-en": "cd pipeline && uv run python instructions_en.py",
     "pipeline:crop": "cd pipeline && uv run python crop.py",
     "pipeline:full-book": "bash scripts/full-book-extract.sh"
   },

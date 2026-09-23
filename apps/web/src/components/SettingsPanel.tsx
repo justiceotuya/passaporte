@@ -56,6 +56,39 @@ export function SettingsPanel() {
           </div>
         </div>
 
+        <div className="card-surface p-4" data-testid="setting-instruction-language">
+          <p className="text-sm font-bold text-ink">Instructions</p>
+          <p className="mt-1 text-sm text-ink-muted">
+            Language for exercise instructions. Prompts and options stay Portuguese.
+          </p>
+          <div className="mt-4 flex gap-2">
+            {(
+              [
+                { id: "en", label: "English" },
+                { id: "pt", label: "Portuguese" },
+              ] as const
+            ).map((mode) => {
+              const active = settings.instructionLanguage === mode.id;
+              return (
+                <button
+                  key={mode.id}
+                  type="button"
+                  className={`min-h-tap flex-1 rounded-pill text-sm font-bold ${
+                    active
+                      ? "bg-primary text-ink-on"
+                      : "border border-ink/20 text-ink-muted"
+                  }`}
+                  aria-pressed={active}
+                  data-testid={`setting-instruction-language-${mode.id}`}
+                  onClick={() => updateSettings({ instructionLanguage: mode.id })}
+                >
+                  {mode.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         <ToggleRow
           label="Hearts"
           description="Three hearts; a miss costs one. Session ends at zero."

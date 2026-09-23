@@ -4,7 +4,10 @@ import { useCallback, useEffect, useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import { StimulusImage } from "@/components/StimulusImage";
+import { instructionForDisplay } from "@/lib/instruction-display";
 import type { ReviewQueueItem } from "@/lib/content-review";
+import { useProgressStore } from "@/lib/progress-store";
+import { useReviewAction, useReviewQueue } from "@/hooks/use-review";
 import type { ReviewStatus } from "@/types/item";
 
 type Props = {
@@ -13,55 +16,40 @@ type Props = {
 };
 
 export function AdminReviewBoard({ initialItems, bypass = false }: Props) {
-  const [items, setItems] = useState(initialItems);
+  const { data: items = [] } = useReviewQueue({
+    bypass,
+    initialItems,
+  });
   const [index, setIndex] = useState(0);
   const [editPrompt, setEditPrompt] = useState(false);
-  const [pending, setPending] = useState(false);
+  const instructionLanguage = useProgressStore(
+    (s) => s.settings.instructionLanguage ?? "en",
+  );
 
-  const current = items[index] ?? null;
+  const current = items[Math.min(index, Math.max(0, items.length - 1))] ?? null;
 
-  const advance = useCallback(() => {
-    setEditPrompt(false);
-    setItems((prev) => {
-      if (prev.length === 0) return prev;
-      const next = [...prev];
-      next.splice(index, 1);
-      return next;
-    });
-    setIndex(0);
-  }, [index]);
+  const reviewMutation = useReviewAction({ bypass });
+  const pending = reviewMutation.isPending;
 
   const applyStatus = useCallback(
     async (status: ReviewStatus, prompt?: string) => {
       if (!current || pending) return false;
-      setPending(true);
       try {
-        const headers: Record<string, string> = {
-          "Content-Type": "application/json",
-        };
-        if (bypass) headers["x-passaporte-admin-bypass"] = "1";
-        const res = await fetch("/api/admin/review", {
-          method: "POST",
-          headers,
-          body: JSON.stringify({
-            itemId: current.id,
-            status,
-            prompt,
-          }),
+        await reviewMutation.mutateAsync({
+          status,
+          prompt,
+          itemId: current.id,
         });
-        if (!res.ok) {
-          const body = (await res.json().catch(() => ({}))) as { error?: string };
-          toast.error(body.error ?? `Failed (${res.status})`);
-          return false;
-        }
         toast.success(`${status} · ${current.id}`);
-        advance();
+        setEditPrompt(false);
+        setIndex(0);
         return true;
-      } finally {
-        setPending(false);
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Review failed");
+        return false;
       }
     },
-    [advance, bypass, current, pending],
+    [current, pending, reviewMutation],
   );
 
   const promptForm = useForm({
@@ -121,8 +109,7 @@ export function AdminReviewBoard({ initialItems, bypass = false }: Props) {
   return (
     <div data-testid="admin-review-board" data-item-id={current.id}>
       <p className="mb-4 text-xs font-bold uppercase tracking-wide text-ink-faint">
-        {index + 1} remaining in view · U{current.unit} p{current.page} ·{" "}
-        {current.type}
+        {items.length} remaining · U{current.unit} p{current.page} · {current.type}
       </p>
 
       <div className="card-surface space-y-4 p-5">
@@ -132,7 +119,17 @@ export function AdminReviewBoard({ initialItems, bypass = false }: Props) {
             alt={`Stimulus for ${current.id}`}
           />
         ) : null}
-        <p className="book-text">{current.instruction}</p>
+        <p className="book-text">
+          {instructionForDisplay(current, instructionLanguage)}
+        </p>
+        {instructionLanguage === "en" &&
+        current.instruction_en?.trim() &&
+        current.instruction.trim() &&
+        current.instruction_en.trim() !== current.instruction.trim() ? (
+          <p className="text-sm text-ink-muted" data-testid="admin-instruction-pt">
+            PT: {current.instruction}
+          </p>
+        ) : null}
         {editPrompt ? (
           <form
             className="flex flex-col gap-2"
@@ -142,96 +139,104 @@ export function AdminReviewBoard({ initialItems, bypass = false }: Props) {
               void promptForm.handleSubmit();
             }}
           >
-            <span className="text-xs font-bold uppercase tracking-wide text-ink-faint">
-              Edit prompt
-            </span>
-            <promptForm.Field
-              name="prompt"
-              validators={{
-                onChange: ({ value }) =>
-                  value.trim() ? undefined : "Prompt cannot be empty",
-              }}
-            >
+            <promptForm.Field name="prompt">
               {(field) => (
-                <>
-                  <textarea
-                    className="min-h-24 rounded-md border border-ink/20 bg-surface px-3 py-2 text-ink"
-                    value={field.state.value}
-                    data-testid="admin-edit-prompt"
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                  {field.state.meta.errors.length > 0 ? (
-                    <span className="text-xs text-error" role="alert">
-                      {field.state.meta.errors.join(", ")}
-                    </span>
-                  ) : null}
-                </>
+                <textarea
+                  className="min-h-24 w-full rounded-2xl border border-ink/15 bg-surface px-3 py-2 text-base font-semibold text-ink"
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  data-testid="admin-edit-prompt"
+                />
               )}
             </promptForm.Field>
-            <button
-              type="submit"
-              className="btn-primary"
-              data-testid="admin-save-edit"
-              disabled={pending || promptForm.state.isSubmitting}
-            >
-              Save + approve
-            </button>
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                className="btn-primary"
+                disabled={pending}
+                data-testid="admin-save-prompt"
+              >
+                Save & approve
+              </button>
+              <button
+                type="button"
+                className="rounded-pill border border-ink/20 px-4 text-sm font-bold"
+                onClick={() => setEditPrompt(false)}
+              >
+                Cancel
+              </button>
+            </div>
           </form>
         ) : (
-          <h2 className="text-xl font-semibold text-ink">{current.prompt}</h2>
+          <h2 className="text-xl font-semibold tracking-tight text-ink">
+            {current.prompt}
+          </h2>
         )}
-        <p className="text-sm text-ink-muted">
-          Answer:{" "}
-          <code className="text-ink">{JSON.stringify(current.answer)}</code>
-        </p>
+
+        {current.options?.length ? (
+          <ul className="space-y-2">
+            {current.options.map((opt) => (
+              <li
+                key={opt}
+                className={`rounded-2xl border px-4 py-3 text-sm font-semibold ${
+                  opt === current.answer
+                    ? "border-success bg-success/10 text-success"
+                    : "border-ink/10 text-ink-muted"
+                }`}
+              >
+                {opt}
+                {opt === current.answer ? " · answer" : ""}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-ink-muted">
+            Answer:{" "}
+            <span className="font-bold text-ink">
+              {typeof current.answer === "string"
+                ? current.answer
+                : JSON.stringify(current.answer)}
+            </span>
+          </p>
+        )}
+
         {current.hint_en ? (
-          <p className="text-sm text-ink-muted">Hint: {current.hint_en}</p>
+          <p className="text-sm text-ink-faint">Hint: {current.hint_en}</p>
         ) : null}
       </div>
 
-      <div className="mt-6 flex flex-wrap gap-2">
+      <div className="mt-6 flex flex-wrap gap-3">
         <button
           type="button"
           className="btn-primary"
-          data-testid="admin-approve"
           disabled={pending}
+          data-testid="admin-approve"
           onClick={() => void applyStatus("approved")}
         >
-          Approve (a)
+          Approve
         </button>
         <button
           type="button"
-          className="rounded-pill border border-ink/20 px-4 py-3 text-sm font-bold"
-          data-testid="admin-edit"
+          className="rounded-pill border border-error/40 bg-error/10 px-5 py-3 text-sm font-bold text-error"
+          disabled={pending}
+          data-testid="admin-reject"
+          onClick={() => void applyStatus("rejected")}
+        >
+          Reject
+        </button>
+        <button
+          type="button"
+          className="rounded-pill border border-ink/20 px-5 py-3 text-sm font-bold"
           disabled={pending}
           onClick={() => setEditPrompt(true)}
         >
-          Edit (e)
-        </button>
-        <button
-          type="button"
-          className="rounded-pill border border-error/40 px-4 py-3 text-sm font-bold text-error"
-          data-testid="admin-reject"
-          disabled={pending}
-          onClick={() => void applyStatus("rejected")}
-        >
-          Reject (r)
-        </button>
-        <button
-          type="button"
-          className="rounded-pill border border-ink/20 px-4 py-3 text-sm font-bold text-ink-muted"
-          data-testid="admin-next"
-          onClick={() =>
-            setIndex((i) => Math.min(i + 1, Math.max(0, items.length - 1)))
-          }
-        >
-          Next (→)
+          Edit prompt
         </button>
       </div>
 
       <p className="mt-4 text-xs text-ink-faint" data-testid="admin-shortcuts">
-        Shortcuts: a approve · e edit · r reject · → / n next
+        Shortcuts: a approve · r reject · e edit · n next
       </p>
     </div>
   );

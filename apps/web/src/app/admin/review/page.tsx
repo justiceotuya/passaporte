@@ -40,7 +40,7 @@ export default async function AdminReviewPage() {
             Content review
           </h1>
         </div>
-        <Link href="/" className="text-sm font-bold text-ink-muted">
+        <Link href="/map" className="text-sm font-bold text-ink-muted">
           Map
         </Link>
       </header>

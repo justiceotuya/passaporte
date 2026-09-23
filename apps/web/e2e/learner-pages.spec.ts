@@ -8,6 +8,14 @@ async function clearProgress(page: import("@playwright/test").Page) {
   await page.reload();
 }
 
+test("landing page shows marketing hero and links to map", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByTestId("passaporte-landing")).toBeVisible();
+  await expect(page.getByTestId("landing-start")).toBeVisible();
+  await page.getByTestId("landing-start").click();
+  await expect(page.getByTestId("unit-map")).toBeVisible();
+});
+
 test("review / stats / settings pages and analytics mock", async ({ page }) => {
   await page.addInitScript(() => {
     const events: { event: string; props?: Record<string, unknown> }[] = [];
@@ -32,6 +40,12 @@ test("review / stats / settings pages and analytics mock", async ({ page }) => {
   await expect(page.getByTestId("settings-page")).toBeVisible();
   await expect(page.getByTestId("setting-appearance")).toBeVisible();
   await page.getByTestId("setting-appearance-dark").click();
+  await expect(page.getByTestId("setting-instruction-language")).toBeVisible();
+  await page.getByTestId("setting-instruction-language-pt").click();
+  await expect(page.getByTestId("setting-instruction-language-pt")).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
   await page.getByTestId("setting-accent-strict").click();
   await page.getByTestId("setting-typed-mode").check();
   await page.getByTestId("setting-hearts").check();

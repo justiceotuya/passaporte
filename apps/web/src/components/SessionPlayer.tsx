@@ -23,6 +23,8 @@ import {
 import { buildSession, isPlayableItem } from "@/lib/session-builder";
 import { useProgressStore, type AnsweredItem } from "@/lib/progress-store";
 import { track } from "@/lib/analytics";
+import { instructionForDisplay } from "@/lib/instruction-display";
+import { useSyncProgress } from "@/hooks/use-progress";
 
 type Phase = "playing" | "feedback" | "summary";
 
@@ -61,7 +63,12 @@ export function SessionPlayer({
   const hintsEnabled = useProgressStore((s) => s.settings.hintsEnabled);
   const settingsSessionLength = useProgressStore((s) => s.settings.sessionLength);
   const typedMode = useProgressStore((s) => s.settings.typedMode);
+  const instructionLanguage = useProgressStore(
+    (s) => s.settings.instructionLanguage ?? "en",
+  );
   const accentStrictness = useProgressStore((s) => s.settings.accentStrictness);
+
+  const progressMutation = useSyncProgress();
 
   const sessionId = useMemo(
     () => `local-${unit.unit}-${Date.now()}`,
@@ -131,17 +138,13 @@ export function SessionPlayer({
       missedItemIds: opts.missedIds,
       answeredItems: opts.answered,
     });
-    void fetch("/api/progress", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type: "finish",
-        sessionId,
-        unitId: `passaporte-u${String(unit.unit).padStart(2, "0")}`,
-        xp: opts.xp,
-        missedItemIds: opts.missedIds,
-        answeredItems: opts.answered,
-      }),
+    void progressMutation.mutateAsync({
+      type: "finish",
+      sessionId,
+      unitId: `passaporte-u${String(unit.unit).padStart(2, "0")}`,
+      xp: opts.xp,
+      missedItemIds: opts.missedIds,
+      answeredItems: opts.answered,
     }).catch(() => undefined);
     track("session_complete", {
       unit: unit.unit,
@@ -169,17 +172,13 @@ export function SessionPlayer({
       xp: result.xp,
     });
 
-    void fetch("/api/progress", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type: "attempt",
-        itemId: current.id,
-        correct: result.correct,
-        answerGiven: given,
-        attemptNo,
-        sessionId,
-      }),
+    void progressMutation.mutateAsync({
+      type: "attempt",
+      itemId: current.id,
+      correct: result.correct,
+      answerGiven: given,
+      attemptNo,
+      sessionId,
     }).catch(() => undefined);
 
     track("item_answered", {
@@ -433,7 +432,9 @@ export function SessionPlayer({
         />
       </div>
 
-      <p className="book-text mb-4">{current.instruction}</p>
+      <p className="book-text mb-4">
+        {instructionForDisplay(current, instructionLanguage)}
+      </p>
 
       {current.stimulus_image ? (
         <StimulusImage src={current.stimulus_image} />

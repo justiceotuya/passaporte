@@ -23,6 +23,24 @@ export const progressHandlers = [
 ];
 
 export const authHandlers = [
+  http.get("/api/auth/providers", () => {
+    return HttpResponse.json({ google: false });
+  }),
+  http.get("http://localhost/api/auth/providers", () => {
+    return HttpResponse.json({ google: false });
+  }),
+  http.get("/api/admin/review", () => {
+    return HttpResponse.json({ items: [] });
+  }),
+  http.get("http://localhost/api/admin/review", () => {
+    return HttpResponse.json({ items: [] });
+  }),
+  http.post("/api/admin/review", async () => {
+    return HttpResponse.json({ ok: true });
+  }),
+  http.post("http://localhost/api/admin/review", async () => {
+    return HttpResponse.json({ ok: true });
+  }),
   http.post("http://localhost/api/auth/sign-in/email", async ({ request }) => {
     const body = (await request.json()) as { email?: string; password?: string };
     if (!body.email || !body.password) {

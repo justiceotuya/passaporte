@@ -5,6 +5,8 @@ import { persist } from "zustand/middleware";
 import { applySm2, isDue, type Sm2State } from "@/lib/sm2";
 
 import type { AppearanceSetting } from "@/lib/appearance";
+import type { InstructionLanguage } from "@/lib/instruction-display";
+import type { ProgressSnapshot } from "@/lib/progress-api";
 
 export type AttemptRecord = {
   itemId: string;
@@ -23,6 +25,7 @@ export type LearnerSettings = {
   hintsEnabled: boolean;
   typedMode: boolean;
   appearance: AppearanceSetting;
+  instructionLanguage: InstructionLanguage;
 };
 
 export type AnsweredItem = {
@@ -46,6 +49,8 @@ export type ProgressState = {
     answeredItems?: AnsweredItem[];
   }) => void;
   updateSettings: (patch: Partial<LearnerSettings>) => void;
+  /** Soft-merge remote XP / streak / due without wiping local SM-2 item state. */
+  mergeRemoteSnapshot: (snap: ProgressSnapshot) => void;
   reset: () => void;
 };
 
@@ -66,6 +71,7 @@ const defaultSettings: LearnerSettings = {
   hintsEnabled: true,
   typedMode: false,
   appearance: "system",
+  instructionLanguage: "en",
 };
 
 export const useProgressStore = create<ProgressState>()(
@@ -120,6 +126,16 @@ export const useProgressStore = create<ProgressState>()(
         set((state) => ({
           settings: { ...state.settings, ...patch },
         }));
+      },
+      mergeRemoteSnapshot: (snap) => {
+        set((state) => {
+          const due = new Set([...state.dueItemIds, ...snap.dueItemIds]);
+          return {
+            totalXp: Math.max(state.totalXp, snap.totalXp),
+            streakDays: Math.max(state.streakDays, snap.streakDays),
+            dueItemIds: [...due],
+          };
+        });
       },
       reset: () =>
         set({

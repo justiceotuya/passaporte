@@ -51,6 +51,8 @@ export interface PassaporteItem {
   skill: Skill;
   topic: string;
   instruction: string;
+  /** English translation of the book instruction (optional until generated). */
+  instruction_en?: string;
   prompt: string;
   options?: string[];
   pairs?: MatchPair[];

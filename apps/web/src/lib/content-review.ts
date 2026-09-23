@@ -13,6 +13,7 @@ export type ReviewQueueItem = Pick<
   | "type"
   | "prompt"
   | "instruction"
+  | "instruction_en"
   | "answer"
   | "options"
   | "hint_en"
@@ -47,6 +48,7 @@ export function listReviewQueue(status: ReviewStatus = "pending"): ReviewQueueIt
         type: item.type,
         prompt: item.prompt,
         instruction: item.instruction,
+        instruction_en: item.instruction_en,
         answer: item.answer,
         options: item.options,
         hint_en: item.hint_en,

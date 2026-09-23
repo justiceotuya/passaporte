@@ -47,6 +47,7 @@ pnpm web:convex
 pnpm test:phase0    # scaffold smoke
 pnpm test:phase1    # schema validation (TS + Python)
 pnpm pipeline:test  # all pipeline pytest
+pnpm pipeline:instructions-en  # translate book instructions → instruction_en (needs ANTHROPIC_API_KEY)
 pnpm web:test       # Vitest in apps/web (includes convex-test)
 pnpm web:convex     # convex dev watcher
 ```

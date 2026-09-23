@@ -1,19 +1,5 @@
-import { listUnitSummaries } from "@/lib/content";
-import { UnitMap } from "@/components/UnitMap";
+import { PassaporteLanding } from "@/components/PassaporteLanding";
 
 export default function HomePage() {
-  const units = listUnitSummaries();
-
-  return (
-    <main>
-      <UnitMap
-        units={units.map((u) => ({
-          unit: u.unit,
-          title: u.title,
-          itemCount: u.itemCount,
-          itemIds: u.itemIds,
-        }))}
-      />
-    </main>
-  );
+  return <PassaporteLanding />;
 }

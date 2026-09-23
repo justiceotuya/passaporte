@@ -48,4 +48,25 @@ describe("progress store SM-2 finishSession", () => {
   it("defaults appearance to system", () => {
     expect(useProgressStore.getState().settings.appearance).toBe("system");
   });
+
+  it("defaults instructionLanguage to en", () => {
+    expect(useProgressStore.getState().settings.instructionLanguage).toBe("en");
+  });
+
+  it("mergeRemoteSnapshot unions due ids and takes max xp/streak", () => {
+    useProgressStore.setState({
+      totalXp: 10,
+      streakDays: 2,
+      dueItemIds: ["a"],
+    });
+    useProgressStore.getState().mergeRemoteSnapshot({
+      totalXp: 40,
+      streakDays: 1,
+      dueItemIds: ["b"],
+    });
+    const next = useProgressStore.getState();
+    expect(next.totalXp).toBe(40);
+    expect(next.streakDays).toBe(2);
+    expect(next.dueItemIds.sort()).toEqual(["a", "b"]);
+  });
 });

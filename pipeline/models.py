@@ -77,6 +77,7 @@ class PassaporteItem(BaseModel):
     skill: Skill
     topic: str = Field(min_length=1)
     instruction: str = Field(min_length=1)
+    instruction_en: str | None = None
     prompt: str = Field(min_length=1)
     options: list[str] | None = None
     pairs: list[MatchPair] | None = None

@@ -1,7 +1,10 @@
-import { describe, expect, it, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+import { screen, fireEvent, waitFor } from "@testing-library/react";
+import { http, HttpResponse } from "msw";
 import { AdminReviewBoard } from "@/components/AdminReviewBoard";
 import type { ReviewQueueItem } from "@/lib/content-review";
+import { server } from "@/mocks/server";
+import { renderWithQuery } from "./test-utils";
 
 const sample: ReviewQueueItem = {
   id: "pass-u01-p010-A-1",
@@ -11,6 +14,7 @@ const sample: ReviewQueueItem = {
   type: "choice",
   prompt: "Como estás?",
   instruction: "Escolhe a opção correta.",
+  instruction_en: "Choose the correct option.",
   answer: "Bem",
   options: ["Bem", "Mau"],
   hint_en: "How are you?",
@@ -19,25 +23,35 @@ const sample: ReviewQueueItem = {
 
 describe("AdminReviewBoard", () => {
   it("documents keyboard shortcuts and fires approve", async () => {
-    const fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => ({ item: { ...sample, review: { status: "approved" } } }),
-    });
-    vi.stubGlobal("fetch", fetchMock);
+    let posted: { status?: string } | null = null;
+    server.use(
+      http.get("/api/admin/review", () =>
+        HttpResponse.json({ items: posted ? [] : [sample] }),
+      ),
+      http.post("/api/admin/review", async ({ request }) => {
+        posted = (await request.json()) as { status?: string };
+        return HttpResponse.json({
+          item: { ...sample, review: { status: "approved" } },
+        });
+      }),
+    );
 
-    render(<AdminReviewBoard initialItems={[sample]} bypass />);
+    renderWithQuery(<AdminReviewBoard initialItems={[sample]} bypass />);
     expect(screen.getByTestId("admin-shortcuts")).toHaveTextContent(/a approve/i);
     fireEvent.click(screen.getByTestId("admin-approve"));
-    expect(fetchMock).toHaveBeenCalled();
-    const body = JSON.parse(
-      (fetchMock.mock.calls[0][1] as RequestInit).body as string,
+    await waitFor(() => expect(posted?.status).toBe("approved"));
+    await waitFor(() =>
+      expect(screen.getByTestId("admin-review-empty")).toBeInTheDocument(),
     );
-    expect(body.status).toBe("approved");
-    vi.unstubAllGlobals();
   });
 
   it("opens edit mode with e shortcut", () => {
-    render(<AdminReviewBoard initialItems={[sample]} />);
+    server.use(
+      http.get("/api/admin/review", () =>
+        HttpResponse.json({ items: [sample] }),
+      ),
+    );
+    renderWithQuery(<AdminReviewBoard initialItems={[sample]} />);
     fireEvent.keyDown(window, { key: "e" });
     expect(screen.getByTestId("admin-edit-prompt")).toBeInTheDocument();
   });

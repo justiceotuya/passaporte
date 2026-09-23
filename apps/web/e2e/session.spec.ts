@@ -187,12 +187,19 @@ test("can create an account from sign-in", async ({ page }) => {
 
   // Auth may stay on /sign-in if Convex is unreachable; accept either success or visible error.
   await Promise.race([
-    page.waitForURL(/\/(\?|$)/, { timeout: 30_000 }),
+    page.waitForURL(/\/(map)?(\?|$)/, { timeout: 30_000 }),
     page.getByRole("alert").waitFor({ state: "visible", timeout: 30_000 }),
   ]).catch(() => undefined);
 
-  const onHome = /\/(\?|$)/.test(page.url()) && !page.url().includes("sign-in");
-  if (onHome) {
+  const url = page.url();
+  const onApp =
+    !url.includes("sign-in") &&
+    (/\/map(\?|$)/.test(url) || /\/(\?|$)/.test(url));
+  if (onApp) {
+    // Signed-in landing redirects to /map; unit map is the learner home.
+    if (/\/(\?|$)/.test(url) && !url.includes("/map")) {
+      await page.goto("/map");
+    }
     await expect(page.getByTestId("unit-map")).toBeVisible({ timeout: 15_000 });
   } else {
     await expect(page.getByTestId("sign-in-form")).toBeVisible();

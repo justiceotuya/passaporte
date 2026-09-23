@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Fredoka, Nunito, Source_Serif_4 } from "next/font/google";
 import { ConvexClientProvider } from "@/components/ConvexClientProvider";
+import { QueryProvider } from "@/components/QueryProvider";
+import { ProgressHydrator } from "@/components/ProgressHydrator";
 import { AppToaster } from "@/components/AppToaster";
 import { ThemeSync } from "@/components/ThemeSync";
 import { isConvexConfigured } from "@/lib/convex-env";
@@ -58,9 +60,12 @@ export default async function RootLayout({
           }}
         />
         <ConvexClientProvider initialToken={initialToken}>
-          <ThemeSync />
-          <AppToaster />
-          {children}
+          <QueryProvider>
+            <ProgressHydrator />
+            <ThemeSync />
+            <AppToaster />
+            {children}
+          </QueryProvider>
         </ConvexClientProvider>
       </body>
     </html>

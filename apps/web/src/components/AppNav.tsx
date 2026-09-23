@@ -7,7 +7,7 @@ import { authClient } from "@/lib/auth-client";
 import { AuthAccount } from "@/components/AuthAccount";
 
 const links = [
-  { href: "/", label: "Map", testId: "nav-map" },
+  { href: "/map", label: "Map", testId: "nav-map" },
   { href: "/review", label: "Review", testId: "nav-review" },
   { href: "/stats", label: "Stats", testId: "nav-stats" },
   { href: "/settings", label: "Settings", testId: "nav-settings" },
@@ -33,8 +33,8 @@ export function AppNav() {
         <div className="mx-auto flex max-w-lg md:max-w-2xl">
           {links.map((link) => {
             const active =
-              link.href === "/"
-                ? pathname === "/"
+              link.href === "/map"
+                ? pathname === "/map" || pathname.startsWith("/units")
                 : pathname.startsWith(link.href);
             return (
               <Link
@@ -65,7 +65,7 @@ export function AppNav() {
         aria-label="Main"
       >
         <Link
-          href="/"
+          href="/map"
           className="font-display mb-6 px-2.5 text-2xl font-semibold text-ink"
         >
           Passaporte
@@ -73,8 +73,8 @@ export function AppNav() {
         <div className="flex flex-col gap-1.5">
           {links.map((link) => {
             const active =
-              link.href === "/"
-                ? pathname === "/"
+              link.href === "/map"
+                ? pathname === "/map" || pathname.startsWith("/units")
                 : pathname.startsWith(link.href);
             return (
               <Link
