@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fredoka, Nunito, Source_Serif_4 } from "next/font/google";
 import { ConvexClientProvider } from "@/components/ConvexClientProvider";
+import { AppToaster } from "@/components/AppToaster";
 import { ThemeSync } from "@/components/ThemeSync";
 import { isConvexConfigured } from "@/lib/convex-env";
 import "./globals.css";
@@ -53,6 +54,7 @@ export default async function RootLayout({
       <body className="font-sans">
         <ConvexClientProvider initialToken={initialToken}>
           <ThemeSync />
+          <AppToaster />
           {children}
         </ConvexClientProvider>
       </body>

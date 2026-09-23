@@ -16,12 +16,14 @@
   },
   "dependencies": {
     "@convex-dev/better-auth": "^0.12.5",
+    "@tanstack/react-form": "^1.33.5",
     "better-auth": "^1.6.33",
     "better-sqlite3": "^13.0.3",
     "convex": "^1.46.0",
     "next": "^15.5.25",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
+    "sonner": "^2.0.8",
     "zustand": "^5.0.15"
   },
   "devDependencies": {
