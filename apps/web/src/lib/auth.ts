@@ -44,6 +44,15 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  account: {
+    accountLinking: {
+      enabled: true,
+      // Google verifies email; local email/password signup does not verify,
+      // so allow linking without a verified local email.
+      trustedProviders: ["google"],
+      requireLocalEmailVerified: false,
+    },
+  },
   socialProviders: googleEnabled
     ? {
         google: {
@@ -53,6 +62,9 @@ export const auth = betterAuth({
       }
     : undefined,
   trustedOrigins: trustedOrigins(),
+  onAPIError: {
+    errorURL: "/sign-in",
+  },
 });
 
 export const isGoogleAuthConfigured = googleEnabled;

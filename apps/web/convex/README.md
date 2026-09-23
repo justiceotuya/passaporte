@@ -61,4 +61,6 @@ pnpm exec convex env set GOOGLE_CLIENT_SECRET "..."
 Google Cloud redirect URI: `{SITE_URL}/api/auth/callback/google`  
 (e.g. `http://localhost:3000/api/auth/callback/google`).
 
+Google is a **trusted** account-linking provider (`requireLocalEmailVerified: false`) so the same email can use password signup then Google sign-in.
+
 The sign-in UI polls `/api/auth/providers` and enables Google when both secrets are set.

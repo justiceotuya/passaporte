@@ -28,6 +28,13 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
       enabled: true,
       requireEmailVerification: false,
     },
+    account: {
+      accountLinking: {
+        enabled: true,
+        trustedProviders: ["google"],
+        requireLocalEmailVerified: false,
+      },
+    },
     socialProviders: googleEnabled
       ? {
           google: {
@@ -37,6 +44,9 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
         }
       : undefined,
     plugins: [convex({ authConfig })],
+    onAPIError: {
+      errorURL: "/sign-in",
+    },
   });
 };
 

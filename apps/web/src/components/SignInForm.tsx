@@ -31,6 +31,19 @@ export function SignInForm() {
   }, []);
 
   useEffect(() => {
+    const oauthError = searchParams.get("error");
+    if (!oauthError) return;
+    const messages: Record<string, string> = {
+      account_not_linked:
+        "This email already has a Passaporte account. Sign in with email/password, then try Google again — or use the same Google email after restarting the app.",
+      unable_to_link_account: "Could not link Google to this account. Try email sign-in.",
+      email_doesn't_match: "Google email does not match your Passaporte account.",
+      access_denied: "Google sign-in was cancelled.",
+    };
+    setError(messages[oauthError] ?? `Sign-in failed (${oauthError}).`);
+  }, [searchParams]);
+
+  useEffect(() => {
     if (!sessionPending && session?.user) {
       router.replace(callbackURL);
     }
