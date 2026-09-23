@@ -2,8 +2,8 @@
 
 **Last updated:** 2026-09-23  
 **Owner:** Justice  
-**Status:** Classify **done** · aluno extract **resumed** in `screen` (`--run-id 20260923T002149Z-d2ef0ba5`) · resume script hardened (`set -e` + completeness gate)  
-**Next:** Wait for extract aluno (~219) + extract_key professor (~176) → join → `pnpm pipeline:hints` · `pnpm pipeline:crop` · Google OAuth keys · gold cleanup
+**Status:** Filling extract gaps in `screen passaporte-extract` · validators accept numbered exercise labels + coerce bbox/skill  
+**Next:** Finish missing extract pages → join (`20260923T002149Z-d2ef0ba5` + `20260923T014601Z-db7b1051`) → hints → crop · Google OAuth keys · gold cleanup
 
 ---
 
@@ -36,12 +36,13 @@ Open signup · player-first · Zustand progress · Better Auth (Convex when URL 
 | 2026-09-22 | **Classify merge** · skip existing pages · `pnpm pipeline:full-book` script started |
 | 2026-09-23 | **Full-book classify** · aluno **258/258** · professor **207/207** · p-222 letter sanitize |
 | 2026-09-23 | **Resume harden** · `set -euo pipefail` · extract completeness check before ALL DONE · extract resumed with `--run-id` |
+| 2026-09-23 | **Extract gap resume** · allow numbered exercise labels · coerce bad bbox/skill · screen `passaporte-extract` filling 7 aluno + 12 professor misses |
 
 ---
 
 ## Remaining
 
-- [ ] Full-book **extract** (aluno ~219 exercise pages + professor ~176 answer_key) in `screen -S passaporte-classify` → then join + hints + crop
+- [ ] Finish extract gaps (aluno toward 219 · professor toward 176) in `screen -S passaporte-extract` → then join + hints + crop
 - [ ] Set `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` (local + Convex) to enable Google button
 - [ ] Gold review · better bboxes
 - [ ] Browser smoke Convex signup with `pnpm web:convex`

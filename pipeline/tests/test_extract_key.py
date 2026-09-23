@@ -59,6 +59,27 @@ def test_key_page_validates() -> None:
     assert page.exercises[0].letter == "H"
 
 
+def test_key_page_accepts_numbered_letters() -> None:
+    page = KeyPage.model_validate(
+        {
+            "book": "passaporte-professor",
+            "page": 65,
+            "unit": 4,
+            "exercises": [
+                {
+                    "letter": "4",
+                    "skill": "writing",
+                    "student_page": 50,
+                    "solution_text": "…",
+                    "items": [{"item_index": 1, "answer": "sim"}],
+                }
+            ],
+        }
+    )
+    assert page.exercises[0].letter == "4"
+    assert page.exercises[0].skill == "other"
+
+
 def test_extract_keys_writes(tmp_path: Path) -> None:
     extracted = tmp_path / "extracted" / "passaporte-professor"
     extracted.mkdir(parents=True)

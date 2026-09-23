@@ -42,6 +42,16 @@ class KeyItem(BaseModel):
     accepted: list[str] = Field(default_factory=list)
 
 
+def normalize_exercise_label(value: object) -> str:
+    """Accept A–Z letters or numbered exercise ids (e.g. \"12\")."""
+    label = str(value).strip().upper()
+    if re.fullmatch(r"[A-Z]", label):
+        return label
+    if re.fullmatch(r"[1-9]\d{0,2}", label):
+        return label
+    raise ValueError(f"invalid exercise letter: {value!r}")
+
+
 class KeyExercise(BaseModel):
     letter: str = Field(min_length=1)
     skill: str = "other"
@@ -49,13 +59,18 @@ class KeyExercise(BaseModel):
     solution_text: str = ""
     items: list[KeyItem] = Field(default_factory=list)
 
-    @field_validator("letter")
+    @field_validator("letter", mode="before")
     @classmethod
-    def upper_letter(cls, value: str) -> str:
-        letter = value.strip().upper()
-        if not re.fullmatch(r"[A-Z]", letter):
-            raise ValueError(f"invalid exercise letter: {value!r}")
-        return letter
+    def upper_letter(cls, value: object) -> str:
+        return normalize_exercise_label(value)
+
+    @field_validator("skill", mode="before")
+    @classmethod
+    def coerce_skill(cls, value: object) -> object:
+        allowed = {"grammar", "vocabulary", "reading", "listening", "other"}
+        if isinstance(value, str) and value not in allowed:
+            return "other"
+        return value
 
 
 class KeyPage(BaseModel):
@@ -86,7 +101,9 @@ Return ONLY valid JSON:
   ]
 }
 Rules:
-- Map each exercise letter to per-item answers when the key lists 1. 2. 3. or a/b/c choices.
+- letter is a single A–Z exercise letter, or a number string when the key numbers exercises (e.g. \"4\", \"12\").
+- skill must be one of grammar|vocabulary|reading|listening|other (map writing→other).
+- Map each exercise letter/number to per-item answers when the key lists 1. 2. 3. or a/b/c choices.
 - If the solution is only prose like "1. c, 2. a", split into items with the option text if visible, else the letter/choice as answer.
 - student_page is the Livro do Aluno page referenced (e.g. p. 42).
 - skill from headings when present (GRAMÁTICA → grammar, VOCABULÁRIO → vocabulary, etc.).

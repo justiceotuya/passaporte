@@ -70,6 +70,35 @@ def test_extracted_page_validates() -> None:
     assert page.exercises[0].letter == "A"
 
 
+def test_extracted_page_accepts_numbered_letters_and_coerces_bbox_skill() -> None:
+    page = ExtractedPage.model_validate(
+        {
+            "book": "passaporte-aluno",
+            "page": 222,
+            "unit": 12,
+            "exercises": [
+                {
+                    "letter": "5",
+                    "items": [
+                        {
+                            "item_index": 1,
+                            "type": "fill_blank",
+                            "skill": "writing",
+                            "topic": "verbs",
+                            "instruction": "Complete.",
+                            "prompt": "Eu ___",
+                            "bbox": 1,
+                        }
+                    ],
+                }
+            ],
+        }
+    )
+    assert page.exercises[0].letter == "5"
+    assert page.exercises[0].items[0].skill == "other"
+    assert page.exercises[0].items[0].bbox is None
+
+
 def test_extract_book_writes_run(tmp_path: Path) -> None:
     extracted = tmp_path / "extracted" / "passaporte-aluno"
     extracted.mkdir(parents=True)

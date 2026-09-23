@@ -52,6 +52,16 @@ class MatchPair(BaseModel):
     right: str = Field(min_length=1)
 
 
+def normalize_exercise_label(value: object) -> str:
+    """Accept A–Z letters or numbered exercise ids (e.g. \"12\")."""
+    label = str(value).strip().upper()
+    if re.fullmatch(r"[A-Z]", label):
+        return label
+    if re.fullmatch(r"[1-9]\d{0,2}", label):
+        return label
+    raise ValueError(f"invalid exercise letter: {value!r}")
+
+
 class ExtractedItem(BaseModel):
     item_index: int = Field(ge=1)
     type: ItemType
@@ -83,6 +93,27 @@ class ExtractedItem(BaseModel):
             return "open"
         return value
 
+    @field_validator("skill", mode="before")
+    @classmethod
+    def coerce_skill(cls, value: object) -> object:
+        allowed = {"grammar", "vocabulary", "reading", "listening", "other"}
+        if isinstance(value, str) and value not in allowed:
+            return "other"
+        return value
+
+    @field_validator("bbox", mode="before")
+    @classmethod
+    def coerce_bbox(cls, value: object) -> object:
+        # Model sometimes returns item_index-like ints; drop invalid boxes.
+        if value is None:
+            return None
+        if not isinstance(value, list) or len(value) != 4:
+            return None
+        try:
+            return [float(x) for x in value]
+        except (TypeError, ValueError):
+            return None
+
     @field_validator("pairs", mode="before")
     @classmethod
     def clean_pairs(cls, value: object) -> object:
@@ -110,13 +141,10 @@ class ExtractedItem(BaseModel):
 class ExtractedExercise(BaseModel):
     letter: str = Field(min_length=1)
 
-    @field_validator("letter")
+    @field_validator("letter", mode="before")
     @classmethod
-    def upper_letter(cls, value: str) -> str:
-        letter = value.strip().upper()
-        if not re.fullmatch(r"[A-Z]", letter):
-            raise ValueError(f"invalid exercise letter: {value!r}")
-        return letter
+    def upper_letter(cls, value: object) -> str:
+        return normalize_exercise_label(value)
 
     items: list[ExtractedItem] = Field(min_length=1)
 
@@ -168,6 +196,9 @@ Return ONLY valid JSON:
   ]
 }}
 Rules:
+- letter is a single A–Z exercise letter, or a number string when the book numbers exercises (e.g. \"5\", \"12\").
+- bbox must be [x, y, w, h] normalized 0–1 floats, or null — never an integer index.
+- skill must be one of grammar|vocabulary|reading|listening|other (map writing→other).
 - Prefer closed types. Use open only when the task cannot be graded automatically.
 - instruction must be the book's Portuguese wording.
 - Do not invent answers; omit answers entirely.
