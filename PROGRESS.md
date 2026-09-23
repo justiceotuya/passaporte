@@ -2,8 +2,8 @@
 
 **Last updated:** 2026-09-23  
 **Owner:** Justice  
-**Status:** Gold-approved 37 shipped units · ship-gate green  
-**Next:** Google OAuth keys · Convex smoke · better bboxes
+**Status:** Gold-approved 37 units · Convex auth signup smoke PASS  
+**Next:** Set Google OAuth keys · better bboxes / deeper gold QA
 ---
 
 ## Working agreements (non-negotiable)
@@ -41,14 +41,14 @@ Open signup · player-first · Zustand progress · Better Auth (Convex when URL 
 | 2026-09-23 | **Hints + crop (v1)** · 293 hints · 7 crops |
 | 2026-09-23 | **Join matching fix** · remap claimed `student_page` (printed→PDF, default −2) · item-index shift/positional align · stale unit cleanup · crop run id updated |
 | 2026-09-23 | **Gold approve** · 37 units in `shipped-units.json` · closed items `review.status=approved` · ship-gate PASS |
+| 2026-09-23 | **Convex signup smoke** · `convex dev` + Playwright auth providers + create-account · PASS |
 
 ---
 
 ## Remaining
 
+- [ ] Set `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` (local `apps/web/.env.local` + `convex env set`) to enable Google button
 - [ ] Better bboxes / deeper gold QA on joined answers
-- [ ] Set `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` (local + Convex) to enable Google button
-- [ ] Browser smoke Convex signup with `pnpm web:convex`
 
 ---
 
@@ -107,6 +107,7 @@ pnpm pipeline:join && pnpm pipeline:hints && pnpm pipeline:crop
 | 2026-09-23 | join + content | `join.py` full-book · `pnpm content:validate` | PASS **36** units (ship-gate fails until gold approve) |
 | 2026-09-23 | join match fix | `uv run pytest tests/test_join.py` · `join.py` · hints · crop · `pnpm content:validate` | PASS **10** join · **38** units / **919** items · ship-gate still fails (pending gold) |
 | 2026-09-23 | gold approve | `approve-unit` ×37 · `pnpm content:validate` · `pnpm content:ship-gate` | PASS **38** units validated · ship-gate **37** |
+| 2026-09-23 | convex smoke | `convex dev` · Playwright auth providers + create-account | PASS **2** |
 
 ---
 
@@ -117,9 +118,9 @@ You are continuing Passaporte.
 
 Read: PROGRESS.md, TESTING.md, extracted/join_report.md
 
-Done: full-book classify+extract+join (page remap)+hints+crop. Content in content/passaporte (38 units, 919 items, teacher_book answers).
+Done: full-book content shipped (37 gold-approved units) · Convex email signup smoke PASS.
 
-Next: Google OAuth keys, Convex smoke, deeper gold QA / bboxes.
+Next: add GOOGLE_CLIENT_ID/SECRET (apps/web/.env.local + convex env set) · deeper gold QA / bboxes.
 
-Commands: pnpm web · pnpm web:convex · pnpm content:validate · pnpm pipeline:join
+Commands: pnpm web · pnpm web:convex · pnpm content:validate · pnpm content:ship-gate
 ```
