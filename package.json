@@ -3,6 +3,7 @@
   "private": true,
   "packageManager": "pnpm@11.7.0",
   "scripts": {
+    "prepare": "bash scripts/install-git-hooks.sh",
     "smoke:scaffold": "bash scripts/smoke-scaffold.sh",
     "test:schema": "pnpm --filter @passaporte/web exec vitest run schema && cd pipeline && uv run pytest tests/test_schema.py -q",
     "test:phase0": "pnpm smoke:scaffold",

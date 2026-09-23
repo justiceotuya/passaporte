@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Final pass: strip Cursor attribution before the commit object is created.
+
+set -euo pipefail
+
+msg_file="${1:-}"
+[[ -n "$msg_file" && -f "$msg_file" ]] || exit 0
+
+python3 - "$msg_file" <<'PY'
+import pathlib
+import re
+import sys
+
+path = pathlib.Path(sys.argv[1])
+text = path.read_text(encoding="utf-8")
+patterns = [
+    re.compile(r"^Co-authored-by:\s*Cursor\b.*\n?", re.IGNORECASE | re.MULTILINE),
+    re.compile(r"^Co-authored-by:\s*.*<cursoragent@cursor\.com>.*\n?", re.IGNORECASE | re.MULTILINE),
+    re.compile(r"^Made-with:\s*Cursor\s*\n?", re.IGNORECASE | re.MULTILINE),
+    re.compile(r"^Made with Cursor\s*\n?", re.IGNORECASE | re.MULTILINE),
+]
+cleaned = text
+for pattern in patterns:
+    cleaned = pattern.sub("", cleaned)
+cleaned = re.sub(r"\n{3,}", "\n\n", cleaned).rstrip() + "\n"
+if cleaned != text:
+    path.write_text(cleaned, encoding="utf-8")
+PY

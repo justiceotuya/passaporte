@@ -16,6 +16,7 @@
 5. Full-book vision/PDF extract is **approved and in progress** (`scripts/full-book-extract.sh`).
 6. Never commit `raw/`, `extracted/`, PDFs, page images, `*.db`, `.env*`.
 7. Design: `../templates/passaporte/` · Spec: design doc · Kuji parent = reference.
+8. **No Cursor attribution on commits.** Repo `.githooks` strips Cursor co-author trailers (`pnpm install` / `scripts/install-git-hooks.sh`). Also turn off Cursor Settings → Agent (or Git & PRs) → Attribution.
 
 ---
 

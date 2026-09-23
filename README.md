@@ -25,8 +25,9 @@ raw/pdf/        Symlink to textbooks (gitignored)
 ## Setup
 
 ```bash
-# Node
+# Node (also installs local git hooks that strip Cursor commit attribution)
 pnpm install
+# or: bash scripts/install-git-hooks.sh
 
 # Python pipeline
 cd pipeline && uv sync && cd ..
@@ -60,3 +61,4 @@ pnpm web:convex     # convex dev watcher
 - Player-first on invented `content/passaporte/u01.json`
 - Pipeline: no live vision until Anthropic key in `.env`
 - `uv` for Python; pnpm workspaces for JS
+- No Cursor co-author on commits: repo hooks strip `Co-authored-by: Cursor` / `Made with Cursor`. Also disable in Cursor Settings → **Agent → Attribution** (or **Git & PRs → Attribution** on 3.11+): turn off commit + PR attribution. CLI: `~/.cursor/cli-config.json` → `attribution.attributeCommitsToAgent` / `attributePRsToAgent` = `false`.
