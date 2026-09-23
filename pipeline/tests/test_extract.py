@@ -11,6 +11,7 @@ import pytest
 from extract import (
     ExtractError,
     ExtractedPage,
+    _merge_extracted_exercises,
     extract_book,
     extract_json_object,
     load_exercise_pages,
@@ -97,6 +98,41 @@ def test_extracted_page_accepts_numbered_letters_and_coerces_bbox_skill() -> Non
     assert page.exercises[0].letter == "5"
     assert page.exercises[0].items[0].skill == "other"
     assert page.exercises[0].items[0].bbox is None
+
+
+def test_merge_extracted_exercises_dedupes_letters() -> None:
+    item = {
+        "item_index": 1,
+        "type": "open",
+        "skill": "other",
+        "topic": "t",
+        "instruction": "i",
+        "prompt": "p",
+    }
+    first = ExtractedPage.model_validate(
+        {
+            "book": "passaporte-aluno",
+            "page": 116,
+            "unit": 17,
+            "exercises": [{"letter": "A", "items": [item]}],
+        }
+    )
+    second = ExtractedPage.model_validate(
+        {
+            "book": "passaporte-aluno",
+            "page": 116,
+            "unit": 17,
+            "exercises": [
+                {"letter": "A", "items": [{**item, "prompt": "newer"}]},
+                {"letter": "B", "items": [item]},
+            ],
+        }
+    )
+    merged = _merge_extracted_exercises(
+        [first, second], book="passaporte-aluno", page=116, unit_hint=17
+    )
+    assert [ex.letter for ex in merged.exercises] == ["A", "B"]
+    assert merged.exercises[0].items[0].prompt == "newer"
 
 
 def test_extract_book_writes_run(tmp_path: Path) -> None:

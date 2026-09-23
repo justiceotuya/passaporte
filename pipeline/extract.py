@@ -32,6 +32,8 @@ DEFAULT_MODEL = os.environ.get(
     "ANTHROPIC_EXTRACT_MODEL",
     "claude-sonnet-4-5-20250929",
 )
+DEFAULT_MAX_TOKENS = int(os.environ.get("ANTHROPIC_EXTRACT_MAX_TOKENS", "16384"))
+LETTER_CHUNK_SIZE = 4
 
 BOOKS = ("passaporte-aluno", "passaporte-professor", "valer")
 ItemType = Literal[
@@ -258,6 +260,29 @@ def parse_pages_arg(value: str | None) -> list[int] | None:
     return [int(value)]
 
 
+def _merge_extracted_exercises(
+    chunks: list[ExtractedPage],
+    *,
+    book: str,
+    page: int,
+    unit_hint: int | None,
+) -> ExtractedPage:
+    """Merge letter-chunked extracts; later chunks win on duplicate letters."""
+    by_letter: dict[str, ExtractedExercise] = {}
+    unit = unit_hint
+    for chunk in chunks:
+        if chunk.unit is not None:
+            unit = chunk.unit
+        for exercise in chunk.exercises:
+            by_letter[exercise.letter] = exercise
+    return ExtractedPage(
+        book=book,
+        page=page,
+        unit=unit,
+        exercises=list(by_letter.values()),
+    )
+
+
 def extract_page_image(
     *,
     client: Any,
@@ -267,19 +292,25 @@ def extract_page_image(
     page: int,
     unit_hint: int | None,
     letters_hint: list[str],
+    max_tokens: int = DEFAULT_MAX_TOKENS,
 ) -> ExtractedPage:
     image_b64 = base64.standard_b64encode(image_path.read_bytes()).decode("ascii")
 
-    def call(strict: bool) -> str:
+    def call(strict: bool, letters: list[str]) -> str:
         hint = (
             f"Book={book}. Page={page}. Unit hint={unit_hint}. "
-            f"Expected exercise letters hint={letters_hint}."
+            f"Expected exercise letters hint={letters}."
         )
+        if letters:
+            hint += (
+                f" Extract ONLY exercises with letters {letters}; "
+                "omit all other exercises on the page."
+            )
         if strict:
-            hint += " JSON object only — no markdown."
+            hint += " JSON object only — no markdown. Keep prompts short."
         message = client.messages.create(
             model=model,
-            max_tokens=4096,
+            max_tokens=max_tokens,
             system=EXTRACT_SYSTEM,
             messages=[
                 {
@@ -304,22 +335,60 @@ def extract_page_image(
                 parts.append(block.text)
         return "\n".join(parts)
 
-    raw = call(strict=False)
-    try:
+    def parse_raw(raw: str, allowed: list[str]) -> ExtractedPage:
         data = extract_json_object(raw)
         data["book"] = book
         data["page"] = page
         if data.get("unit") is None and unit_hint is not None:
             data["unit"] = unit_hint
-        return ExtractedPage.model_validate(data)
-    except (json.JSONDecodeError, ValidationError, TypeError, ValueError):
-        raw = call(strict=True)
-        data = extract_json_object(raw)
-        data["book"] = book
-        data["page"] = page
-        if data.get("unit") is None and unit_hint is not None:
-            data["unit"] = unit_hint
-        return ExtractedPage.model_validate(data)
+        page_model = ExtractedPage.model_validate(data)
+        if not allowed:
+            return page_model
+        allowed_set = {letter.upper() for letter in allowed}
+        matched = [
+            exercise
+            for exercise in page_model.exercises
+            if exercise.letter in allowed_set
+        ]
+        # Dense-page chunks: model often re-emits top-of-page letters (A–D).
+        # For a single requested letter, relabel the first exercise.
+        if not matched and len(allowed) == 1 and page_model.exercises:
+            want = allowed[0].upper()
+            matched = [page_model.exercises[0].model_copy(update={"letter": want})]
+        return page_model.model_copy(update={"exercises": matched})
+
+    def extract_letters(letters: list[str]) -> ExtractedPage:
+        raw = call(strict=False, letters=letters)
+        try:
+            return parse_raw(raw, letters)
+        except (json.JSONDecodeError, ValidationError, TypeError, ValueError):
+            raw = call(strict=True, letters=letters)
+            return parse_raw(raw, letters)
+
+    # Dense pages (many letters) truncate at 4k tokens — chunk by letter.
+    if len(letters_hint) > LETTER_CHUNK_SIZE:
+        chunks = [
+            extract_letters(letters_hint[i : i + LETTER_CHUNK_SIZE])
+            for i in range(0, len(letters_hint), LETTER_CHUNK_SIZE)
+        ]
+        merged = _merge_extracted_exercises(
+            chunks, book=book, page=page, unit_hint=unit_hint
+        )
+        have = {exercise.letter for exercise in merged.exercises}
+        for letter in letters_hint:
+            if letter in have:
+                continue
+            try:
+                chunk = extract_letters([letter])
+            except (json.JSONDecodeError, ValidationError, TypeError, ValueError):
+                continue
+            chunks.append(chunk)
+            have.update(exercise.letter for exercise in chunk.exercises)
+        return _merge_extracted_exercises(
+            chunks, book=book, page=page, unit_hint=unit_hint
+        )
+
+    return extract_letters(letters_hint)
 
 
 def extract_book(
