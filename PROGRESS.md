@@ -2,8 +2,8 @@
 
 **Last updated:** 2026-09-23  
 **Owner:** Justice  
-**Status:** Full-book pipeline through hints+crop **done** · 36 units / 363 items · 293 hints · 7 crops  
-**Next:** Improve join matching (low match rate) · gold approve items · Google OAuth keys · Convex smoke
+**Status:** Join matching improved · 38 units / 919 items · hints+crop refreshed  
+**Next:** Gold approve items · Google OAuth keys · Convex smoke
 
 ---
 
@@ -38,14 +38,14 @@ Open signup · player-first · Zustand progress · Better Auth (Convex when URL 
 | 2026-09-23 | **Resume harden** · `set -euo pipefail` · extract completeness check before ALL DONE · extract resumed with `--run-id` |
 | 2026-09-23 | **Extract gap resume** · allow numbered exercise labels · coerce bad bbox/skill · screen `passaporte-extract` filling 7 aluno + 12 professor misses |
 | 2026-09-23 | **Extract complete** · aluno `20260923T002149Z-d2ef0ba5` (219) · professor `20260923T014601Z-db7b1051` (176) · dense-page letter chunking + 16k max_tokens |
-| 2026-09-23 | **Join full-book** · 36 units · 363 items · defaults updated to new run ids · hints+crop queued |
-| 2026-09-23 | **Hints + crop** · 293 hints updated · 70 pending (69 open + 1 match) · 7 stimulus crops |
+| 2026-09-23 | **Join full-book (v1)** · 36 units · 363 items · poor match (printed vs PDF page drift) |
+| 2026-09-23 | **Hints + crop (v1)** · 293 hints · 7 crops |
+| 2026-09-23 | **Join matching fix** · remap claimed `student_page` (printed→PDF, default −2) · item-index shift/positional align · stale unit cleanup · crop run id updated |
 
 ---
 
 ## Remaining
 
-- [ ] Improve join matching (27 matched / 653 exercise_only — student_page alignment)
 - [ ] Gold review / approve closed items (ship-gate fails until approved) · better bboxes
 - [ ] Set `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` (local + Convex) to enable Google button
 - [ ] Browser smoke Convex signup with `pnpm web:convex`
@@ -60,9 +60,23 @@ Open signup · player-first · Zustand progress · Better Auth (Convex when URL 
 | Classify professor | **done** | 207/207 |
 | Extract aluno | **done** | `20260923T002149Z-d2ef0ba5` · 219/219 |
 | Extract_key professor | **done** | `20260923T014601Z-db7b1051` · 176/176 |
-| Join | **done** | 36 units · 363 items · report `extracted/join_report.md` |
-| Hints | **done** | 293 updated · open items skip hints by design |
-| Crop | **done** | 7 `needs_image` crops |
+| Join | **done (improved)** | 38 units · 919 items · see match stats below |
+| Hints | **done** | 768 updated · 151 still pending (open / skipped) |
+| Crop | **done** | 134 `needs_image` crops |
+
+### Join match stats (before → after)
+
+| Bucket | Before | After |
+| --- | --- | --- |
+| matched | 27 | **163** |
+| count_mismatch | 141 | 155 |
+| empty_key | 66 | 140 |
+| exercise_only | 653 | **429** |
+| key_only | 596 | **157** |
+| skipped validation | 2096 | 1535 |
+| items (teacher_book) | 363 | **919** |
+
+Root cause: teacher keys cite Livro do Aluno *printed* pages; aluno extracts use PDF page indices (typically printed − 2). Blind `(student_page, letter)` lookup missed most exercises.
 
 ```bash
 cd pipeline && uv run python join.py  # defaults → full-book run ids
@@ -91,6 +105,7 @@ pnpm pipeline:join && pnpm pipeline:hints && pnpm pipeline:crop
 | 2026-09-22 | auth + classify merge | `pnpm web:test` · `pytest tests/test_classify.py` | PASS **69** web · **7** classify |
 | 2026-09-23 | classify letter sanitize | `uv run pytest tests/test_classify.py` | PASS **7** |
 | 2026-09-23 | join + content | `join.py` full-book · `pnpm content:validate` | PASS **36** units (ship-gate fails until gold approve) |
+| 2026-09-23 | join match fix | `uv run pytest tests/test_join.py` · `join.py` · hints · crop · `pnpm content:validate` | PASS **10** join · **38** units / **919** items · ship-gate still fails (pending gold) |
 
 ---
 
@@ -101,9 +116,9 @@ You are continuing Passaporte.
 
 Read: PROGRESS.md, TESTING.md, extracted/join_report.md
 
-Done: full-book classify+extract+join+hints+crop. Content in content/passaporte (36 units, 363 items).
+Done: full-book classify+extract+join (page remap)+hints+crop. Content in content/passaporte (38 units, 919 items, teacher_book answers).
 
-Next: improve join matching (student_page), gold-approve items for ship-gate, Google OAuth keys, Convex smoke.
+Next: gold-approve items for ship-gate, Google OAuth keys, Convex smoke.
 
 Commands: pnpm web · pnpm web:convex · pnpm content:validate · pnpm pipeline:join
 ```

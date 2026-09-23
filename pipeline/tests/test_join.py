@@ -5,7 +5,15 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from join import index_keys, join_runs, make_item_id
+from join import (
+    AlunoExerciseIndex,
+    align_key_items,
+    build_aluno_exercise_index,
+    index_keys,
+    join_runs,
+    make_item_id,
+    resolve_student_page,
+)
 
 
 def _write(path: Path, data: dict) -> None:
@@ -34,6 +42,107 @@ def test_index_keys_by_student_page_and_letter() -> None:
     index = index_keys(pages)
     assert (10, "A") in index
     assert index[(10, "A")]["items"][0]["answer"] == "bom dia"
+
+
+def test_resolve_student_page_prefers_printed_offset() -> None:
+    aluno_index = AlunoExerciseIndex(
+        letters_by_page={8: {"A", "B"}, 10: {"D", "E"}},
+        item_counts={(8, "A"): 1, (8, "B"): 4, (10, "D"): 4, (10, "E"): 1},
+    )
+    # Teacher cites printed p.10 for A/B which live on PDF p.8
+    assert resolve_student_page(10, "A", 1, aluno_index) == 8
+    assert resolve_student_page(10, "B", 4, aluno_index) == 8
+    # Count fit beats bare offset when both pages expose the letter
+    both = AlunoExerciseIndex(
+        letters_by_page={8: {"C"}, 10: {"C"}},
+        item_counts={(8, "C"): 1, (10, "C"): 5},
+    )
+    assert resolve_student_page(10, "C", 5, both) == 10
+
+
+def test_index_keys_remaps_claimed_page_onto_aluno() -> None:
+    aluno_index = build_aluno_exercise_index(
+        [
+            {
+                "page": 8,
+                "unit": 1,
+                "exercises": [
+                    {"letter": "A", "items": [{"item_index": 1}]},
+                    {
+                        "letter": "B",
+                        "items": [
+                            {"item_index": 1},
+                            {"item_index": 2},
+                            {"item_index": 3},
+                            {"item_index": 4},
+                        ],
+                    },
+                ],
+            }
+        ]
+    )
+    key_pages = [
+        {
+            "page": 17,
+            "unit": 1,
+            "exercises": [
+                {
+                    "letter": "A",
+                    "student_page": 10,
+                    "items": [{"item_index": 1, "answer": "Informal"}],
+                },
+                {
+                    "letter": "B",
+                    "student_page": 10,
+                    "items": [
+                        {"item_index": 1, "answer": "A4"},
+                        {"item_index": 2, "answer": "B2"},
+                        {"item_index": 3, "answer": "C1"},
+                        {"item_index": 4, "answer": "D3"},
+                    ],
+                },
+            ],
+        }
+    ]
+    index = index_keys(key_pages, aluno_index)
+    assert (8, "A") in index
+    assert (8, "B") in index
+    assert (10, "A") not in index
+    assert index[(8, "A")]["_claimed_student_page"] == 10
+
+
+def test_align_key_items_shifts_when_exact_coverage_poor() -> None:
+    # Key numbering starts at 1 but aluno items are labeled 3..5 (no overlap).
+    ex_items = [{"item_index": 3}, {"item_index": 4}, {"item_index": 5}]
+    key_items = [
+        {"item_index": 1, "answer": "a"},
+        {"item_index": 2, "answer": "b"},
+        {"item_index": 3, "answer": "c"},
+    ]
+    aligned = align_key_items(ex_items, key_items)
+    assert aligned[3]["answer"] == "a"
+    assert aligned[4]["answer"] == "b"
+    assert aligned[5]["answer"] == "c"
+
+
+def test_align_key_items_keeps_exact_when_mostly_overlapping() -> None:
+    ex_items = [{"item_index": i} for i in range(1, 7)]
+    key_items = [{"item_index": i, "answer": f"a{i}"} for i in range(2, 7)]
+    aligned = align_key_items(ex_items, key_items)
+    assert 1 not in aligned
+    assert aligned[2]["answer"] == "a2"
+    assert aligned[6]["answer"] == "a6"
+
+
+def test_align_key_items_positional_when_same_length() -> None:
+    ex_items = [{"item_index": 1}, {"item_index": 2}]
+    key_items = [
+        {"item_index": 10, "answer": "first"},
+        {"item_index": 20, "answer": "second"},
+    ]
+    aligned = align_key_items(ex_items, key_items)
+    assert aligned[1]["answer"] == "first"
+    assert aligned[2]["answer"] == "second"
 
 
 def test_join_matched_and_buckets(tmp_path: Path) -> None:
@@ -150,6 +259,72 @@ def test_join_matched_and_buckets(tmp_path: Path) -> None:
     a_item = next(i for i in unit["items"] if i["id"] == "pass-u01-p010-A-1")
     assert a_item["answer"] == "dia"
     assert a_item["answer_source"] == "teacher_book"
+
+
+def test_join_remaps_printed_page_and_writes_items(tmp_path: Path) -> None:
+    aluno = tmp_path / "aluno"
+    prof = tmp_path / "prof"
+    _write(
+        aluno / "p-008.json",
+        {
+            "page": 8,
+            "unit": 1,
+            "exercises": [
+                {
+                    "letter": "B",
+                    "items": [
+                        {
+                            "item_index": 1,
+                            "type": "match",
+                            "skill": "vocabulary",
+                            "topic": "diálogos",
+                            "instruction": "Relacione.",
+                            "prompt": "A",
+                            "pairs": [{"left": "A", "right": "4"}],
+                        },
+                        {
+                            "item_index": 2,
+                            "type": "match",
+                            "skill": "vocabulary",
+                            "topic": "diálogos",
+                            "instruction": "Relacione.",
+                            "prompt": "B",
+                            "pairs": [{"left": "B", "right": "2"}],
+                        },
+                    ],
+                }
+            ],
+        },
+    )
+    _write(
+        prof / "p-017.json",
+        {
+            "page": 17,
+            "unit": 1,
+            "exercises": [
+                {
+                    "letter": "B",
+                    "student_page": 10,  # printed page; PDF is 8
+                    "items": [
+                        {"item_index": 1, "answer": "A4"},
+                        {"item_index": 2, "answer": "B2"},
+                    ],
+                }
+            ],
+        },
+    )
+    buckets, _ = join_runs(
+        aluno_dir=aluno,
+        professor_dir=prof,
+        content_dir=tmp_path / "content",
+        report_path=tmp_path / "report.md",
+    )
+    assert "p008-B" in buckets.matched
+    unit = json.loads((tmp_path / "content" / "u01.json").read_text())
+    assert {i["id"] for i in unit["items"]} == {
+        "pass-u01-p008-B-1",
+        "pass-u01-p008-B-2",
+    }
 
 
 def test_missing_item_alignment_omits_and_logs_failure(tmp_path: Path) -> None:

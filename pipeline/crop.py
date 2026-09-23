@@ -27,7 +27,7 @@ DEFAULT_EXTRACTED = ROOT / "extracted"
 DEFAULT_CONTENT = ROOT / "content" / "passaporte"
 DEFAULT_CROPS = ROOT / "apps" / "web" / "public" / "crops"
 FAILURES_PATH = ROOT / "failures.jsonl"
-ALUNO_RUN = "20260922T163925Z-0b8f810b"
+ALUNO_RUN = "20260923T002149Z-d2ef0ba5"
 BOOK = "passaporte-aluno"
 
 ID_RE = re.compile(
