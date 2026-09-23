@@ -48,14 +48,13 @@ class PageClassification(BaseModel):
     @field_validator("exercise_letters")
     @classmethod
     def upper_letters(cls, value: list[str]) -> list[str]:
+        # Drop non A–Z tokens (e.g. numbered exercises "5","6") so one bad
+        # letter cannot block the whole page from being saved.
         cleaned: list[str] = []
         for item in value:
-            letter = item.strip().upper()
-            if not letter:
-                continue
-            if not re.fullmatch(r"[A-Z]", letter):
-                raise ValueError(f"invalid exercise letter: {item!r}")
-            cleaned.append(letter)
+            letter = str(item).strip().upper()
+            if re.fullmatch(r"[A-Z]", letter):
+                cleaned.append(letter)
         return cleaned
 
 
@@ -83,7 +82,8 @@ Rules:
 - page_kind=transcript for audio transcript appendices.
 - page_kind=grammar_ref for grammar tables/explanations without exercises.
 - page_kind=other for covers, TOC, blank, ads, etc.
-- exercise_letters are single Latin letters only, uppercase.
+- exercise_letters are single Latin letters only, uppercase (A–Z).
+- If exercises are numbered (1, 2, 3…) instead of lettered, use [].
 - unit is the textbook unit number if visible; otherwise null.
 """
 

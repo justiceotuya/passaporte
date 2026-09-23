@@ -40,14 +40,14 @@ def test_page_classification_validates_letters() -> None:
     assert item.exercise_letters == ["A", "B"]
 
 
-def test_page_classification_rejects_bad_letter() -> None:
-    with pytest.raises(Exception):
-        PageClassification(
-            page=10,
-            unit=1,
-            page_kind=PageKind.EXERCISES,
-            exercise_letters=["AB"],
-        )
+def test_page_classification_drops_non_letter_tokens() -> None:
+    item = PageClassification(
+        page=10,
+        unit=1,
+        page_kind=PageKind.EXERCISES,
+        exercise_letters=["AB", "5", "6", "C", ""],
+    )
+    assert item.exercise_letters == ["C"]
 
 
 def test_parse_pages_arg_range() -> None:
