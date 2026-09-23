@@ -15,6 +15,9 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
       - name: Install
         run: pnpm install --frozen-lockfile
       - name: Schema validate content
@@ -24,11 +27,4 @@ jobs:
       - name: Web unit tests
         run: pnpm web:test
       - name: Pipeline pytest
-        run: |
-          cd pipeline
-          if command -v uv >/dev/null 2>&1; then
-            uv run pytest -q
-          else
-            pip install -q -e ".[dev]" 2>/dev/null || pip install -q pytest jsonschema pydantic
-            pytest -q
-          fi
+        run: pnpm pipeline:test
