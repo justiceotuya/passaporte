@@ -93,7 +93,6 @@ export function SessionPlayer({
   const [index, setIndex] = useState(0);
   const [attemptNo, setAttemptNo] = useState(1);
   const [selected, setSelected] = useState<string | null>(null);
-  const [typed, setTyped] = useState("");
   const [phase, setPhase] = useState<Phase>("playing");
   const [lastCorrect, setLastCorrect] = useState(false);
   const [sessionXp, setSessionXp] = useState(0);
@@ -296,7 +295,6 @@ export function SessionPlayer({
     if (!lastCorrect && attemptNo < 2) {
       setAttemptNo(2);
       setSelected(null);
-      setTyped("");
       setLocked(false);
       setPhase("playing");
       return;
@@ -329,7 +327,6 @@ export function SessionPlayer({
     setIndex(next);
     setAttemptNo(1);
     setSelected(null);
-    setTyped("");
     setLocked(false);
     setPhase("playing");
   }
@@ -496,9 +493,8 @@ export function SessionPlayer({
         {typedLike ? (
           phase === "playing" ? (
             <FillBlankTyped
-              value={typed}
-              onChange={setTyped}
-              onSubmit={() => submitAnswer(typed)}
+              key={`${current.id}-${attemptNo}`}
+              onSubmit={(answer) => submitAnswer(answer)}
               disabled={locked}
             />
           ) : (

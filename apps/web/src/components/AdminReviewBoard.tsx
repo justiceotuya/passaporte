@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useForm } from "@tanstack/react-form";
+import { toast } from "sonner";
 import { StimulusImage } from "@/components/StimulusImage";
 import type { ReviewQueueItem } from "@/lib/content-review";
 import type { ReviewStatus } from "@/types/item";
@@ -14,15 +16,9 @@ export function AdminReviewBoard({ initialItems, bypass = false }: Props) {
   const [items, setItems] = useState(initialItems);
   const [index, setIndex] = useState(0);
   const [editPrompt, setEditPrompt] = useState(false);
-  const [draftPrompt, setDraftPrompt] = useState("");
-  const [message, setMessage] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
   const current = items[index] ?? null;
-
-  useEffect(() => {
-    if (current) setDraftPrompt(current.prompt);
-  }, [current]);
 
   const advance = useCallback(() => {
     setEditPrompt(false);
@@ -37,9 +33,8 @@ export function AdminReviewBoard({ initialItems, bypass = false }: Props) {
 
   const applyStatus = useCallback(
     async (status: ReviewStatus, prompt?: string) => {
-      if (!current || pending) return;
+      if (!current || pending) return false;
       setPending(true);
-      setMessage(null);
       try {
         const headers: Record<string, string> = {
           "Content-Type": "application/json",
@@ -56,17 +51,36 @@ export function AdminReviewBoard({ initialItems, bypass = false }: Props) {
         });
         if (!res.ok) {
           const body = (await res.json().catch(() => ({}))) as { error?: string };
-          setMessage(body.error ?? `Failed (${res.status})`);
-          return;
+          toast.error(body.error ?? `Failed (${res.status})`);
+          return false;
         }
-        setMessage(`${status} · ${current.id}`);
+        toast.success(`${status} · ${current.id}`);
         advance();
+        return true;
       } finally {
         setPending(false);
       }
     },
     [advance, bypass, current, pending],
   );
+
+  const promptForm = useForm({
+    defaultValues: { prompt: "" },
+    onSubmit: async ({ value }) => {
+      const next = value.prompt.trim();
+      if (!next) {
+        toast.error("Prompt cannot be empty");
+        return;
+      }
+      await applyStatus("approved", next);
+    },
+  });
+
+  useEffect(() => {
+    if (!current) return;
+    promptForm.setFieldValue("prompt", current.prompt);
+    setEditPrompt(false);
+  }, [current?.id]); // eslint-disable-line react-hooks/exhaustive-deps -- reset only on item change
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
@@ -120,25 +134,50 @@ export function AdminReviewBoard({ initialItems, bypass = false }: Props) {
         ) : null}
         <p className="book-text">{current.instruction}</p>
         {editPrompt ? (
-          <label className="flex flex-col gap-2">
+          <form
+            className="flex flex-col gap-2"
+            onSubmit={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              void promptForm.handleSubmit();
+            }}
+          >
             <span className="text-xs font-bold uppercase tracking-wide text-ink-faint">
               Edit prompt
             </span>
-            <textarea
-              className="min-h-24 rounded-md border border-ink/20 bg-surface px-3 py-2 text-ink"
-              value={draftPrompt}
-              data-testid="admin-edit-prompt"
-              onChange={(e) => setDraftPrompt(e.target.value)}
-            />
+            <promptForm.Field
+              name="prompt"
+              validators={{
+                onChange: ({ value }) =>
+                  value.trim() ? undefined : "Prompt cannot be empty",
+              }}
+            >
+              {(field) => (
+                <>
+                  <textarea
+                    className="min-h-24 rounded-md border border-ink/20 bg-surface px-3 py-2 text-ink"
+                    value={field.state.value}
+                    data-testid="admin-edit-prompt"
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                  />
+                  {field.state.meta.errors.length > 0 ? (
+                    <span className="text-xs text-error" role="alert">
+                      {field.state.meta.errors.join(", ")}
+                    </span>
+                  ) : null}
+                </>
+              )}
+            </promptForm.Field>
             <button
-              type="button"
+              type="submit"
               className="btn-primary"
               data-testid="admin-save-edit"
-              onClick={() => void applyStatus("approved", draftPrompt)}
+              disabled={pending || promptForm.state.isSubmitting}
             >
               Save + approve
             </button>
-          </label>
+          </form>
         ) : (
           <h2 className="text-xl font-semibold text-ink">{current.prompt}</h2>
         )}
@@ -194,11 +233,6 @@ export function AdminReviewBoard({ initialItems, bypass = false }: Props) {
       <p className="mt-4 text-xs text-ink-faint" data-testid="admin-shortcuts">
         Shortcuts: a approve · e edit · r reject · → / n next
       </p>
-      {message ? (
-        <p className="mt-2 text-sm text-success" role="status">
-          {message}
-        </p>
-      ) : null}
     </div>
   );
 }

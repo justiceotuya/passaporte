@@ -66,22 +66,15 @@ describe("player components", () => {
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
-  it("fill_blank typed inserts diacritics and submits", () => {
+  it("fill_blank typed inserts diacritics and submits", async () => {
     const onSubmit = vi.fn();
-    let value = "";
-    const onChange = (next: string) => {
-      value = next;
-    };
-    const { rerender } = render(
-      <FillBlankTyped value={value} onChange={onChange} onSubmit={onSubmit} />,
-    );
+    render(<FillBlankTyped onSubmit={onSubmit} />);
     fireEvent.click(screen.getByRole("button", { name: "á" }));
-    rerender(
-      <FillBlankTyped value={value} onChange={onChange} onSubmit={onSubmit} />,
-    );
     expect(screen.getByTestId("fill-blank-input")).toHaveValue("á");
     fireEvent.click(screen.getByTestId("fill-blank-submit"));
-    expect(onSubmit).toHaveBeenCalled();
+    await vi.waitFor(() => {
+      expect(onSubmit).toHaveBeenCalledWith("á");
+    });
   });
 
   it("match pair-tap locks correct pairs and completes", () => {
