@@ -24,7 +24,7 @@ load_dotenv(ROOT / ".env")
 
 DEFAULT_RAW = ROOT / "raw"
 DEFAULT_EXTRACTED = ROOT / "extracted"
-DEFAULT_CONTENT = ROOT / "content" / "passaporte"
+DEFAULT_CONTENT = ROOT / "content" / "local" / "passaporte"
 DEFAULT_CROPS = ROOT / "apps" / "web" / "public" / "crops"
 FAILURES_PATH = ROOT / "failures.jsonl"
 ALUNO_RUN = "20260923T002149Z-d2ef0ba5"

@@ -1,8 +1,9 @@
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { resolveContentDir } from "@/lib/content-dir";
 import type { PassaporteItem, PassaporteUnit, ReviewStatus } from "@/types/item";
 
-const CONTENT_DIR = path.join(process.cwd(), "../../content/passaporte");
+const CONTENT_DIR = resolveContentDir();
 
 export type ReviewQueueItem = Pick<
   PassaporteItem,

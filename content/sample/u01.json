@@ -1,0 +1,544 @@
+{
+  "book": "sample",
+  "unit": 1,
+  "title": "Olá! Primeiros passos",
+  "topics": [
+    "cumprimentos",
+    "verbo ser",
+    "apresentações"
+  ],
+  "items": [
+    {
+      "id": "demo-u01-p001-A-1",
+      "book": "sample",
+      "unit": 1,
+      "page": 1,
+      "exercise": "A",
+      "type": "choice",
+      "skill": "vocabulary",
+      "topic": "cumprimentos",
+      "instruction": "Escolha a opção correta.",
+      "instruction_en": "Choose the correct option.",
+      "prompt": "Está sol e são oito da manhã. Diz…",
+      "answer": "Bom dia!",
+      "accepted": [],
+      "hint_en": "Think about what time of day the picture shows.",
+      "stimulus_image": "samples/demo-sun.webp",
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "options": [
+        "Bom dia!",
+        "Boa noite!",
+        "Boa tarde!"
+      ]
+    },
+    {
+      "id": "demo-u01-p001-A-2",
+      "book": "sample",
+      "unit": 1,
+      "page": 1,
+      "exercise": "A",
+      "type": "choice",
+      "skill": "vocabulary",
+      "topic": "cumprimentos",
+      "instruction": "Escolha a opção correta.",
+      "instruction_en": "Choose the correct option.",
+      "prompt": "Já é tarde e vais dormir. Diz…",
+      "answer": "Boa noite!",
+      "accepted": [],
+      "hint_en": "Look at the sky in the picture.",
+      "stimulus_image": "samples/demo-moon.webp",
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "options": [
+        "Bom dia!",
+        "Boa noite!",
+        "Olá!"
+      ]
+    },
+    {
+      "id": "demo-u01-p001-B-1",
+      "book": "sample",
+      "unit": 1,
+      "page": 1,
+      "exercise": "B",
+      "type": "choice",
+      "skill": "grammar",
+      "topic": "verbo ser",
+      "instruction": "Escolha a forma correta do verbo.",
+      "instruction_en": "Choose the correct form of the verb.",
+      "prompt": "Eu ___ engenheiro.",
+      "answer": "sou",
+      "accepted": [],
+      "hint_en": "First person singular of 'ser'.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "options": [
+        "sou",
+        "és",
+        "é",
+        "somos"
+      ]
+    },
+    {
+      "id": "demo-u01-p001-B-2",
+      "book": "sample",
+      "unit": 1,
+      "page": 1,
+      "exercise": "B",
+      "type": "choice",
+      "skill": "grammar",
+      "topic": "verbo ser",
+      "instruction": "Escolha a forma correta do verbo.",
+      "instruction_en": "Choose the correct form of the verb.",
+      "prompt": "Nós ___ de Lisboa.",
+      "answer": "somos",
+      "accepted": [],
+      "hint_en": "'Nós' is first person plural.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "options": [
+        "sou",
+        "são",
+        "somos",
+        "é"
+      ]
+    },
+    {
+      "id": "demo-u01-p001-B-3",
+      "book": "sample",
+      "unit": 1,
+      "page": 1,
+      "exercise": "B",
+      "type": "choice",
+      "skill": "grammar",
+      "topic": "verbo chamar-se",
+      "instruction": "Escolha a forma correta.",
+      "instruction_en": "Choose the correct form.",
+      "prompt": "Como ___ chamas?",
+      "answer": "te",
+      "accepted": [],
+      "hint_en": "Informal 'tu' form of the reflexive pronoun.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "options": [
+        "te",
+        "se",
+        "me"
+      ]
+    },
+    {
+      "id": "demo-u01-p002-C-1",
+      "book": "sample",
+      "unit": 1,
+      "page": 2,
+      "exercise": "C",
+      "type": "true_false",
+      "skill": "reading",
+      "topic": "apresentações",
+      "instruction": "Leia e responda: verdadeiro ou falso?",
+      "instruction_en": "Read and answer: true or false?",
+      "prompt": "«Olá, eu sou a Inês e moro no Porto.» — A Inês mora em Lisboa.",
+      "answer": "false",
+      "accepted": [],
+      "hint_en": "Check the city she mentions.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "options": [
+        "V",
+        "F"
+      ]
+    },
+    {
+      "id": "demo-u01-p002-C-2",
+      "book": "sample",
+      "unit": 1,
+      "page": 2,
+      "exercise": "C",
+      "type": "true_false",
+      "skill": "reading",
+      "topic": "apresentações",
+      "instruction": "Leia e responda: verdadeiro ou falso?",
+      "instruction_en": "Read and answer: true or false?",
+      "prompt": "«Chamo-me Rui e tenho vinte anos.» — O Rui tem 20 anos.",
+      "answer": "true",
+      "accepted": [],
+      "hint_en": "'Vinte' is a number word.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "options": [
+        "V",
+        "F"
+      ]
+    },
+    {
+      "id": "demo-u01-p002-C-3",
+      "book": "sample",
+      "unit": 1,
+      "page": 2,
+      "exercise": "C",
+      "type": "true_false",
+      "skill": "reading",
+      "topic": "apresentações",
+      "instruction": "Leia e responda: verdadeiro ou falso?",
+      "instruction_en": "Read and answer: true or false?",
+      "prompt": "«Sou professora numa escola.» — Esta pessoa é estudante.",
+      "answer": "false",
+      "accepted": [],
+      "hint_en": "Look at the profession she gives.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "options": [
+        "V",
+        "F"
+      ]
+    },
+    {
+      "id": "demo-u01-p002-D-1",
+      "book": "sample",
+      "unit": 1,
+      "page": 2,
+      "exercise": "D",
+      "type": "fill_blank",
+      "skill": "grammar",
+      "topic": "verbo ser",
+      "instruction": "Complete com a forma correta do verbo ser.",
+      "instruction_en": "Complete with the correct form of 'ser'.",
+      "prompt": "Tu ___ português?",
+      "answer": "és",
+      "accepted": [],
+      "hint_en": "Informal 'you' form of 'ser'.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "options": [
+        "és",
+        "sou",
+        "é"
+      ]
+    },
+    {
+      "id": "demo-u01-p002-D-2",
+      "book": "sample",
+      "unit": 1,
+      "page": 2,
+      "exercise": "D",
+      "type": "fill_blank",
+      "skill": "grammar",
+      "topic": "verbo ser",
+      "instruction": "Complete com a forma correta do verbo ser.",
+      "instruction_en": "Complete with the correct form of 'ser'.",
+      "prompt": "Eles ___ amigos.",
+      "answer": "são",
+      "accepted": [],
+      "hint_en": "Third person plural.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "options": [
+        "é",
+        "são",
+        "somos"
+      ]
+    },
+    {
+      "id": "demo-u01-p002-D-3",
+      "book": "sample",
+      "unit": 1,
+      "page": 2,
+      "exercise": "D",
+      "type": "fill_blank",
+      "skill": "vocabulary",
+      "topic": "cumprimentos",
+      "instruction": "Escreva a palavra que falta.",
+      "instruction_en": "Type the missing word.",
+      "prompt": "Muito ___! — Igualmente.",
+      "answer": "prazer",
+      "accepted": [],
+      "hint_en": "A common reply when you meet someone for the first time.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "demo-u01-p003-E-1",
+      "book": "sample",
+      "unit": 1,
+      "page": 3,
+      "exercise": "E",
+      "type": "match",
+      "skill": "vocabulary",
+      "topic": "perguntas e respostas",
+      "instruction": "Faça corresponder as perguntas às respostas.",
+      "instruction_en": "Match the questions with the answers.",
+      "prompt": "Liga cada pergunta à resposta certa.",
+      "answer": [
+        {
+          "left": "Como te chamas?",
+          "right": "Chamo-me Ana."
+        },
+        {
+          "left": "De onde és?",
+          "right": "Sou de Faro."
+        },
+        {
+          "left": "Como estás?",
+          "right": "Estou bem, obrigada."
+        },
+        {
+          "left": "Quantos anos tens?",
+          "right": "Tenho trinta anos."
+        }
+      ],
+      "accepted": [],
+      "hint_en": "Match the question word (como, onde, quantos) to the information.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "pairs": [
+        {
+          "left": "Como te chamas?",
+          "right": "Chamo-me Ana."
+        },
+        {
+          "left": "De onde és?",
+          "right": "Sou de Faro."
+        },
+        {
+          "left": "Como estás?",
+          "right": "Estou bem, obrigada."
+        },
+        {
+          "left": "Quantos anos tens?",
+          "right": "Tenho trinta anos."
+        }
+      ]
+    },
+    {
+      "id": "demo-u01-p003-F-1",
+      "book": "sample",
+      "unit": 1,
+      "page": 3,
+      "exercise": "F",
+      "type": "order",
+      "skill": "grammar",
+      "topic": "ordem das palavras",
+      "instruction": "Ordene as palavras para formar uma frase.",
+      "instruction_en": "Put the words in order to make a sentence.",
+      "prompt": "Forma a frase: chamo-me / Olá, / Tiago",
+      "answer": [
+        "Olá,",
+        "chamo-me",
+        "Tiago"
+      ],
+      "accepted": [],
+      "hint_en": "A greeting usually comes first.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "sequence": [
+        "Olá,",
+        "chamo-me",
+        "Tiago"
+      ]
+    },
+    {
+      "id": "demo-u01-p003-F-2",
+      "book": "sample",
+      "unit": 1,
+      "page": 3,
+      "exercise": "F",
+      "type": "order",
+      "skill": "grammar",
+      "topic": "ordem das palavras",
+      "instruction": "Ordene as palavras para formar uma frase.",
+      "instruction_en": "Put the words in order to make a sentence.",
+      "prompt": "Forma a frase: de / sou / Eu / Coimbra",
+      "answer": [
+        "Eu",
+        "sou",
+        "de",
+        "Coimbra"
+      ],
+      "accepted": [],
+      "hint_en": "Subject, then verb, then where you are from.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "sequence": [
+        "Eu",
+        "sou",
+        "de",
+        "Coimbra"
+      ]
+    },
+    {
+      "id": "demo-u01-p003-G-1",
+      "book": "sample",
+      "unit": 1,
+      "page": 3,
+      "exercise": "G",
+      "type": "transform",
+      "skill": "grammar",
+      "topic": "formal e informal",
+      "instruction": "Reescreva a pergunta na forma formal (você).",
+      "instruction_en": "Rewrite the question in the formal form (você).",
+      "prompt": "Como te chamas?",
+      "answer": "Como se chama?",
+      "accepted": [
+        "Como é que se chama?"
+      ],
+      "hint_en": "Formal address uses the third person.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "demo-u01-p003-G-2",
+      "book": "sample",
+      "unit": 1,
+      "page": 3,
+      "exercise": "G",
+      "type": "transform",
+      "skill": "grammar",
+      "topic": "negativa",
+      "instruction": "Escreva a frase na forma negativa.",
+      "instruction_en": "Write the sentence in the negative.",
+      "prompt": "Eu sou brasileiro.",
+      "answer": "Eu não sou brasileiro.",
+      "accepted": [],
+      "hint_en": "Put the negative word right before the verb.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "demo-u01-p004-H-1",
+      "book": "sample",
+      "unit": 1,
+      "page": 4,
+      "exercise": "H",
+      "type": "listen_choice",
+      "skill": "listening",
+      "topic": "apresentações",
+      "instruction": "Ouça e escolha a resposta certa.",
+      "instruction_en": "Listen and choose the right answer.",
+      "prompt": "De onde é a Marta?",
+      "answer": "Braga",
+      "accepted": [],
+      "hint_en": "Listen for the city name after 'sou de'.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "options": [
+        "Braga",
+        "Évora",
+        "Setúbal"
+      ],
+      "transcript": "Olá! Eu sou a Marta e sou de Braga."
+    },
+    {
+      "id": "demo-u01-p004-H-2",
+      "book": "sample",
+      "unit": 1,
+      "page": 4,
+      "exercise": "H",
+      "type": "listen_choice",
+      "skill": "listening",
+      "topic": "números",
+      "instruction": "Ouça e escolha a resposta certa.",
+      "instruction_en": "Listen and choose the right answer.",
+      "prompt": "Quantos anos tem o Pedro?",
+      "answer": "25",
+      "accepted": [],
+      "hint_en": "Listen for the number after 'tenho'.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "options": [
+        "15",
+        "25",
+        "35"
+      ],
+      "transcript": "Chamo-me Pedro e tenho vinte e cinco anos."
+    }
+  ]
+}

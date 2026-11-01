@@ -1,8 +1,9 @@
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
+import { resolveContentDir } from "@/lib/content-dir";
 import type { PassaporteUnit } from "@/types/item";
 
-const CONTENT_DIR = path.join(process.cwd(), "../../content/passaporte");
+const CONTENT_DIR = resolveContentDir();
 
 export type UnitSummary = {
   unit: number;

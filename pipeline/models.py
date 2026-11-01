@@ -11,6 +11,7 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 class BookId(str, Enum):
     PASSAPORTE = "passaporte"
     VALER = "valer"
+    SAMPLE = "sample"
 
 
 class ItemType(str, Enum):
@@ -36,6 +37,7 @@ class AnswerSource(str, Enum):
     TEACHER_BOOK = "teacher_book"
     STUDENT_BOOK_KEY = "student_book_key"
     GENERATED = "generated"
+    ORIGINAL = "original"
 
 
 class ReviewStatus(str, Enum):

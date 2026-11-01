@@ -1,0 +1,265 @@
+{
+  "book": "sample",
+  "unit": 3,
+  "title": "No café",
+  "topics": [
+    "no café",
+    "artigos",
+    "preços"
+  ],
+  "items": [
+    {
+      "id": "demo-u03-p007-A-1",
+      "book": "sample",
+      "unit": 3,
+      "page": 7,
+      "exercise": "A",
+      "type": "match",
+      "skill": "vocabulary",
+      "topic": "no café",
+      "instruction": "Faça corresponder as palavras às traduções.",
+      "instruction_en": "Match the words with their translations.",
+      "prompt": "Liga a palavra portuguesa à inglesa.",
+      "answer": [
+        {
+          "left": "um galão",
+          "right": "a milky coffee"
+        },
+        {
+          "left": "uma torrada",
+          "right": "a slice of toast"
+        },
+        {
+          "left": "um sumo",
+          "right": "a juice"
+        },
+        {
+          "left": "a conta",
+          "right": "the bill"
+        }
+      ],
+      "accepted": [],
+      "hint_en": "Think about what you would order for breakfast.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "pairs": [
+        {
+          "left": "um galão",
+          "right": "a milky coffee"
+        },
+        {
+          "left": "uma torrada",
+          "right": "a slice of toast"
+        },
+        {
+          "left": "um sumo",
+          "right": "a juice"
+        },
+        {
+          "left": "a conta",
+          "right": "the bill"
+        }
+      ]
+    },
+    {
+      "id": "demo-u03-p007-A-2",
+      "book": "sample",
+      "unit": 3,
+      "page": 7,
+      "exercise": "A",
+      "type": "choice",
+      "skill": "grammar",
+      "topic": "artigos",
+      "instruction": "Escolha o artigo correto.",
+      "instruction_en": "Choose the correct article.",
+      "prompt": "Queria ___ água, por favor.",
+      "answer": "uma",
+      "accepted": [],
+      "hint_en": "'Água' is a feminine noun.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "options": [
+        "um",
+        "uma",
+        "uns"
+      ]
+    },
+    {
+      "id": "demo-u03-p007-B-1",
+      "book": "sample",
+      "unit": 3,
+      "page": 7,
+      "exercise": "B",
+      "type": "fill_blank",
+      "skill": "grammar",
+      "topic": "verbo querer",
+      "instruction": "Complete com a forma correta.",
+      "instruction_en": "Complete with the correct form.",
+      "prompt": "Eu ___ um café, por favor.",
+      "answer": "queria",
+      "accepted": [],
+      "hint_en": "The polite past form is used to order.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "options": [
+        "queria",
+        "quer",
+        "queres"
+      ]
+    },
+    {
+      "id": "demo-u03-p007-B-2",
+      "book": "sample",
+      "unit": 3,
+      "page": 7,
+      "exercise": "B",
+      "type": "true_false",
+      "skill": "reading",
+      "topic": "no café",
+      "instruction": "Leia e responda: verdadeiro ou falso?",
+      "instruction_en": "Read and answer: true or false?",
+      "prompt": "«Um pastel de nata e um café, por favor. Quanto é?» — O cliente quer pagar.",
+      "answer": "true",
+      "accepted": [],
+      "hint_en": "What does the last question ask about?",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "options": [
+        "V",
+        "F"
+      ]
+    },
+    {
+      "id": "demo-u03-p008-C-1",
+      "book": "sample",
+      "unit": 3,
+      "page": 8,
+      "exercise": "C",
+      "type": "order",
+      "skill": "grammar",
+      "topic": "pedir no café",
+      "instruction": "Ordene as palavras para formar uma frase.",
+      "instruction_en": "Put the words in order to make a sentence.",
+      "prompt": "Forma a frase: por favor / A conta,",
+      "answer": [
+        "A conta,",
+        "por favor"
+      ],
+      "accepted": [],
+      "hint_en": "The polite phrase goes at the end.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "sequence": [
+        "A conta,",
+        "por favor"
+      ]
+    },
+    {
+      "id": "demo-u03-p008-C-2",
+      "book": "sample",
+      "unit": 3,
+      "page": 8,
+      "exercise": "C",
+      "type": "listen_choice",
+      "skill": "listening",
+      "topic": "preços",
+      "instruction": "Ouça e escolha o preço certo.",
+      "instruction_en": "Listen and choose the right price.",
+      "prompt": "Quanto custa o almoço?",
+      "answer": "8,50 €",
+      "accepted": [],
+      "hint_en": "Listen for 'euros' and 'cêntimos'.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "options": [
+        "5,80 €",
+        "8,50 €",
+        "18,50 €"
+      ],
+      "transcript": "O almoço custa oito euros e cinquenta cêntimos."
+    },
+    {
+      "id": "demo-u03-p008-D-1",
+      "book": "sample",
+      "unit": 3,
+      "page": 8,
+      "exercise": "D",
+      "type": "transform",
+      "skill": "grammar",
+      "topic": "plural",
+      "instruction": "Escreva a frase no plural.",
+      "instruction_en": "Write the sentence in the plural.",
+      "prompt": "Um café, por favor.",
+      "answer": "Dois cafés, por favor.",
+      "accepted": [
+        "Uns cafés, por favor."
+      ],
+      "hint_en": "Use the number two and add an -s.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "demo-u03-p008-D-2",
+      "book": "sample",
+      "unit": 3,
+      "page": 8,
+      "exercise": "D",
+      "type": "choice",
+      "skill": "vocabulary",
+      "topic": "no café",
+      "instruction": "Escolha a resposta certa.",
+      "instruction_en": "Choose the right answer.",
+      "prompt": "O empregado pergunta: «Mais alguma coisa?» Tu respondes…",
+      "answer": "Não, obrigado.",
+      "accepted": [],
+      "hint_en": "He wants to know if you need anything else.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "options": [
+        "Não, obrigado.",
+        "Bom dia.",
+        "Sou de Lisboa."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "type": "fill_blank",
+  "description": "Worked example (original, not from any book): fill_blank item shape for extract prompts",
+  "example": {
+    "letter": "B",
+    "items": [
+      {
+        "item_index": 1,
+        "type": "fill_blank",
+        "skill": "grammar",
+        "topic": "chamar-se",
+        "instruction": "Complete com a forma correta.",
+        "prompt": "Ela ___ Sofia.",
+        "options": ["chamo-me", "chamas-te", "chama-se"],
+        "needs_image": false
+      }
+    ]
+  }
+}

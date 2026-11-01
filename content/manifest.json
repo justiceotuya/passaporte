@@ -2,9 +2,9 @@
   "version": 1,
   "books": [
     {
-      "id": "passaporte",
-      "title": "Passaporte para Português 1",
-      "units": ["u01"]
+      "id": "sample",
+      "title": "Original demo units (shipped with the repo)",
+      "units": ["u01", "u02", "u03"]
     }
   ]
 }

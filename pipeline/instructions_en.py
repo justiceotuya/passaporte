@@ -23,7 +23,7 @@ from models import PassaporteUnit
 ROOT = Path(__file__).resolve().parents[1]
 load_dotenv(ROOT / ".env")
 
-DEFAULT_CONTENT = ROOT / "content" / "passaporte"
+DEFAULT_CONTENT = ROOT / "content" / "local" / "passaporte"
 FAILURES_PATH = ROOT / "failures.jsonl"
 DEFAULT_MODEL = os.environ.get(
     "ANTHROPIC_INSTRUCTIONS_EN_MODEL",

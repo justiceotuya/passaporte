@@ -3,6 +3,12 @@
 .env.*
 !.env.example
 
+# Textbook-derived content stays local (never commit copyrighted material)
+content/local/
+apps/web/public/crops/
+gold/*
+!gold/.gitkeep
+
 # PDFs, rasters, model dumps (never commit)
 raw/
 extracted/

@@ -18,7 +18,7 @@ type FixtureUnit = {
 
 const unit = JSON.parse(
   readFileSync(
-    path.join(__dirname, "../../../content/passaporte/u01.json"),
+    path.join(__dirname, "../../../content/sample/u01.json"),
     "utf8",
   ),
 ) as FixtureUnit;

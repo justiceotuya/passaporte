@@ -3,7 +3,7 @@
  * Keep in sync when the JSON Schema changes (Phase 1 contract).
  */
 
-export type BookId = "passaporte" | "valer";
+export type BookId = "passaporte" | "valer" | "sample";
 
 export type ItemType =
   | "choice"
@@ -25,7 +25,8 @@ export type Skill =
 export type AnswerSource =
   | "teacher_book"
   | "student_book_key"
-  | "generated";
+  | "generated"
+  | "original";
 
 export type ReviewStatus = "pending" | "approved" | "rejected";
 

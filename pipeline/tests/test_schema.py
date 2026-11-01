@@ -15,7 +15,7 @@ from models import PassaporteItem, PassaporteUnit
 ROOT = Path(__file__).resolve().parents[2]
 ITEM_SCHEMA_PATH = ROOT / "schema" / "item.schema.json"
 UNIT_SCHEMA_PATH = ROOT / "schema" / "unit.schema.json"
-FIXTURE_PATH = ROOT / "content" / "passaporte" / "u01.json"
+FIXTURE_PATH = ROOT / "content" / "sample" / "u01.json"
 
 ITEM_SCHEMA = json.loads(ITEM_SCHEMA_PATH.read_text())
 UNIT_SCHEMA = json.loads(UNIT_SCHEMA_PATH.read_text())

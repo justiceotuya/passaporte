@@ -1,0 +1,22 @@
+{
+  "type": "match",
+  "description": "Worked example (original, not from any book): match item shape for extract prompts",
+  "example": {
+    "letter": "C",
+    "items": [
+      {
+        "item_index": 1,
+        "type": "match",
+        "skill": "vocabulary",
+        "topic": "cumprimentos",
+        "instruction": "Faça corresponder as colunas.",
+        "prompt": "Liga cada cumprimento ao momento do dia.",
+        "pairs": [
+          {"left": "Bom dia", "right": "às nove da manhã"},
+          {"left": "Boa tarde", "right": "às quatro da tarde"}
+        ],
+        "needs_image": false
+      }
+    ]
+  }
+}

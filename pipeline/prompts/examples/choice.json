@@ -1,0 +1,19 @@
+{
+  "type": "choice",
+  "description": "Worked example (original, not from any book): choice item shape for extract prompts",
+  "example": {
+    "letter": "H",
+    "items": [
+      {
+        "item_index": 1,
+        "type": "choice",
+        "skill": "grammar",
+        "topic": "gostar de",
+        "instruction": "Veja as imagens e escolha a opção correta.",
+        "prompt": "O Rui ___ de chá.",
+        "options": ["gosta", "não gosta"],
+        "needs_image": true
+      }
+    ]
+  }
+}

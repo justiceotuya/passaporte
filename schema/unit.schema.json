@@ -7,7 +7,7 @@
   "additionalProperties": false,
   "required": ["book", "unit", "title", "items"],
   "properties": {
-    "book": { "type": "string", "enum": ["passaporte", "valer"] },
+    "book": { "type": "string", "enum": ["passaporte", "valer", "sample"] },
     "unit": { "type": "integer", "minimum": 1 },
     "title": { "type": "string", "minLength": 1 },
     "topics": {

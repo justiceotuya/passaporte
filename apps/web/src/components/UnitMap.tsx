@@ -40,7 +40,7 @@ export function UnitMap({ units }: Props) {
           <h1 className="font-display text-3xl font-semibold text-ink lg:text-4xl">
             Passaporte
           </h1>
-          <p className="mt-1 text-sm text-ink-muted">Passaporte para Português 1</p>
+          <p className="mt-1 text-sm text-ink-muted">A1 European Portuguese</p>
         </div>
         <div className="flex flex-wrap items-center gap-2 sm:justify-end">
           <span className="rounded-pill bg-primary/15 px-3 py-2 text-sm font-bold text-primary">

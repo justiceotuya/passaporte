@@ -14,7 +14,7 @@ const unitSchema = JSON.parse(
   readFileSync(path.join(root, "schema/unit.schema.json"), "utf8"),
 );
 const fixture = JSON.parse(
-  readFileSync(path.join(root, "content/passaporte/u01.json"), "utf8"),
+  readFileSync(path.join(root, "content/sample/u01.json"), "utf8"),
 ) as PassaporteUnit;
 
 const ajv = new Ajv2020({ allErrors: true, strict: false });
@@ -74,6 +74,6 @@ describe("schema contract", () => {
 
   it("TypeScript PassaporteUnit accepts the fixture shape", () => {
     const unit: PassaporteUnit = fixture;
-    expect(unit.book).toBe("passaporte");
+    expect(unit.book).toBe("sample");
   });
 });

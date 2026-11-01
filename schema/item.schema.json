@@ -30,7 +30,7 @@
     },
     "book": {
       "type": "string",
-      "enum": ["passaporte", "valer"]
+      "enum": ["passaporte", "valer", "sample"]
     },
     "unit": { "type": "integer", "minimum": 1 },
     "page": { "type": "integer", "minimum": 1 },
@@ -121,7 +121,7 @@
     },
     "stimulus_image": {
       "type": ["string", "null"],
-      "description": "Path under public/crops/, or null"
+      "description": "Path under apps/web/public/ (crops/ for local pipeline output, samples/ for demo content), or null"
     },
     "transcript": {
       "type": "string",
@@ -129,7 +129,7 @@
     },
     "answer_source": {
       "type": "string",
-      "enum": ["teacher_book", "student_book_key", "generated"]
+      "enum": ["teacher_book", "student_book_key", "generated", "original"]
     },
     "review": {
       "type": "object",

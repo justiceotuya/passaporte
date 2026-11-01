@@ -1,0 +1,263 @@
+{
+  "book": "sample",
+  "unit": 2,
+  "title": "Números, horas e dias",
+  "topics": [
+    "números",
+    "horas",
+    "dias da semana"
+  ],
+  "items": [
+    {
+      "id": "demo-u02-p005-A-1",
+      "book": "sample",
+      "unit": 2,
+      "page": 5,
+      "exercise": "A",
+      "type": "match",
+      "skill": "vocabulary",
+      "topic": "números 1-10",
+      "instruction": "Faça corresponder os números às palavras.",
+      "instruction_en": "Match the numbers with the words.",
+      "prompt": "Liga o número à palavra.",
+      "answer": [
+        {
+          "left": "3",
+          "right": "três"
+        },
+        {
+          "left": "6",
+          "right": "seis"
+        },
+        {
+          "left": "8",
+          "right": "oito"
+        },
+        {
+          "left": "10",
+          "right": "dez"
+        }
+      ],
+      "accepted": [],
+      "hint_en": "Say each number out loud first.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "pairs": [
+        {
+          "left": "3",
+          "right": "três"
+        },
+        {
+          "left": "6",
+          "right": "seis"
+        },
+        {
+          "left": "8",
+          "right": "oito"
+        },
+        {
+          "left": "10",
+          "right": "dez"
+        }
+      ]
+    },
+    {
+      "id": "demo-u02-p005-A-2",
+      "book": "sample",
+      "unit": 2,
+      "page": 5,
+      "exercise": "A",
+      "type": "choice",
+      "skill": "vocabulary",
+      "topic": "números",
+      "instruction": "Escolha a opção correta.",
+      "instruction_en": "Choose the correct option.",
+      "prompt": "Doze mais três são…",
+      "answer": "quinze",
+      "accepted": [],
+      "hint_en": "Add the two numbers.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "options": [
+        "treze",
+        "quinze",
+        "dezoito"
+      ]
+    },
+    {
+      "id": "demo-u02-p005-B-1",
+      "book": "sample",
+      "unit": 2,
+      "page": 5,
+      "exercise": "B",
+      "type": "fill_blank",
+      "skill": "vocabulary",
+      "topic": "horas",
+      "instruction": "Escreva a palavra que falta.",
+      "instruction_en": "Type the missing word.",
+      "prompt": "São três ___ da tarde.",
+      "answer": "horas",
+      "accepted": [],
+      "hint_en": "The plural word for 'hours'.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      }
+    },
+    {
+      "id": "demo-u02-p005-B-2",
+      "book": "sample",
+      "unit": 2,
+      "page": 5,
+      "exercise": "B",
+      "type": "choice",
+      "skill": "vocabulary",
+      "topic": "horas",
+      "instruction": "Escolha a opção correta.",
+      "instruction_en": "Choose the correct option.",
+      "prompt": "Como se diz 12:30?",
+      "answer": "Meio-dia e meia",
+      "accepted": [],
+      "hint_en": "Midday plus half an hour.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "options": [
+        "Meio-dia e meia",
+        "Uma e meia",
+        "Meia-noite"
+      ]
+    },
+    {
+      "id": "demo-u02-p006-C-1",
+      "book": "sample",
+      "unit": 2,
+      "page": 6,
+      "exercise": "C",
+      "type": "true_false",
+      "skill": "reading",
+      "topic": "horário",
+      "instruction": "Leia e responda: verdadeiro ou falso?",
+      "instruction_en": "Read and answer: true or false?",
+      "prompt": "«A loja abre às nove e fecha às sete.» — A loja fecha às 19h.",
+      "answer": "true",
+      "accepted": [],
+      "hint_en": "Convert the evening hour to 24-hour time.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "options": [
+        "V",
+        "F"
+      ]
+    },
+    {
+      "id": "demo-u02-p006-C-2",
+      "book": "sample",
+      "unit": 2,
+      "page": 6,
+      "exercise": "C",
+      "type": "listen_choice",
+      "skill": "listening",
+      "topic": "horas",
+      "instruction": "Ouça e escolha a hora certa.",
+      "instruction_en": "Listen and choose the right time.",
+      "prompt": "A que horas é a aula?",
+      "answer": "10:15",
+      "accepted": [],
+      "hint_en": "'Um quarto' means fifteen minutes.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "options": [
+        "10:15",
+        "10:45",
+        "11:15"
+      ],
+      "transcript": "A aula é às dez e um quarto."
+    },
+    {
+      "id": "demo-u02-p006-D-1",
+      "book": "sample",
+      "unit": 2,
+      "page": 6,
+      "exercise": "D",
+      "type": "order",
+      "skill": "vocabulary",
+      "topic": "dias da semana",
+      "instruction": "Ordene os dias da semana.",
+      "instruction_en": "Put the days of the week in order.",
+      "prompt": "Ordena: quarta-feira / segunda-feira / terça-feira",
+      "answer": [
+        "segunda-feira",
+        "terça-feira",
+        "quarta-feira"
+      ],
+      "accepted": [],
+      "hint_en": "The Portuguese week names count from Monday as the second day.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      },
+      "sequence": [
+        "segunda-feira",
+        "terça-feira",
+        "quarta-feira"
+      ]
+    },
+    {
+      "id": "demo-u02-p006-D-2",
+      "book": "sample",
+      "unit": 2,
+      "page": 6,
+      "exercise": "D",
+      "type": "transform",
+      "skill": "grammar",
+      "topic": "horas",
+      "instruction": "Escreva a hora por extenso.",
+      "instruction_en": "Write the time in words.",
+      "prompt": "08:00",
+      "answer": "São oito horas.",
+      "accepted": [
+        "São oito.",
+        "Oito horas"
+      ],
+      "hint_en": "Start with the plural verb used for times.",
+      "stimulus_image": null,
+      "answer_source": "original",
+      "review": {
+        "status": "approved",
+        "by": "author",
+        "at": "2026-11-01T00:00:00.000Z"
+      }
+    }
+  ]
+}

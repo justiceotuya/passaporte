@@ -5,8 +5,9 @@ import path from "node:path";
 type FixtureItem = {
   id: string;
   type: string;
-  answer: string | { left: string; right: string }[];
+  answer: string | string[] | { left: string; right: string }[];
   pairs?: { left: string; right: string }[];
+  sequence?: string[];
   options?: string[];
 };
 
@@ -16,7 +17,7 @@ type FixtureUnit = {
 
 const unit = JSON.parse(
   readFileSync(
-    path.join(__dirname, "../../../content/passaporte/u07.json"),
+    path.join(__dirname, "../../../content/sample/u02.json"),
     "utf8",
   ),
 ) as FixtureUnit;
@@ -30,8 +31,8 @@ test.beforeEach(async ({ page }) => {
   });
 });
 
-test("smoke play shipped unit u07", async ({ page }) => {
-  await page.goto("/play?unit=7&size=2");
+test("smoke play shipped unit u02", async ({ page }) => {
+  await page.goto("/play?unit=2&size=2");
   await expect(page.getByTestId("session-player")).toBeVisible();
 
   for (let i = 0; i < 2; i += 1) {
@@ -61,6 +62,15 @@ test("smoke play shipped unit u07", async ({ page }) => {
         await page.getByRole("button", { name: pair.left, exact: true }).click();
         await page.getByRole("button", { name: pair.right, exact: true }).click();
       }
+    } else if (itemType === "order") {
+      const seq =
+        Array.isArray(item!.answer) && typeof item!.answer[0] === "string"
+          ? (item!.answer as string[])
+          : (item!.sequence ?? []);
+      for (const step of seq) {
+        await page.getByRole("button", { name: step, exact: true }).first().click();
+      }
+      await page.getByTestId("order-submit").click();
     } else {
       throw new Error(`Unhandled type ${itemType} for ${itemId}`);
     }

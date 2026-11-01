@@ -69,8 +69,8 @@ function LandingTryDemo() {
 
       <div className="rounded-3xl border-2 border-b-4 border-[#FCF5EF]/[0.05] bg-[#FCF5EF]/[0.05] p-4">
         <p className="mb-3 text-[21px] font-semibold leading-[1.35] tracking-tight text-[#FCF5EF]">
-          A Marta ___ de café.{" "}
-          <span className="text-sm font-medium text-[#FCF5EF]/45">☕✕</span>
+          O Rui ___ de chá.{" "}
+          <span className="text-sm font-medium text-[#FCF5EF]/45">🍵✕</span>
         </p>
 
         <button
@@ -83,7 +83,7 @@ function LandingTryDemo() {
         </button>
         {hintOpen ? (
           <div className="mt-2 rounded-r-xl border-l-[3px] border-warning bg-warning/[0.08] px-3.5 py-3 text-sm font-medium leading-normal text-[#FCF5EF]/90">
-            Marta doesn’t like coffee — put “não” before the verb.
+            Rui doesn’t like tea — put “não” before the verb.
           </div>
         ) : null}
 
