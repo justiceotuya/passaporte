@@ -13,7 +13,7 @@
 3. **Commit and push after every finished stage.**
 4. Keep the handover prompt at the bottom accurate.
 5. Full-book vision/PDF extract is **approved and in progress** (`scripts/full-book-extract.sh` / `scripts/resume-full-book.sh`).
-6. Never commit `raw/`, `extracted/`, PDFs, page images, `*.db`, `.env*`.
+6. Never commit `raw/`, `extracted/`, PDFs, page images, `*.db`, `.env*`, or any textbook-derived content (`content/local/`, `apps/web/public/crops/`). Only original units go in `content/sample/`.
 7. Design: `../templates/passaporte/` · Spec: design doc · Kuji parent = reference.
 
 ---
@@ -48,6 +48,7 @@ Open signup · player-first · Zustand progress · Better Auth (Convex when URL 
 | 2026-09-23 | **Landing** · `PassaporteLanding` from template · `/` marketing · unit map at `/map` |
 | 2026-09-23 | **Query hooks** · `useAuthProviders` · `useSyncProgress` · `useProgressSnapshot` · `useReviewQueue` · ProgressHydrator |
 | 2026-09-23 | **TanStack Query** · providers query + progress/review mutations via `@tanstack/react-query` |
+| 2026-11-01 | **Open-source prep** · textbook output moved to gitignored `content/local/` + crops · 3 original demo units in `content/sample/` · invite-only signup (`PASSAPORTE_ALLOWED_EMAILS`) · MIT license · README + ROADMAP |
 
 ---
 
