@@ -2,6 +2,8 @@ import fs from "node:fs";
 import path from "node:path";
 import Database from "better-sqlite3";
 import { betterAuth } from "better-auth";
+import { APIError } from "better-auth/api";
+import { isSignupAllowed, SIGNUP_CLOSED_MESSAGE } from "@/lib/signup-allowlist";
 
 const dataDir = path.join(process.cwd(), "data");
 if (!fs.existsSync(dataDir)) {
@@ -61,6 +63,19 @@ export const auth = betterAuth({
         },
       }
     : undefined,
+  databaseHooks: {
+    user: {
+      create: {
+        // Invite-only: see src/lib/signup-allowlist.ts
+        before: async (user) => {
+          if (!isSignupAllowed(user.email)) {
+            throw new APIError("FORBIDDEN", { message: SIGNUP_CLOSED_MESSAGE });
+          }
+          return { data: user };
+        },
+      },
+    },
+  },
   trustedOrigins: trustedOrigins(),
   onAPIError: {
     errorURL: "/sign-in",

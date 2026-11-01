@@ -1,6 +1,8 @@
 import { createClient, type GenericCtx } from "@convex-dev/better-auth";
 import { convex } from "@convex-dev/better-auth/plugins";
 import { betterAuth } from "better-auth/minimal";
+import { APIError } from "better-auth/api";
+import { isSignupAllowed, SIGNUP_CLOSED_MESSAGE } from "../src/lib/signup-allowlist";
 import { components } from "./_generated/api";
 import type { DataModel } from "./_generated/dataModel";
 import { query } from "./_generated/server";
@@ -43,6 +45,19 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
           },
         }
       : undefined,
+    databaseHooks: {
+      user: {
+        create: {
+          // Invite-only: see src/lib/signup-allowlist.ts
+          before: async (user) => {
+            if (!isSignupAllowed(user.email)) {
+              throw new APIError("FORBIDDEN", { message: SIGNUP_CLOSED_MESSAGE });
+            }
+            return { data: user };
+          },
+        },
+      },
+    },
     plugins: [convex({ authConfig })],
     onAPIError: {
       errorURL: "/sign-in",
