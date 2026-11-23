@@ -3,6 +3,7 @@ import path from "node:path";
 import Database from "better-sqlite3";
 import { betterAuth } from "better-auth";
 import { APIError } from "better-auth/api";
+import { sendPasswordResetEmail } from "@/lib/auth-email";
 import { isSignupAllowed, SIGNUP_CLOSED_MESSAGE } from "@/lib/signup-allowlist";
 
 const dataDir = path.join(process.cwd(), "data");
@@ -45,6 +46,11 @@ export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET,
   emailAndPassword: {
     enabled: true,
+    sendResetPassword: async ({ user, url }) => {
+      // Fire-and-forget to reduce timing leaks; errors still surface in logs.
+      void sendPasswordResetEmail({ to: user.email, url });
+    },
+    revokeSessionsOnPasswordReset: true,
   },
   account: {
     accountLinking: {

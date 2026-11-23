@@ -5,9 +5,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { useAuthProviders } from "@/hooks/use-auth-providers";
+import { ChoiceOption } from "@/components/ChoiceOption";
+import { HintDisclosure } from "@/components/HintDisclosure";
+import { SocialAuthButton } from "@/components/SocialAuthButton";
+import { Button, FeedbackCard, ProgressBar } from "@/kuji";
 
 const DEMO_ANSWER = "não gosta";
 const DEMO_OPTIONS = ["gosta", "não gosta"] as const;
+const DEMO_HINT =
+  "Rui doesn’t like tea — put “não” before the verb.";
 
 const PRACTICE_TYPES = [
   "Multiple choice",
@@ -19,34 +25,21 @@ const PRACTICE_TYPES = [
   "Read the dialogue",
 ] as const;
 
-function GoogleMark() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden>
-      <path
-        fill="#EA4335"
-        d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.6 2.4 30.2 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.2 17.7 9.5 24 9.5z"
-      />
-      <path
-        fill="#4285F4"
-        d="M46.1 24.6c0-1.6-.1-3.2-.4-4.6H24v9.1h12.4c-.5 2.9-2.2 5.3-4.6 7l7.2 5.6c4.2-3.9 6.6-9.7 6.6-16.6z"
-      />
-      <path
-        fill="#FBBC05"
-        d="M10.5 28.7c-.5-1.5-.8-3-.8-4.7s.3-3.2.8-4.7l-7.9-6.1C1 16.4 0 20.1 0 24s1 7.6 2.6 10.8l7.9-6.1z"
-      />
-      <path
-        fill="#34A853"
-        d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.2-5.6c-2 1.4-4.6 2.2-8.7 2.2-6.3 0-11.6-3.7-13.5-9.1l-7.9 6.1C6.5 42.6 14.6 48 24 48z"
-      />
-    </svg>
-  );
-}
-
 function LandingTryDemo() {
   const [picked, setPicked] = useState<string | null>(null);
-  const [hintOpen, setHintOpen] = useState(false);
   const answered = picked !== null;
   const ok = picked === DEMO_ANSWER;
+
+  function optionState(
+    label: string,
+  ): "default" | "correct" | "incorrect" | "revealed" | "dim" {
+    if (!answered) return "default";
+    const isPicked = label === picked;
+    if (isPicked && ok) return "correct";
+    if (isPicked && !ok) return "incorrect";
+    if (!ok && label === DEMO_ANSWER) return "revealed";
+    return "dim";
+  }
 
   return (
     <div
@@ -54,12 +47,12 @@ function LandingTryDemo() {
       data-testid="landing-try-demo"
     >
       <div className="mb-[18px] flex items-center gap-3">
-        <div className="h-2.5 flex-1 overflow-hidden rounded-pill bg-[#FCF5EF]/10">
-          <div
-            className="h-full rounded-pill bg-success transition-all duration-base ease-out"
-            style={{ width: answered ? "100%" : "12%" }}
-          />
-        </div>
+        <ProgressBar
+          value={answered ? 100 : 12}
+          color="green"
+          height={10}
+          className="flex-1"
+        />
         <span className="text-[13px] font-bold text-[#FCF5EF]/60">Try one</span>
       </div>
 
@@ -67,118 +60,77 @@ function LandingTryDemo() {
         Escolha a opção correta.
       </p>
 
-      <div className="rounded-3xl border-2 border-b-4 border-[#FCF5EF]/[0.05] bg-[#FCF5EF]/[0.05] p-4">
+      <div className="card-surface-lg border-[#FCF5EF]/[0.05] bg-[#FCF5EF]/[0.05] p-4">
         <p className="mb-3 text-[21px] font-semibold leading-[1.35] tracking-tight text-[#FCF5EF]">
           O Rui ___ de chá.{" "}
           <span className="text-sm font-medium text-[#FCF5EF]/45">🍵✕</span>
         </p>
 
-        <button
-          type="button"
-          className="inline-flex h-11 items-center gap-2 rounded-pill bg-warning/10 px-3.5 text-sm font-bold text-warning"
-          onClick={() => setHintOpen((open) => !open)}
-          data-testid="landing-demo-hint"
-        >
-          ? Hint
-        </button>
-        {hintOpen ? (
-          <div className="mt-2 rounded-r-xl border-l-[3px] border-warning bg-warning/[0.08] px-3.5 py-3 text-sm font-medium leading-normal text-[#FCF5EF]/90">
-            Rui doesn’t like tea — put “não” before the verb.
-          </div>
-        ) : null}
+        <div data-testid="landing-demo-hint">
+          <HintDisclosure hint={DEMO_HINT} />
+        </div>
 
         <div className="mt-4 flex flex-col gap-3">
-          {DEMO_OPTIONS.map((label) => {
-            const isPicked = label === picked;
-            const right = answered && isPicked && ok;
-            const wrong = answered && isPicked && !ok;
-            const reveal = answered && !ok && label === DEMO_ANSWER;
-            const dim =
-              answered && !isPicked && !(label === DEMO_ANSWER && !ok);
-
-            let className =
-              "flex min-h-14 w-full items-center rounded-2xl border-2 border-b-4 px-4 py-3.5 text-left text-[17px] font-semibold leading-snug";
-            if (!answered) {
-              className +=
-                " border-[#FCF5EF]/10 bg-[#FCF5EF]/[0.05] text-[#FCF5EF] hover:bg-[#FCF5EF]/[0.09]";
-            } else if (right) {
-              className +=
-                " justify-between border-success bg-success/12 font-bold text-[#FCF5EF]";
-            } else if (wrong) {
-              className +=
-                " justify-between border-error bg-error/12 font-bold text-[#FCF5EF]";
-            } else if (reveal) {
-              className +=
-                " justify-between border-dashed border-success font-bold text-success";
-            } else if (dim) {
-              className +=
-                " border-[#FCF5EF]/[0.06] bg-[#FCF5EF]/[0.03] font-medium text-[#FCF5EF]/40";
-            }
-
-            return (
-              <button
-                key={label}
-                type="button"
-                disabled={answered}
-                className={className}
-                onClick={() => setPicked(label)}
-                data-testid={`landing-demo-option-${label.replace(/\s+/g, "-")}`}
-              >
-                <span>{label}</span>
-                {right ? <span className="text-lg text-success">✓</span> : null}
-                {wrong ? <span className="text-lg text-error">✕</span> : null}
-                {reveal ? (
-                  <span className="rounded-pill bg-success/20 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-success">
-                    Answer
-                  </span>
-                ) : null}
-              </button>
-            );
-          })}
+          {DEMO_OPTIONS.map((label) => (
+            <ChoiceOption
+              key={label}
+              label={label}
+              state={optionState(label)}
+              disabled={answered}
+              onClick={() => setPicked(label)}
+              data-testid={`landing-demo-option-${label.replace(/\s+/g, "-")}`}
+            />
+          ))}
         </div>
       </div>
 
       {answered && ok ? (
-        <div className="mt-3.5 rounded-[20px] border-2 border-success bg-[#0E1A14] p-4">
-          <p className="mb-1 text-lg font-bold leading-tight text-success">
-            Correct! +10 XP
-          </p>
-          <p className="mb-3 text-sm font-medium leading-normal text-[#FCF5EF]/80">
-            In Portuguese, “não” goes right before the verb: não gosta de café.
-          </p>
-          <button
-            type="button"
-            className="inline-flex h-11 items-center rounded-pill bg-[#FCF5EF]/[0.08] px-[18px] text-xs font-bold uppercase tracking-wide text-[#FCF5EF]"
-            onClick={() => {
-              setPicked(null);
-              setHintOpen(false);
-            }}
-          >
-            Try again
-          </button>
-        </div>
+        <FeedbackCard
+          tone="correct"
+          heading="Correct! +10 XP"
+          style={{ marginTop: 14, background: "#0E1A14", borderColor: "#07C874" }}
+          action={
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setPicked(null)}
+              style={{
+                background: "rgba(252,245,239,0.08)",
+                color: "#FCF5EF",
+                alignSelf: "flex-start",
+              }}
+            >
+              Try again
+            </Button>
+          }
+        >
+          In Portuguese, “não” goes right before the verb: não gosta de chá.
+        </FeedbackCard>
       ) : null}
 
       {answered && !ok ? (
-        <div className="mt-3.5 rounded-[20px] border-2 border-error bg-[#1E1112] p-4">
-          <p className="mb-1 text-lg font-bold leading-tight text-error">
-            Not quite — it’s “não gosta”
-          </p>
-          <p className="mb-3 text-sm font-medium leading-normal text-[#FCF5EF]/80">
-            The negative sits before the verb: não gosta de café. This one would
-            come back in tomorrow’s review.
-          </p>
-          <button
-            type="button"
-            className="inline-flex h-11 items-center rounded-pill bg-[#FCF5EF]/[0.08] px-[18px] text-xs font-bold uppercase tracking-wide text-[#FCF5EF]"
-            onClick={() => {
-              setPicked(null);
-              setHintOpen(false);
-            }}
-          >
-            Try again
-          </button>
-        </div>
+        <FeedbackCard
+          tone="wrong"
+          heading="Not quite — it’s “não gosta”"
+          style={{ marginTop: 14, background: "#1E1112", borderColor: "#FF6467" }}
+          action={
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setPicked(null)}
+              style={{
+                background: "rgba(252,245,239,0.08)",
+                color: "#FCF5EF",
+                alignSelf: "flex-start",
+              }}
+            >
+              Try again
+            </Button>
+          }
+        >
+          The negative sits before the verb: não gosta de chá. This one would
+          come back in tomorrow’s review.
+        </FeedbackCard>
       ) : null}
     </div>
   );
@@ -192,11 +144,16 @@ export function PassaporteLanding() {
   const googleEnabled = providers?.google ?? false;
   const [googlePending, setGooglePending] = useState(false);
 
+  const signedIn = Boolean(session?.user);
+  /** Unauthenticated Start goes to auth; signed-in users land on the map. */
+  const startHref = signedIn ? "/map" : "/sign-in?next=/map";
+
   useEffect(() => {
-    if (!sessionPending && session?.user) {
+    if (sessionPending) return;
+    if (signedIn) {
       router.replace("/map");
     }
-  }, [session, sessionPending, router]);
+  }, [signedIn, sessionPending, router]);
 
   async function onGoogle() {
     if (!googleEnabled || googlePending) return;
@@ -232,7 +189,7 @@ export function PassaporteLanding() {
           </a>
           <Link
             href="/sign-in"
-            className="flex h-11 items-center rounded-pill border-2 border-[#FCF5EF]/12 bg-[#FCF5EF]/[0.06] px-[18px] text-[13px] font-bold uppercase tracking-wide text-[#FCF5EF]"
+            className="btn-ghost border-[#FCF5EF]/12 bg-[#FCF5EF]/[0.06] text-[#FCF5EF]"
             data-testid="landing-sign-in"
           >
             Sign in
@@ -255,27 +212,19 @@ export function PassaporteLanding() {
           </p>
           <div className="mb-5 flex flex-wrap gap-3">
             <Link
-              href="/map"
+              href={startHref}
               className="btn-primary gap-2.5 px-6 text-[15px]"
               data-testid="landing-start"
             >
               Start learning free
             </Link>
-            <button
-              type="button"
+            <SocialAuthButton
               disabled={!googleEnabled || googlePending}
+              needsKeys={!googleEnabled}
               onClick={() => void onGoogle()}
-              className="inline-flex h-14 items-center gap-2.5 rounded-pill border-b-4 border-[#18140F]/25 bg-[#FCF5EF] px-[22px] text-[15px] font-bold text-[#18140F] transition duration-fast ease-out active:translate-y-0.5 disabled:opacity-50"
               data-testid="landing-google"
-              title={
-                googleEnabled
-                  ? "Continue with Google"
-                  : "Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to enable"
-              }
-            >
-              <GoogleMark />
-              Continue with Google
-            </button>
+              className="w-auto"
+            />
           </div>
           <p className="text-sm font-medium leading-snug text-[#FCF5EF]/50">
             No timers. No pressure. Hearts only if you want them.
@@ -411,7 +360,7 @@ export function PassaporteLanding() {
             </p>
           </div>
           <Link
-            href="/map"
+            href={startHref}
             className="btn-primary px-7 text-[15px]"
             data-testid="landing-cta-footer"
           >

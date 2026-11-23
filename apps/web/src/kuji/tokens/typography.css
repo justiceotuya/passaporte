@@ -1,0 +1,54 @@
+/* ============================================================
+   KUJI · Typography tokens
+   Two rounded families: Nunito (UI / numbers, sub. for DIN Round Pro)
+   and Fredoka (playful display, sub. for Open Runde).
+   Body tracking is tight (-0.02em); button/label tracking opens up
+   (+0.05em) and goes UPPERCASE. See readme.md → CONTENT FUNDAMENTALS.
+   ============================================================ */
+
+:root {
+  /* ---- Families ------------------------------------------- */
+  --font-sans:    'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Fredoka', 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* ---- Weights -------------------------------------------- */
+  --weight-regular:  400;
+  --weight-medium:   500;   /* DIN Round Pro Medium — the workhorse body weight */
+  --weight-semibold: 600;
+  --weight-bold:     700;   /* DIN Round Pro Bold — buttons, numbers, headings  */
+  --weight-black:    800;   /* big display numerals                              */
+
+  /* ---- Type scale (px) ------------------------------------ */
+  --text-2xs:  12px;   /* legal, micro-labels                */
+  --text-xs:   14px;   /* default body / list labels         */
+  --text-sm:   15px;
+  --text-base: 16px;   /* emphasised body, inputs            */
+  --text-md:   18px;
+  --text-lg:   20px;   /* streak count, stat values          */
+  --text-xl:   24px;   /* screen titles                      */
+  --text-2xl:  28px;   /* greeting name                      */
+  --text-3xl:  32px;   /* hero display                       */
+  --text-4xl:  40px;   /* splash / celebration numerals      */
+
+  /* ---- Line heights --------------------------------------- */
+  --leading-none:  1;      /* numerals, single-line buttons   */
+  --leading-tight: 1.2;    /* display + most body             */
+  --leading-loose: 1.5;    /* legal / multi-line helper copy  */
+
+  /* ---- Tracking ------------------------------------------- */
+  --tracking-tight:  -0.02em;  /* body, titles                */
+  --tracking-normal:  0em;
+  --tracking-wide:    0.05em;  /* UPPERCASE buttons + labels  */
+
+  /* ============================================================
+     Role aliases
+     ============================================================ */
+  --type-display:  var(--weight-semibold) var(--text-3xl)/var(--leading-tight) var(--font-display);
+  --type-title:    var(--weight-bold)     var(--text-xl)/var(--leading-tight)  var(--font-sans);
+  --type-greeting: var(--weight-bold)     var(--text-2xl)/var(--leading-tight) var(--font-sans);
+  --type-stat:     var(--weight-bold)     var(--text-lg)/var(--leading-none)   var(--font-sans);
+  --type-body:     var(--weight-medium)   var(--text-xs)/var(--leading-tight)  var(--font-sans);
+  --type-body-lg:  var(--weight-medium)   var(--text-base)/var(--leading-tight) var(--font-sans);
+  --type-label:    var(--weight-bold)     var(--text-xs)/var(--leading-none)   var(--font-sans);
+  --type-legal:    var(--weight-medium)   var(--text-2xs)/var(--leading-loose) var(--font-sans);
+}

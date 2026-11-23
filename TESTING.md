@@ -127,7 +127,7 @@ Note: outputs live under `raw/` and must stay **gitignored**.
 - [x] `match` pair-tap
 - [x] `order` tap-to-sequence
 - [x] `transform` typed (skips `PENDING` answers)
-- [x] `listen_choice` collapsible transcript + options
+- [x] `listen_choice` / listening items: play button (audio file or TTS) + collapsible transcript
 
 
 ### 5d Session end / SRS / stats
@@ -163,6 +163,15 @@ Note: outputs live under `raw/` and must stay **gitignored**.
 - [x] Every shipped `content/**/*.json` validates against schema in CI (`pnpm content:validate`)
 - [x] Unit ships only if 100% closed items `review.status === approved` (`pnpm content:ship-gate` + `content/shipped-units.json`)
 - [x] Smoke play one session per newly shipped unit (Playwright `shipped-unit-smoke.spec.ts` for u07)
+
+### Content in Convex
+
+- [x] `pnpm content:seed` upserts git JSON → Convex (`units` / `items`); idempotent re-seed
+- [x] Env: `NEXT_PUBLIC_CONVEX_URL` + matching `CONTENT_SEED_SECRET` in `.env.local` and `convex env set`
+- [x] App uses `CONTENT_SOURCE=convex` (default when Convex URL set) or `fs` fallback
+- [x] `convex-test`: seed upsert idempotency + unauthorized seed + `updateItemReview`
+
+**Run:** `pnpm content:seed` · `pnpm --filter @passaporte/web exec vitest run convex-content convex-env`
 
 ---
 

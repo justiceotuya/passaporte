@@ -7,7 +7,7 @@ import { StimulusImage } from "@/components/StimulusImage";
 import { FillBlankTyped } from "@/components/FillBlankTyped";
 import { MatchPairTap } from "@/components/MatchPairTap";
 import { OrderSequence } from "@/components/OrderSequence";
-import { ListenTranscript } from "@/components/ListenTranscript";
+import { ListenStimulus } from "@/components/ListenStimulus";
 
 describe("player components", () => {
   it("renders choice states", () => {
@@ -22,9 +22,15 @@ describe("player components", () => {
         <ChoiceOption label="Option A" />
       </div>,
     );
-    fireEvent.click(screen.getByRole("button", { name: /hint/i }));
-    expect(screen.getByText("Morning greeting.")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("hint-toggle"));
+    expect(screen.getByTestId("hint-body")).toHaveTextContent("Morning greeting.");
     expect(screen.getByRole("button", { name: /option a/i })).toBeInTheDocument();
+  });
+
+  it("renders choice correct state with check mark", () => {
+    render(<ChoiceOption label="não gosta" state="correct" />);
+    const option = screen.getByRole("button", { name: /não gosta/i });
+    expect(option.querySelector('[data-kuji-icon="check"]')).toBeTruthy();
   });
 
   it("shows inline feedback banner", () => {
@@ -110,10 +116,13 @@ describe("player components", () => {
     expect(onSubmit).toHaveBeenCalledWith(["one", "two"]);
   });
 
-  it("listen transcript toggles open", () => {
-    render(<ListenTranscript transcript="Olá, bom dia." />);
-    expect(screen.queryByText("Olá, bom dia.")).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: /show transcript/i }));
-    expect(screen.getByText("Olá, bom dia.")).toBeInTheDocument();
+  it("listen stimulus shows play and toggles transcript", () => {
+    render(<ListenStimulus transcript="Olá, bom dia." />);
+    expect(screen.getByTestId("listen-play")).toBeInTheDocument();
+    expect(screen.queryByTestId("listen-transcript-body")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("listen-transcript-toggle"));
+    expect(screen.getByTestId("listen-transcript-body")).toHaveTextContent(
+      "Olá, bom dia.",
+    );
   });
 });

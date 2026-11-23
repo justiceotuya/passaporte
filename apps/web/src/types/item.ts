@@ -63,6 +63,8 @@ export interface PassaporteItem {
   hint_en?: string;
   stimulus_image?: string | null;
   transcript?: string;
+  /** Optional listening audio path under /public (e.g. audio/pass-u01-p010-A-1.mp3). */
+  audio?: string | null;
   answer_source: AnswerSource;
   review: Review;
 }

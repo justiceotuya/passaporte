@@ -7,6 +7,7 @@ import { components } from "./_generated/api";
 import type { DataModel } from "./_generated/dataModel";
 import { query } from "./_generated/server";
 import authConfig from "./auth.config";
+import { sendPasswordResetEmail } from "./authEmail";
 
 const siteUrl = process.env.SITE_URL!;
 
@@ -29,6 +30,10 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: false,
+      sendResetPassword: async ({ user, url }) => {
+        void sendPasswordResetEmail({ to: user.email, url });
+      },
+      revokeSessionsOnPasswordReset: true,
     },
     account: {
       accountLinking: {

@@ -1,22 +1,20 @@
+import { FeedbackCard } from "@/kuji";
+
 type Props = {
   correct: boolean;
   message: string;
 };
 
+/** Post-answer banner using Kuji FeedbackCard. */
 export function FeedbackBanner({ correct, message }: Props) {
   return (
-    <div
+    <FeedbackCard
       role="status"
-      className={`mt-4 rounded-lg border px-4 py-3 text-sm font-medium ${
-        correct
-          ? "border-success/40 bg-success/10 text-success"
-          : "border-error/40 bg-error/10 text-error"
-      }`}
+      tone={correct ? "correct" : "wrong"}
+      heading={correct ? "Correct" : "Not quite"}
+      style={{ marginTop: 16 }}
     >
-      <p className="font-bold uppercase tracking-wide">
-        {correct ? "Correct" : "Not quite"}
-      </p>
-      <p className="mt-1 text-ink">{message}</p>
-    </div>
+      {message}
+    </FeedbackCard>
   );
 }

@@ -20,8 +20,14 @@ export async function GET(request: Request) {
   }
   const { searchParams } = new URL(request.url);
   const status = (searchParams.get("status") as ReviewStatus | null) ?? "pending";
-  const items = listReviewQueue(status);
-  return NextResponse.json({ items });
+  try {
+    const items = await listReviewQueue(status);
+    return NextResponse.json({ items });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to load review queue";
+    return NextResponse.json({ error: message }, { status: 503 });
+  }
 }
 
 export async function POST(request: Request) {
@@ -53,13 +59,20 @@ export async function POST(request: Request) {
   }
 
   const user = await getSessionUser();
-  const updated = updateItemReview({
-    itemId: body.itemId,
-    status: body.status,
-    by: user?.email ?? "admin-bypass",
-    notes: body.notes,
-    prompt: body.prompt,
-  });
+  let updated;
+  try {
+    updated = await updateItemReview({
+      itemId: body.itemId,
+      status: body.status,
+      by: user?.email ?? "admin-bypass",
+      notes: body.notes,
+      prompt: body.prompt,
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to update review";
+    return NextResponse.json({ error: message }, { status: 503 });
+  }
 
   if (!updated) {
     return NextResponse.json({ error: "Item not found" }, { status: 404 });

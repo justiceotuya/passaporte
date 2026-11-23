@@ -24,10 +24,18 @@ export const progressHandlers = [
 
 export const authHandlers = [
   http.get("/api/auth/providers", () => {
-    return HttpResponse.json({ google: false });
+    return HttpResponse.json({
+      google: false,
+      emailPassword: true,
+      passwordResetEmail: false,
+    });
   }),
   http.get("http://localhost/api/auth/providers", () => {
-    return HttpResponse.json({ google: false });
+    return HttpResponse.json({
+      google: false,
+      emailPassword: true,
+      passwordResetEmail: false,
+    });
   }),
   http.get("/api/admin/review", () => {
     return HttpResponse.json({ items: [] });

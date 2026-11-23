@@ -10,7 +10,7 @@ import { StimulusImage } from "@/components/StimulusImage";
 import { FillBlankTyped } from "@/components/FillBlankTyped";
 import { MatchPairTap } from "@/components/MatchPairTap";
 import { OrderSequence } from "@/components/OrderSequence";
-import { ListenTranscript } from "@/components/ListenTranscript";
+import { ListenStimulus } from "@/components/ListenStimulus";
 import {
   gradeChoice,
   gradeFillBlank,
@@ -20,6 +20,11 @@ import {
   gradeTransform,
   gradeTrueFalse,
 } from "@/lib/grader";
+import {
+  isListeningItem,
+  listeningAudioSrc,
+  listeningSpeakText,
+} from "@/lib/listening";
 import { buildSession, isPlayableItem } from "@/lib/session-builder";
 import { useProgressStore, type AnsweredItem } from "@/lib/progress-store";
 import { track } from "@/lib/analytics";
@@ -436,6 +441,16 @@ export function SessionPlayer({
         {instructionForDisplay(current, instructionLanguage)}
       </p>
 
+      {isListeningItem(current) ? (
+        <ListenStimulus
+          key={`${current.id}-listen-${attemptNo}`}
+          transcript={current.transcript}
+          audioSrc={listeningAudioSrc(current)}
+          speakText={listeningSpeakText(current)}
+          forceTranscriptOpen={phase === "feedback" && !lastCorrect}
+        />
+      ) : null}
+
       {current.stimulus_image ? (
         <StimulusImage src={current.stimulus_image} />
       ) : null}
@@ -445,10 +460,6 @@ export function SessionPlayer({
       </h2>
       {hintsEnabled && current.hint_en ? (
         <HintDisclosure hint={current.hint_en} />
-      ) : null}
-
-      {current.type === "listen_choice" && current.transcript ? (
-        <ListenTranscript transcript={current.transcript} />
       ) : null}
 
       <div className="mt-6 flex flex-col gap-3">
@@ -513,13 +524,16 @@ export function SessionPlayer({
               | "selected"
               | "correct"
               | "incorrect"
-              | "revealed" = "default";
+              | "revealed"
+              | "dim" = "default";
             if (phase === "feedback") {
               if (option === expected) {
                 state =
                   showReveal && selected !== option ? "revealed" : "correct";
               } else if (option === selected) {
                 state = "incorrect";
+              } else {
+                state = "dim";
               }
             } else if (option === selected) {
               state = "selected";

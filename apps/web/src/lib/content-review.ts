@@ -1,6 +1,11 @@
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { resolveContentDir } from "@/lib/content-dir";
+import {
+  convexListReviewQueue,
+  convexUpdateItemReview,
+} from "@/lib/convex-content";
+import { getContentSource, isConvexConfigured } from "@/lib/convex-env";
 import type { PassaporteItem, PassaporteUnit, ReviewStatus } from "@/types/item";
 
 const CONTENT_DIR = resolveContentDir();
@@ -26,6 +31,24 @@ function unitPath(unit: number): string {
   return path.join(CONTENT_DIR, `u${String(unit).padStart(2, "0")}.json`);
 }
 
+function toQueueItem(item: PassaporteItem): ReviewQueueItem {
+  return {
+    id: item.id,
+    unit: item.unit,
+    page: item.page,
+    exercise: item.exercise,
+    type: item.type,
+    prompt: item.prompt,
+    instruction: item.instruction,
+    instruction_en: item.instruction_en,
+    answer: item.answer,
+    options: item.options,
+    hint_en: item.hint_en,
+    stimulus_image: item.stimulus_image,
+    review: item.review,
+  };
+}
+
 function loadAllUnits(): PassaporteUnit[] {
   return readdirSync(CONTENT_DIR)
     .filter((name) => /^u\d{2}\.json$/.test(name))
@@ -36,32 +59,18 @@ function loadAllUnits(): PassaporteUnit[] {
     );
 }
 
-export function listReviewQueue(status: ReviewStatus = "pending"): ReviewQueueItem[] {
+function listReviewQueueFs(status: ReviewStatus = "pending"): ReviewQueueItem[] {
   const rows: ReviewQueueItem[] = [];
   for (const unit of loadAllUnits()) {
     for (const item of unit.items) {
       if (item.review?.status !== status) continue;
-      rows.push({
-        id: item.id,
-        unit: item.unit,
-        page: item.page,
-        exercise: item.exercise,
-        type: item.type,
-        prompt: item.prompt,
-        instruction: item.instruction,
-        instruction_en: item.instruction_en,
-        answer: item.answer,
-        options: item.options,
-        hint_en: item.hint_en,
-        stimulus_image: item.stimulus_image,
-        review: item.review,
-      });
+      rows.push(toQueueItem(item));
     }
   }
   return rows;
 }
 
-export function updateItemReview(input: {
+function updateItemReviewFs(input: {
   itemId: string;
   status: ReviewStatus;
   by: string;
@@ -90,17 +99,47 @@ export function updateItemReview(input: {
   unit.items[idx] = next;
   writeFileSync(file, `${JSON.stringify(unit, null, 2)}\n`, "utf8");
 
-  return {
-    id: next.id,
-    unit: next.unit,
-    page: next.page,
-    exercise: next.exercise,
-    type: next.type,
-    prompt: next.prompt,
-    instruction: next.instruction,
-    answer: next.answer,
-    options: next.options,
-    hint_en: next.hint_en,
-    review: next.review,
-  };
+  return toQueueItem(next);
+}
+
+function assertConvexReady(): void {
+  if (!isConvexConfigured()) {
+    throw new Error("CONTENT_SOURCE=convex requires NEXT_PUBLIC_CONVEX_URL");
+  }
+}
+
+/**
+ * Admin review queue. When CONTENT_SOURCE=convex, reads review status from
+ * Convex (runtime store). Otherwise scans JSON from resolveContentDir().
+ */
+export async function listReviewQueue(
+  status: ReviewStatus = "pending",
+): Promise<ReviewQueueItem[]> {
+  if (getContentSource() === "convex") {
+    assertConvexReady();
+    const rows = await convexListReviewQueue(status);
+    if (rows === null) {
+      throw new Error("CONTENT_SOURCE=convex requires NEXT_PUBLIC_CONVEX_URL");
+    }
+    return rows;
+  }
+  return listReviewQueueFs(status);
+}
+
+/**
+ * Persist an admin review decision. Convex path uses updateItemReview
+ * mutation; fs path still writes JSON (local pipeline / CONTENT_SOURCE=fs).
+ */
+export async function updateItemReview(input: {
+  itemId: string;
+  status: ReviewStatus;
+  by: string;
+  notes?: string;
+  prompt?: string;
+}): Promise<ReviewQueueItem | null> {
+  if (getContentSource() === "convex") {
+    assertConvexReady();
+    return convexUpdateItemReview(input);
+  }
+  return updateItemReviewFs(input);
 }

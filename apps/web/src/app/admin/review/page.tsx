@@ -27,7 +27,7 @@ export default async function AdminReviewPage() {
     );
   }
 
-  const items = listReviewQueue("pending").slice(0, 40);
+  const items = (await listReviewQueue("pending")).slice(0, 40);
 
   return (
     <main className="mx-auto min-h-screen w-full max-w-lg px-4 py-8 md:max-w-3xl lg:max-w-4xl lg:px-10">

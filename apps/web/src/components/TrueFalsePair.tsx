@@ -1,7 +1,7 @@
 type Props = {
   value: "true" | "false";
   selected?: boolean;
-  state?: "default" | "selected" | "correct" | "incorrect";
+  state?: "default" | "selected" | "correct" | "incorrect" | "dim";
   onClick?: () => void;
   disabled?: boolean;
 };
@@ -23,7 +23,7 @@ export function TrueFalsePair({
     }
     if (correctValue === value) return "correct";
     if (selected === value && selected !== correctValue) return "incorrect";
-    return "default";
+    return "dim";
   }
 
   return (
@@ -60,9 +60,10 @@ function TrueFalseButton({
 }) {
   const classes = {
     default: "border-ink/10 bg-surface-card",
-    selected: "border-info bg-info/10",
-    correct: "border-success bg-success/10 text-success",
-    incorrect: "border-error bg-error/10 text-error",
+    selected: "border-info bg-info/15",
+    correct: "border-success bg-success/12 text-success",
+    incorrect: "border-error bg-error/12 text-error",
+    dim: "border-ink/[0.06] bg-ink/[0.03] text-ink-faint",
   }[state];
 
   return (
@@ -70,8 +71,18 @@ function TrueFalseButton({
       type="button"
       disabled={disabled}
       onClick={onClick}
-      className={`card-surface min-h-tap px-4 py-4 text-center text-base font-bold ${classes}`}
+      className={`card-surface flex h-[72px] flex-col items-center justify-center gap-1 px-4 text-center text-base font-bold ${classes}`}
     >
+      {state === "correct" ? (
+        <span className="text-lg text-success" aria-hidden>
+          ✓
+        </span>
+      ) : null}
+      {state === "incorrect" ? (
+        <span className="text-lg text-error" aria-hidden>
+          ✕
+        </span>
+      ) : null}
       {label}
     </button>
   );

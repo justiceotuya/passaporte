@@ -89,6 +89,7 @@ class PassaporteItem(BaseModel):
     hint_en: str | None = None
     stimulus_image: str | None = None
     transcript: str | None = None
+    audio: str | None = None
     answer_source: AnswerSource
     review: Review
 

@@ -11,10 +11,15 @@ export default async function UnitPage({ params }: Props) {
   const unitNum = Number(raw);
   if (!Number.isFinite(unitNum) || unitNum < 1) notFound();
 
-  const summaries = listUnitSummaries();
+  const summaries = await listUnitSummaries();
   if (!summaries.some((u) => u.unit === unitNum)) notFound();
 
-  const unit = loadUnit(unitNum);
+  let unit;
+  try {
+    unit = await loadUnit(unitNum);
+  } catch {
+    notFound();
+  }
 
   return (
     <main>

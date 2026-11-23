@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useUnitList } from "@/hooks/use-content";
 import { useProgressStore } from "@/lib/progress-store";
 import { buildUnitProgressList } from "@/lib/unit-progress";
 import { PageShell } from "@/components/PageShell";
@@ -13,7 +14,7 @@ export type MapUnit = {
 };
 
 type Props = {
-  units: MapUnit[];
+  initialUnits: MapUnit[];
 };
 
 function shortTitle(title: string, unit: number): string {
@@ -24,7 +25,23 @@ function shortTitle(title: string, unit: number): string {
   return cleaned;
 }
 
-export function UnitMap({ units }: Props) {
+export function UnitMap({ initialUnits }: Props) {
+  const { data: summaries } = useUnitList({
+    initialData: initialUnits.map((u) => ({
+      unit: u.unit,
+      title: u.title,
+      topics: [],
+      itemCount: u.itemCount,
+      itemIds: u.itemIds,
+    })),
+  });
+  const units: MapUnit[] = (summaries ?? initialUnits).map((u) => ({
+    unit: u.unit,
+    title: u.title,
+    itemCount: u.itemCount,
+    itemIds: u.itemIds,
+  }));
+
   const attempts = useProgressStore((s) => s.attempts);
   const dueItemIds = useProgressStore((s) => s.dueItemIds);
   const streakDays = useProgressStore((s) => s.streakDays);

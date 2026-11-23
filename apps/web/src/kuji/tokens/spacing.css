@@ -1,0 +1,64 @@
+/* ============================================================
+   KUJI · Spacing, radii, borders, shadows
+   4-px base grid. Screen gutter is 16px. The signature move is the
+   "chunky" raised edge: a thicker BOTTOM border (4px) on buttons and
+   cards instead of a drop shadow — see --edge-* below.
+   ============================================================ */
+
+:root {
+  /* ---- Spacing scale (4px grid) --------------------------- */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;   /* screen gutter, default card padding */
+  --space-5:  20px;
+  --space-6:  24px;   /* section gap */
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  --gutter:   16px;   /* left/right screen margin */
+  --section-gap: 24px;
+
+  /* ---- Radii ---------------------------------------------- */
+  --radius-sm:   12px;
+  --radius-md:   16px;
+  --radius-lg:   20px;
+  --radius-card: 24px;   /* the standard card */
+  --radius-img:  32px;   /* subject photos / thumbnails */
+  --radius-pill: 100px;  /* every button + chip */
+  --radius-full: 9999px; /* circles (icon buttons, avatars) */
+
+  /* ---- Borders -------------------------------------------- */
+  --border-1: 1px;
+  --border-2: 2px;
+  --edge-thick: 4px;     /* the raised bottom edge */
+
+  /* ---- The "chunky raised" edge --------------------------- *
+   * Apply as a border with a heavier bottom. Buttons use the
+   * accent's -edge color; cards use a faint cream.            */
+  --edge-card:  var(--border-2) solid var(--cream-a05);
+  --edge-card-bottom: var(--edge-thick) solid var(--cream-a05);
+
+  /* ---- Shadows (used sparingly — the system is mostly flat) */
+  --shadow-none: none;
+  --shadow-pop:  0 8px 24px rgba(0,0,0,0.45);          /* floating CTA bar, dialogs */
+  --shadow-soft: 0 2px 8px rgba(0,0,0,0.30);
+  --glow-orange: 0 6px 20px rgba(246,122,29,0.30);     /* emphasised primary CTA   */
+  --glow-green:  0 0 0 1px rgba(7,200,116,0.40);       /* correct-answer ring       */
+
+  /* ---- Motion --------------------------------------------- */
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);       /* @kind other */
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);    /* @kind other */
+  --dur-fast:    120ms;                                 /* @kind other */
+  --dur-base:    200ms;                                 /* @kind other */
+  --dur-slow:    320ms;                                 /* @kind other */
+
+  /* Press feedback — components translateY into their bottom edge */
+  --press-drop:  2px;
+
+  /* ---- Layout -------------------------------------------- */
+  --screen-w:    402px;   /* iPhone design width */
+  --tap-min:     44px;    /* minimum hit target  */
+}

@@ -8,12 +8,14 @@ async function clearProgress(page: import("@playwright/test").Page) {
   await page.reload();
 }
 
-test("landing page shows marketing hero and links to map", async ({ page }) => {
+test("landing page shows marketing hero and Start goes to sign-in", async ({
+  page,
+}) => {
   await page.goto("/");
   await expect(page.getByTestId("passaporte-landing")).toBeVisible();
   await expect(page.getByTestId("landing-start")).toBeVisible();
   await page.getByTestId("landing-start").click();
-  await expect(page.getByTestId("unit-map")).toBeVisible();
+  await expect(page.getByTestId("sign-in-form")).toBeVisible();
 });
 
 test("review / stats / settings pages and analytics mock", async ({ page }) => {

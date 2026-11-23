@@ -8,8 +8,8 @@ type Props = {
   searchParams: Promise<{ size?: string; unit?: string; review?: string }>;
 };
 
-function pickUnit(unitParam: string | undefined): PassaporteUnit {
-  const summaries = listUnitSummaries();
+async function pickUnit(unitParam: string | undefined): Promise<PassaporteUnit> {
+  const summaries = await listUnitSummaries();
   const requested = Number(unitParam);
   if (Number.isFinite(requested) && summaries.some((u) => u.unit === requested)) {
     return loadUnit(requested);
@@ -17,10 +17,12 @@ function pickUnit(unitParam: string | undefined): PassaporteUnit {
   return loadUnit(summaries[0]?.unit ?? 1);
 }
 
-function loadAllPlayableUnit(): PassaporteUnit {
-  const summaries = listUnitSummaries();
-  const first = loadUnit(summaries[0]?.unit ?? 1);
-  const items = summaries.flatMap((s) => loadUnit(s.unit).items);
+async function loadAllPlayableUnit(): Promise<PassaporteUnit> {
+  const summaries = await listUnitSummaries();
+  const firstUnitNum = summaries[0]?.unit ?? 1;
+  const first = await loadUnit(firstUnitNum);
+  const loaded = await Promise.all(summaries.map((s) => loadUnit(s.unit)));
+  const items = loaded.flatMap((u) => u.items);
   return {
     ...first,
     title: "Review",
@@ -31,7 +33,7 @@ function loadAllPlayableUnit(): PassaporteUnit {
 export default async function PlayPage({ searchParams }: Props) {
   const params = await searchParams;
   const reviewOnly = params.review === "1";
-  const unit = reviewOnly ? loadAllPlayableUnit() : pickUnit(params.unit);
+  const unit = reviewOnly ? await loadAllPlayableUnit() : await pickUnit(params.unit);
   const parsed = Number(params.size);
   const sessionSize =
     Number.isFinite(parsed) && parsed >= 1 && parsed <= 15 ? parsed : undefined;

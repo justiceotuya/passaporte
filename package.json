@@ -10,6 +10,7 @@
     "test:phase1": "pnpm test:schema",
     "test:web": "pnpm --filter @passaporte/web exec vitest run",
     "content:validate": "pnpm --filter @passaporte/web exec node ./scripts/validate-content.mjs",
+    "content:seed": "pnpm --filter @passaporte/web run content:seed",
     "content:ship-gate": "node scripts/ship-gate.mjs",
     "content:approve-unit": "node scripts/approve-unit.mjs",
     "web": "pnpm --filter @passaporte/web dev",

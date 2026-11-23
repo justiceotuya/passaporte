@@ -7,6 +7,7 @@ import { useForm } from "@tanstack/react-form";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { useAuthProviders } from "@/hooks/use-auth-providers";
+import { SocialAuthButton } from "@/components/SocialAuthButton";
 
 type AuthMode = "signin" | "signup";
 
@@ -140,25 +141,13 @@ export function SignInForm() {
         Learn A1 Portuguese in short, scored sessions.
       </p>
 
-      <button
-        type="button"
+      <SocialAuthButton
         disabled={googlePending || form.state.isSubmitting || !googleEnabled}
+        needsKeys={!googleEnabled}
         data-testid="sign-in-google"
+        className="mb-4"
         onClick={() => void onGoogle()}
-        className="card-surface mb-4 flex min-h-tap w-full items-center justify-center gap-2 px-4 text-sm font-semibold disabled:text-ink-faint"
-        title={
-          googleEnabled
-            ? "Continue with Google"
-            : "Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to enable"
-        }
-      >
-        Continue with Google
-        {!googleEnabled ? (
-          <span className="rounded-pill bg-ink/10 px-2 py-0.5 text-[10px] uppercase tracking-wide">
-            Needs keys
-          </span>
-        ) : null}
-      </button>
+      />
 
       <div className="mb-4 flex items-center gap-3 text-xs uppercase tracking-wide text-ink-faint">
         <div className="h-px flex-1 bg-ink/10" />
@@ -237,7 +226,18 @@ export function SignInForm() {
         >
           {(field) => (
             <label className="flex flex-col gap-2 text-sm">
-              <span className="font-semibold text-ink-muted">Password</span>
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-semibold text-ink-muted">Password</span>
+                {mode === "signin" ? (
+                  <Link
+                    href="/forgot-password"
+                    className="text-xs font-semibold text-primary"
+                    data-testid="sign-in-forgot-password"
+                  >
+                    Forgot password?
+                  </Link>
+                ) : null}
+              </div>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}

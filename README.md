@@ -59,6 +59,7 @@ scripts/         Content validation, ship gate, pipeline runners
 ```bash
 pnpm content:validate   # every unit against the schema
 pnpm content:ship-gate  # shipped units fully reviewed
+pnpm content:seed       # JSON → Convex units/items (needs NEXT_PUBLIC_CONVEX_URL + CONTENT_SEED_SECRET)
 pnpm web:test           # Vitest (components, grading, SRS, auth)
 pnpm web:e2e            # Playwright (needs `next build`)
 pnpm pipeline:test      # pytest
@@ -72,7 +73,9 @@ pnpm pipeline:test      # pytest
 | `PASSAPORTE_ALLOWED_EMAILS` | Comma-separated emails allowed to sign up. Empty means open in dev and closed in production |
 | `PASSAPORTE_ADMIN_EMAILS` | Who can use the content review board |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Optional Google sign-in |
-| `NEXT_PUBLIC_CONVEX_URL` | Optional Convex deployment for auth + progress sync |
+| `RESEND_API_KEY` / `AUTH_EMAIL_FROM` | Optional Resend delivery for password reset emails |
+| `NEXT_PUBLIC_CONVEX_URL` | Optional Convex deployment for auth, content, and progress sync |
+| `CONTENT_SOURCE` / `CONTENT_SEED_SECRET` | Optional Convex content toggle (`fs` or `convex`) and seed secret |
 | `ANTHROPIC_API_KEY` | Pipeline vision steps only |
 
 ## Roadmap

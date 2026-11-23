@@ -127,6 +127,10 @@
       "type": "string",
       "description": "Listening transcript text for listen_choice"
     },
+    "audio": {
+      "type": ["string", "null"],
+      "description": "Optional path under apps/web/public/ (e.g. audio/pass-u01-p010-I-1.mp3) for real listening tracks"
+    },
     "answer_source": {
       "type": "string",
       "enum": ["teacher_book", "student_book_key", "generated", "original"]

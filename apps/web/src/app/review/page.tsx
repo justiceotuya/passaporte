@@ -1,10 +1,11 @@
 import { listUnitSummaries, loadUnit } from "@/lib/content";
 import { ReviewQueue } from "@/components/ReviewQueue";
 
-export default function ReviewPage() {
+export default async function ReviewPage() {
   const labels: Record<string, string> = {};
-  for (const summary of listUnitSummaries()) {
-    const unit = loadUnit(summary.unit);
+  const summaries = await listUnitSummaries();
+  const units = await Promise.all(summaries.map((s) => loadUnit(s.unit)));
+  for (const unit of units) {
     for (const item of unit.items) {
       labels[item.id] = item.prompt;
     }

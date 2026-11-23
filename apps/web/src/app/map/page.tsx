@@ -1,13 +1,13 @@
 import { listUnitSummaries } from "@/lib/content";
 import { UnitMap } from "@/components/UnitMap";
 
-export default function MapPage() {
-  const units = listUnitSummaries();
+export default async function MapPage() {
+  const units = await listUnitSummaries();
 
   return (
     <main>
       <UnitMap
-        units={units.map((u) => ({
+        initialUnits={units.map((u) => ({
           unit: u.unit,
           title: u.title,
           itemCount: u.itemCount,

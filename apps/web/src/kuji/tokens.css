@@ -1,0 +1,26 @@
+/* Kuji design-system tokens (vendored from ../../../../tokens). */
+@import "./tokens/colors.css";
+@import "./tokens/typography.css";
+@import "./tokens/spacing.css";
+
+/*
+ * Passaporte light theme: remap cream-as-ink alphas so DS components
+ * (FeedbackCard, Button ghost, ProgressBar track) stay readable on cream pages.
+ * Accent fills and --cream / --ink for solid cream buttons stay brand-true.
+ */
+html.light,
+html[data-theme="light"] {
+  --text-primary: #18140f;
+  --text-secondary: rgba(24, 20, 15, 0.65);
+  --text-tertiary: rgba(24, 20, 15, 0.45);
+  --cream-a90: rgba(24, 20, 15, 0.9);
+  --cream-a60: rgba(24, 20, 15, 0.6);
+  --cream-a50: rgba(24, 20, 15, 0.5);
+  --cream-a40: rgba(24, 20, 15, 0.4);
+  --cream-a10: rgba(24, 20, 15, 0.1);
+  --cream-a05: rgba(24, 20, 15, 0.05);
+  --surface-card: var(--cream-a05);
+  --surface-hover: var(--cream-a10);
+  --border-hairline: var(--cream-a10);
+  --border-card: var(--cream-a05);
+}

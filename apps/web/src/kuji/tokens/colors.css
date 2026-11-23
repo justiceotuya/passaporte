@@ -1,0 +1,70 @@
+/* ============================================================
+   KUJI · Color tokens
+   Warm near-black canvas, cream ink, and four candy accents
+   (orange / green / blue / coral) drawn straight from the file.
+   ============================================================ */
+
+:root {
+  /* ---- Brand accents -------------------------------------- */
+  --kuji-orange:        #F67A1D;   /* rgb(246,122,29)  primary CTA, streak, premium */
+  --kuji-orange-edge:   #68330B;   /* rgb(104,51,11)   chunky 3D button under-edge   */
+  --kuji-orange-deep:   #C85A0E;   /* pressed / hover-darken of orange              */
+  --kuji-green:         #07C874;   /* rgb(7,200,116)   correct, progress, success    */
+  --kuji-green-edge:    #05663B;   /* under-edge / dim green                          */
+  --kuji-blue:          #019CF4;   /* rgb(1,156,244)   selected, info, premium        */
+  --kuji-blue-deep:     #003EE1;   /* rgb(0,62,225)    deep info / gradient end        */
+  --kuji-coral:         #FF6467;   /* rgb(255,100,103) wrong, error, destructive       */
+  --kuji-coral-edge:    #8A2F31;   /* under-edge / dim coral                          */
+
+  /* ---- Cream (the "ink") ---------------------------------- */
+  --cream:              #FCF5EF;   /* rgb(252,245,239) primary text + light surfaces  */
+  --cream-2:            #F8FAF0;   /* rgb(248,250,240) cool-cream alt light surface   */
+  --ink:                #18140F;   /* rgb(24,20,15)    dark text on light/accent fills */
+
+  /* ---- Warm dark canvas ----------------------------------- */
+  --bg-0:               #111111;   /* rgb(17,17,17)   true base                       */
+  --bg-top:             #211B14;   /* rgb(33,27,20)   page gradient — top             */
+  --bg-bottom:          #0F0D0B;   /* rgb(15,13,11)   page gradient — bottom          */
+  --surface-1:          #18140F;   /* rgb(24,20,15)   raised panel                    */
+  --surface-2:          #1C1A17;   /* rgb(28,26,23)   higher panel                    */
+  --surface-3:          #29221D;   /* rgb(41,34,29)   highest / hover                 */
+
+  /* ---- Cream alphas (the real surface + ink system) ------- */
+  --cream-a90: rgba(252,245,239,0.90);
+  --cream-a60: rgba(252,245,239,0.60);
+  --cream-a50: rgba(252,245,239,0.50);
+  --cream-a40: rgba(252,245,239,0.40);
+  --cream-a10: rgba(252,245,239,0.10);
+  --cream-a05: rgba(252,245,239,0.05);
+
+  /* Tinted accent washes (selected pills, premium column, feedback cards) */
+  --orange-a08: rgba(246,122,29,0.08);
+  --orange-a05: rgba(246,122,29,0.05);
+  --green-a12:  rgba(7,200,116,0.12);
+  --green-a08:  rgba(7,200,116,0.08);
+  --blue-a14:   rgba(1,156,244,0.14);
+  --blue-a08:   rgba(1,156,244,0.08);
+  --coral-a12:  rgba(255,100,103,0.12);
+
+  /* ============================================================
+     Semantic aliases — reach for these in components.
+     ============================================================ */
+  --bg-page:            linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+  --text-primary:       var(--cream);
+  --text-secondary:     var(--cream-a60);
+  --text-tertiary:      var(--cream-a40);
+  --text-on-accent:     var(--ink);
+
+  --surface-card:       var(--cream-a05);
+  --surface-hover:      var(--cream-a10);
+  --border-hairline:    var(--cream-a10);
+  --border-card:        var(--cream-a05);
+
+  --accent:             var(--kuji-orange);
+  --accent-edge:        var(--kuji-orange-edge);
+  --success:            var(--kuji-green);
+  --info:               var(--kuji-blue);
+  --danger:             var(--kuji-coral);
+
+  --focus-ring:         var(--kuji-blue);
+}

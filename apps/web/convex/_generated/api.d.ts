@@ -9,6 +9,8 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as authEmail from "../authEmail.js";
+import type * as content from "../content.js";
 import type * as http from "../http.js";
 import type * as lib_identity from "../lib/identity.js";
 import type * as profiles from "../profiles.js";
@@ -22,6 +24,8 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  authEmail: typeof authEmail;
+  content: typeof content;
   http: typeof http;
   "lib/identity": typeof lib_identity;
   profiles: typeof profiles;

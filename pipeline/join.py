@@ -472,6 +472,8 @@ def build_content_item(
     pairs = _clean_pairs(item.get("pairs"))
     sequence = _clean_str_list(item.get("sequence"))
     transcript = (item.get("transcript") or None) and str(item.get("transcript")).strip() or None
+    audio_raw = item.get("audio")
+    audio = str(audio_raw).strip() if audio_raw else None
 
     # Downgrade invalid closed shapes so the unit file still validates.
     if item_type == ItemType.CHOICE and (not options or len(options) < 2):
@@ -516,6 +518,7 @@ def build_content_item(
         "pairs": pairs,
         "sequence": sequence,
         "transcript": transcript,
+        "audio": audio,
         "answer": answer,
         "accepted": accepted,
         "hint_en": "Pending hint generation.",
